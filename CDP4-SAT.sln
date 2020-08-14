@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.87
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDP4SAT", "CDP4SAT\CDP4SAT.csproj", "{4E672AC5-A95E-4E5E-B35D-8A4B0E8B5340}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDP4SAT.Tests", "CDP4SAT.Tests\CDP4SAT.Tests.csproj", "{64124677-EBB7-4484-9CC3-2E0A9A6482DA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4E672AC5-A95E-4E5E-B35D-8A4B0E8B5340}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E672AC5-A95E-4E5E-B35D-8A4B0E8B5340}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E672AC5-A95E-4E5E-B35D-8A4B0E8B5340}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E672AC5-A95E-4E5E-B35D-8A4B0E8B5340}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64124677-EBB7-4484-9CC3-2E0A9A6482DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64124677-EBB7-4484-9CC3-2E0A9A6482DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64124677-EBB7-4484-9CC3-2E0A9A6482DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64124677-EBB7-4484-9CC3-2E0A9A6482DA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {37AE4295-ADFC-4A46-9211-441034E2CFA1}
+	EndGlobalSection
+EndGlobal
