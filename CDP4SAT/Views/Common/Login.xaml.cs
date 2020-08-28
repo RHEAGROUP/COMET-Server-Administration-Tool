@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Syncer.cs">
+// <copyright file="Login.cs">
 //    Copyright (c) 2020
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4SAT.Views.Tabs
+namespace CDP4SAT.Views.Common
 {
-    using DevExpress.Xpf.LayoutControl;
+    using System.Windows.Controls;
 
     /// <summary>
-    /// Interaction logic for Syncer.xaml
+    /// Interaction logic for Login.xaml
     /// </summary>
-    public partial class Syncer : LayoutGroup
+    public partial class Login : UserControl
     {
-        public Syncer()
+        public Login()
         {
             InitializeComponent();
         }
