@@ -41,7 +41,7 @@
                                           FontSize="12"
                                           Width="250"
                                           IsEnabled="{Binding FileIsChecked}"
-                                          Text="" />
+                                          Text="{Binding MigrationFile}" />
                             <Button MinWidth="100"
                                     Height="Auto"
                                     MaxWidth="100"

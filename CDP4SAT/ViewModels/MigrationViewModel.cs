@@ -78,7 +78,7 @@ namespace CDP4SAT.ViewModels
         }
 
         /// <summary>
-        /// Backing filed for the the output messages <see cref="Output"/>
+        /// Backing field for the the output messages <see cref="Output"/>
         /// </summary>
         private string output;
 
@@ -90,6 +90,21 @@ namespace CDP4SAT.ViewModels
             get => this.output;
 
             set => this.RaiseAndSetIfChanged(ref this.output, value);
+        }
+
+        /// <summary>
+        /// Backing field for the the migration file <see cref="MigrationFile"/>
+        /// </summary>
+        private string migrationFile;
+
+        /// <summary>
+        /// Gets or sets operation migration file path
+        /// </summary>
+        public string MigrationFile
+        {
+            get => this.migrationFile;
+
+            set => this.RaiseAndSetIfChanged(ref this.migrationFile, value);
         }
 
         /// <summary>
@@ -153,6 +168,7 @@ namespace CDP4SAT.ViewModels
 
             if (dialogResult.HasValue && dialogResult.Value && openFileDialog.FileNames.Length == 1)
             {
+                this.MigrationFile = openFileDialog.FileNames[0];
             }
         }
 
