@@ -8,13 +8,18 @@
              xmlns:ViewModels="clr-namespace:CDP4SAT.ViewModels.Common"
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:utils="clr-namespace:CDP4SAT.Utils"
              x:Class="CDP4SAT.Views.Common.Login"
              mc:Ignorable="d"
              d:DesignHeight="240">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <utils:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
     <UserControl.DataContext>
         <ViewModels:LoginViewModel />
     </UserControl.DataContext>
-
     <Grid HorizontalAlignment="Left" Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -35,20 +40,22 @@
                               Content="Data Source" />
         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
             <ComboBox FontSize="12"
-                  Margin="5"
-                  Width="200"
-                  Text="{Binding Path=ServerType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  ItemsSource="{Binding DataSourceList, Mode=OneTime}"
-                  SelectedValuePath="Key"
-                  DisplayMemberPath="Value" />
+                      Name="ServerType"
+                      Margin="5"
+                      Width="200"
+                      SelectedItem="{Binding Path=ServerType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      ItemsSource="{Binding DataSourceList, Mode=OneTime}"
+                      SelectedValuePath="Key"
+                      DisplayMemberPath="Value" />
             <Button MinWidth="40"
-                            Height="Auto"
-                            MaxWidth="40"
-                            Margin="5"
-                            FontSize="12"
-                            HorizontalAlignment="Right"
-                            Command="{Binding LoadSourceFile}"
-                            IsEnabled="{Binding Path=JsonIsSelected}">
+                    Name="BrowseJson"
+                    Height="Auto"
+                    MaxWidth="40"
+                    Margin="5"
+                    FontSize="12"
+                    HorizontalAlignment="Right"
+                    Command="{Binding LoadSourceFile}"
+                    IsEnabled="{Binding Path=JsonIsSelected}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="{dx:DXImage Image=Open_16x16.png}" Stretch="Uniform" />
                 </StackPanel>
@@ -69,6 +76,7 @@
                       Margin="5"
                       FontSize="12"
                       Width="250"
+                      IsEnabled="{Binding Path=JsonIsSelected, Converter={StaticResource InverseBooleanConverter}}"
                       Text="{Binding Path=Uri, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
         <!-- Username -->

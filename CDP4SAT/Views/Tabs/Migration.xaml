@@ -62,7 +62,7 @@
         </StackPanel>
     </GroupBox>
     <GroupBox Header="Target" Height="210">
-        <common:Login x:Name="LoginTarget"></common:Login>
+        <common:Login x:Name="LoginTarget" JsonIsAvailable="False" />
     </GroupBox>
     <GroupBox Header="Output" HorizontalAlignment="Stretch">
         <dxe:TextEdit

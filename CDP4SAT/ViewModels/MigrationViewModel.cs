@@ -6,6 +6,7 @@
 
 namespace CDP4SAT.ViewModels
 {
+    using CDP4SAT.Utils;
     using CDP4SAT.ViewModels.Common;
     using Microsoft.Win32;
     using ReactiveUI;
@@ -152,7 +153,7 @@ namespace CDP4SAT.ViewModels
             this.WhenAnyValue(vm => vm.TargetViewModel.LoginSuccessfully, vm => vm.TargetViewModel.ServerSession, (loginSuccessfully, dataSourceSession) =>
             {
                 return loginSuccessfully && dataSourceSession != null;
-            }).Where(canContinue => canContinue).Subscribe(async _ =>
+            }).Where(canContinue => canContinue).Subscribe(_ =>
             {
             });
         }
@@ -174,6 +175,9 @@ namespace CDP4SAT.ViewModels
             this.LoadMigrationFile.Subscribe(_ => this.ExecuteLoadMigrationFile());
         }
 
+        /// <summary>
+        /// Trigger loading of the person migration.json file to the application
+        /// </summary>
         private void ExecuteLoadMigrationFile()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog()

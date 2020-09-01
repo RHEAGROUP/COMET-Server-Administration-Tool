@@ -39,22 +39,22 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CDP4Common, Version=6.1.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.6.1.1\lib\net452\CDP4Common.dll</HintPath>
+      <HintPath>..\packages\CDP4Common-CE.6.1.1-2020.8.31.1-pre-release\lib\net452\CDP4Common.dll</HintPath>
     </Reference>
     <Reference Include="CDP4Dal, Version=6.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.6.1.0\lib\net452\CDP4Dal.dll</HintPath>
+      <HintPath>..\packages\CDP4Dal-CE.6.1.0-2020.8.31.1-pre-release\lib\net452\CDP4Dal.dll</HintPath>
     </Reference>
     <Reference Include="CDP4JsonFileDal, Version=6.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4JsonFileDal-CE.6.1.0\lib\net452\CDP4JsonFileDal.dll</HintPath>
+      <HintPath>..\packages\CDP4JsonFileDal-CE.6.1.0-2020.8.31.1-pre-release\lib\net452\CDP4JsonFileDal.dll</HintPath>
     </Reference>
     <Reference Include="CDP4JsonSerializer, Version=6.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4JsonSerializer-CE.6.1.0\lib\net452\CDP4JsonSerializer.dll</HintPath>
+      <HintPath>..\packages\CDP4JsonSerializer-CE.6.1.0-2020.8.31.1-pre-release\lib\net452\CDP4JsonSerializer.dll</HintPath>
     </Reference>
     <Reference Include="CDP4ServicesDal, Version=6.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4ServicesDal-CE.6.1.0\lib\net452\CDP4ServicesDal.dll</HintPath>
+      <HintPath>..\packages\CDP4ServicesDal-CE.6.1.0-2020.8.31.1-pre-release\lib\net452\CDP4ServicesDal.dll</HintPath>
     </Reference>
     <Reference Include="CDP4WspDal, Version=6.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4WspDal-CE.6.1.0\lib\net452\CDP4WspDal.dll</HintPath>
+      <HintPath>..\packages\CDP4WspDal-CE.6.1.0-2020.8.31.1-pre-release\lib\net452\CDP4WspDal.dll</HintPath>
     </Reference>
     <Reference Include="DevExpress.CodeParser.v20.1, Version=20.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <HintPath>..\packages\DevExpress.CodeParser.20.1.6\lib\net452\DevExpress.CodeParser.v20.1.dll</HintPath>
@@ -192,6 +192,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Behaviors\MigrationBehavior.cs" />
+    <Compile Include="Utils\InverseBooleanConverter.cs" />
     <Compile Include="ViewModels\MigrationViewModel.cs" />
     <Compile Include="Views\Common\Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
