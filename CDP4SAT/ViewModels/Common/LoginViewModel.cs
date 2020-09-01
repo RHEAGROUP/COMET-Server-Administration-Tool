@@ -19,6 +19,8 @@ namespace CDP4SAT.ViewModels.Common
     using CDP4WspDal;
     using CDP4JsonFileDal;
     using Microsoft.Win32;
+    using System.Windows;
+    using DevExpress.XtraRichEdit.Model;
 
     /// <summary>
     /// The view-model for the Login that allows users to connect to different datasources
@@ -29,20 +31,20 @@ namespace CDP4SAT.ViewModels.Common
         /// Gets or sets datasource server type
         /// </summary>
         public static KeyValuePair<string, string>[] DataSourceList { get; } = {
-            new KeyValuePair<string, string>("CDP", "CDP"),
-            new KeyValuePair<string, string>("OCDT", "OCDT"),
+            new KeyValuePair<string, string>("CDP", "CDP4 WebServices"),
+            new KeyValuePair<string, string>("OCDT", "OCDT WSP Server"),
             new KeyValuePair<string, string>("JSON", "JSON")
         };
 
         /// <summary>
         /// Backing field for the <see cref="ServerType"/> property
         /// </summary>
-        private string serverType;
+        private KeyValuePair<string, string> serverType;
 
         /// <summary>
         /// Gets or sets server serverType value
         /// </summary>
-        public string ServerType
+        public KeyValuePair<string, string> ServerType
         {
             get => this.serverType;
 
@@ -195,7 +197,7 @@ namespace CDP4SAT.ViewModels.Common
                 vm => vm.Password,
                 vm => vm.Uri,
                 (serverType, username, password, uri) =>
-                    !string.IsNullOrEmpty(serverType) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) &&
+                    !string.IsNullOrEmpty(serverType.Value) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) &&
                     !string.IsNullOrEmpty(uri));
 
             this.WhenAnyValue(vm => vm.LoginFailed).Subscribe((loginFailed) =>
@@ -204,7 +206,7 @@ namespace CDP4SAT.ViewModels.Common
                 {
                     return;
                 }
-                LogMessage($"Cannot login to {this.Uri}({this.ServerType}) data-source");
+                LogMessage($"Cannot login to {this.Uri}({this.ServerType.Value}) data-source");
             });
 
             this.WhenAnyValue(vm => vm.LoginSuccessfully).Subscribe(loginSuccessfully =>
@@ -213,12 +215,12 @@ namespace CDP4SAT.ViewModels.Common
                 {
                     return;
                 }
-                LogMessage($"Succesfully logged to {this.Uri}({this.ServerType}) data-source");
+                LogMessage($"Succesfully logged to {this.Uri}({this.ServerType.Value}) data-source");
             });
 
             this.WhenAnyValue(vm => vm.ServerType).Subscribe(_ =>
             {
-                this.JsonIsSelected = this.ServerType != null && this.ServerType.Equals("JSON");
+                this.JsonIsSelected = this.ServerType.Key != null && this.ServerType.Key.Equals("JSON");
             });
 
             this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, x => this.ExecuteLogin(), RxApp.MainThreadScheduler);
@@ -247,7 +249,7 @@ namespace CDP4SAT.ViewModels.Common
                 }
                 var credentials = new Credentials(this.UserName, this.Password, new Uri(this.Uri));
 
-                switch (this.ServerType)
+                switch (this.ServerType.Key)
                 {
                     case "CDP":
                         this.dal = new CdpServicesDal();
@@ -256,6 +258,7 @@ namespace CDP4SAT.ViewModels.Common
                         this.dal = new WspDal();
                         break;
                     case "JSON":
+                        this.dal = new JsonFileDal(new Version("1.0.0"));
                         break;
                 }
 
