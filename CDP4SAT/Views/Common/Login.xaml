@@ -9,6 +9,7 @@
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:utils="clr-namespace:CDP4SAT.Utils"
+             xmlns:tabs="clr-namespace:CDP4SAT.Views.Tabs"
              x:Class="CDP4SAT.Views.Common.Login"
              mc:Ignorable="d"
              d:DesignHeight="240">
@@ -20,26 +21,35 @@
     <UserControl.DataContext>
         <ViewModels:LoginViewModel />
     </UserControl.DataContext>
-    <Grid HorizontalAlignment="Left" Margin="5">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="130" />
+            <ColumnDefinition Width="420" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="0" Grid.Column="0">
+            <Grid HorizontalAlignment="Left" Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="130" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-        <!-- Data source type -->
-        <dxlc:LayoutItemLabel Grid.Row="0"
+                <!-- Data source type -->
+                <dxlc:LayoutItemLabel Grid.Row="0"
                               Grid.Column="0"
                               Margin="5"
                               Content="Data Source" />
-        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
-            <ComboBox FontSize="12"
+                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                    <ComboBox FontSize="12"
                       Name="ServerType"
                       Margin="5"
                       Width="200"
@@ -47,7 +57,7 @@
                       ItemsSource="{Binding DataSourceList, Mode=OneTime}"
                       SelectedValuePath="Key"
                       DisplayMemberPath="Value" />
-            <Button MinWidth="40"
+                    <Button MinWidth="40"
                     Name="BrowseJson"
                     Height="Auto"
                     MaxWidth="40"
@@ -56,20 +66,20 @@
                     HorizontalAlignment="Right"
                     Command="{Binding LoadSourceFile}"
                     IsEnabled="{Binding Path=JsonIsSelected}">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="{dx:DXImage Image=Open_16x16.png}" Stretch="Uniform" />
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{dx:DXImage Image=Open_16x16.png}" Stretch="Uniform" />
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
-            </Button>
-        </StackPanel>
 
-        <!-- Server Address -->
-        <dxlc:LayoutItemLabel Grid.Row="1"
+                <!-- Server Address -->
+                <dxlc:LayoutItemLabel Grid.Row="1"
                               Grid.Column="0"
                               Height="Auto"
                               Margin="5"
                               FontSize="12"
                               Content="Server address" />
-        <dxe:TextEdit
+                <dxe:TextEdit
                       Grid.Row="1"
                       Grid.Column="1"
                       Height="Auto"
@@ -79,14 +89,14 @@
                       IsEnabled="{Binding Path=JsonIsSelected, Converter={StaticResource InverseBooleanConverter}}"
                       Text="{Binding Path=Uri, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-        <!-- Username -->
-        <dxlc:LayoutItemLabel Grid.Row="2"
+                <!-- Username -->
+                <dxlc:LayoutItemLabel Grid.Row="2"
                               Grid.Column="0"
                               Height="Auto"
                               Margin="5"
                               FontSize="12"
                               Content="Username" />
-        <dxe:TextEdit Grid.Row="2"
+                <dxe:TextEdit Grid.Row="2"
                       Grid.Column="1"
                       Height="Auto"
                       Margin="5"
@@ -94,14 +104,14 @@
                       Width="250"
                       Text="{Binding Path=UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-        <!-- Password -->
-        <dxlc:LayoutItemLabel Grid.Row="3"
+                <!-- Password -->
+                <dxlc:LayoutItemLabel Grid.Row="3"
                               Grid.Column="0"
                               Height="Auto"
                               Margin="5"
                               FontSize="12"
                               Content="Password" />
-        <dxe:PasswordBoxEdit Grid.Row="3"
+                <dxe:PasswordBoxEdit Grid.Row="3"
                              Grid.Column="1"
                              Height="Auto"
                              Margin="5"
@@ -110,31 +120,41 @@
                              Name="PasswordBoxEdit"
                              Text="{Binding Path=Password, Mode=TwoWay}" />
 
-        <!--Login -->
-        <Grid Grid.Row="4" Grid.Column="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right">
-                <Image HorizontalAlignment="Right" Visibility="{Binding Path=LoginSuccessfully, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" Source="{dx:DXImage Image=Apply_16x16.png}" />
-                <Image HorizontalAlignment="Right" Visibility="{Binding Path=LoginFailed, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" Source="{dx:DXImage Image=Cancel_16x16.png}" />
-                <Button Grid.Row="0" Grid.Column="2" Height="Auto"
+                <!--Login -->
+                <Grid Grid.Row="4" Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right">
+                        <Image HorizontalAlignment="Right" Visibility="{Binding Path=LoginSuccessfully, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" Source="{dx:DXImage Image=Apply_16x16.png}" />
+                        <Image HorizontalAlignment="Right" Visibility="{Binding Path=LoginFailed, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" Source="{dx:DXImage Image=Cancel_16x16.png}" />
+                        <Button Grid.Row="0" Grid.Column="2" Height="Auto"
                     MinWidth="100"
                     MaxWidth="100"
                     Margin="5"
                     HorizontalAlignment="Right"
                     Command="{Binding Path=LoginCommand}">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="{dx:DXImage Image=Right_16x16.png}" Stretch="Uniform"/>
-                        <TextBlock Text="Login" VerticalAlignment="Center" Margin="5 0 0 0"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="{dx:DXImage Image=Right_16x16.png}" Stretch="Uniform"/>
+                                <TextBlock Text="Login" VerticalAlignment="Center" Margin="5 0 0 0"/>
+                            </StackPanel>
+                        </Button>
                     </StackPanel>
-                </Button>
-            </StackPanel>
-        </Grid>
+                </Grid>
+            </Grid>
+        </StackPanel>
+        <StackPanel Grid.Row="0" Grid.Column="1"  Visibility="{Binding Path=LoginSuccessfully, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+            <dxlc:LayoutGroup Orientation="Vertical"
+                        View="Tabs"
+                        dxlc:LayoutControl.AllowHorizontalSizing="True">
+                <tabs:EngineeringModelLayoutGroup />
+                <tabs:SiteRdlLayoutGroup />
+            </dxlc:LayoutGroup>
+        </StackPanel>
     </Grid>
 </UserControl>

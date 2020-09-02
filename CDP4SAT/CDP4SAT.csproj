@@ -204,6 +204,12 @@
     <Compile Include="Views\Tabs\StressGeneratorLayoutGroup.xaml.cs">
       <DependentUpon>StressGeneratorLayoutGroup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Tabs\EngineeringModelLayoutGroup.xaml.cs">
+      <DependentUpon>EngineeringModelLayoutGroup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Tabs\SiteRdlLayoutGroup.xaml.cs">
+      <DependentUpon>SiteRdlLayoutGroup.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Tabs\SyncerLayoutGroup.xaml.cs">
       <DependentUpon>SyncerLayoutGroup.xaml</DependentUpon>
     </Compile>
@@ -232,6 +238,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Tabs\StressGeneratorLayoutGroup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Tabs\EngineeringModelLayoutGroup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Tabs\SiteRdlLayoutGroup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
