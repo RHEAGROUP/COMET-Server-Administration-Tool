@@ -6,7 +6,6 @@
 
 namespace CDP4SAT.ViewModels
 {
-    using CDP4SAT.Utils;
     using CDP4SAT.ViewModels.Common;
     using Microsoft.Win32;
     using ReactiveUI;
@@ -28,15 +27,9 @@ namespace CDP4SAT.ViewModels
         /// </summary>
         public bool ServerIsChecked
         {
-            get
-            {
-                return this.serverIsChecked;
-            }
+            get => this.serverIsChecked;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.serverIsChecked, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.serverIsChecked, value);
         }
 
         /// <summary>
@@ -49,15 +42,9 @@ namespace CDP4SAT.ViewModels
         /// </summary>
         public bool FileIsChecked
         {
-            get
-            {
-                return this.fileIsChecked;
-            }
+            get => this.fileIsChecked;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.fileIsChecked, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.fileIsChecked, value);
         }
 
         /// <summary>
@@ -70,18 +57,9 @@ namespace CDP4SAT.ViewModels
         /// </summary>
         public LoginViewModel SourceViewModel
         {
-            get
-            {
-                return this.loginSourceViewModel;
-            }
-            set
-            {
-                if (value != loginSourceViewModel)
-                {
-                    this.loginSourceViewModel = value;
-                    this.RaisePropertyChanged();
-                }
-            }
+            get => this.loginSourceViewModel;
+
+            set => this.RaiseAndSetIfChanged(ref this.loginSourceViewModel, value);
         }
 
         /// <summary>
@@ -94,22 +72,13 @@ namespace CDP4SAT.ViewModels
         /// </summary>
         public LoginViewModel TargetViewModel
         {
-            get
-            {
-                return this.loginTargetViewModel;
-            }
-            set
-            {
-                if (value != loginTargetViewModel)
-                {
-                    this.loginTargetViewModel = value;
-                    this.RaisePropertyChanged();
-                }
-            }
+            get => this.loginTargetViewModel;
+
+            set => this.RaiseAndSetIfChanged(ref this.loginTargetViewModel, value);
         }
 
         /// <summary>
-        /// Backing filed for the the output messages <see cref="Output"/>
+        /// Backing field for the the output messages <see cref="Output"/>
         /// </summary>
         private string output;
 
@@ -118,15 +87,24 @@ namespace CDP4SAT.ViewModels
         /// </summary>
         public string Output
         {
-            get
-            {
-                return this.output;
-            }
+            get => this.output;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.output, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.output, value);
+        }
+
+        /// <summary>
+        /// Backing field for the the migration file <see cref="MigrationFile"/>
+        /// </summary>
+        private string migrationFile;
+
+        /// <summary>
+        /// Gets or sets operation migration file path
+        /// </summary>
+        public string MigrationFile
+        {
+            get => this.migrationFile;
+
+            set => this.RaiseAndSetIfChanged(ref this.migrationFile, value);
         }
 
         /// <summary>
@@ -190,6 +168,7 @@ namespace CDP4SAT.ViewModels
 
             if (dialogResult.HasValue && dialogResult.Value && openFileDialog.FileNames.Length == 1)
             {
+                this.MigrationFile = openFileDialog.FileNames[0];
             }
         }
 

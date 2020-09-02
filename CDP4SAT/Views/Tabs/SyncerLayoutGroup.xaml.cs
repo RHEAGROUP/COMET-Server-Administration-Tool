@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Migration.cs">
+// <copyright file="SyncerLayoutGroup.xaml.cs">
 //    Copyright (c) 2020
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -9,11 +9,14 @@ namespace CDP4SAT.Views.Tabs
     using DevExpress.Xpf.LayoutControl;
 
     /// <summary>
-    /// Interaction logic for Migration.xaml
+    /// Interaction logic for SyncerLayoutGroup.xaml
     /// </summary>
-    public partial class Migration : LayoutGroup
+    public partial class SyncerLayoutGroup : LayoutGroup
     {
-        public Migration()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SyncerLayoutGroup"/> class.
+        /// </summary>
+        public SyncerLayoutGroup()
         {
             InitializeComponent();
         }

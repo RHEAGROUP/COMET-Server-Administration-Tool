@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Windows;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="App.xaml.cs">
+//    Copyright (c) 2020
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
 
 namespace CDP4SAT
 {
+    using System.Windows;
+
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>

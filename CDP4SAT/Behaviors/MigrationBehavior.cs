@@ -16,7 +16,7 @@ namespace CDP4SAT.Behaviors
     /// The purpose of this class is to implement a behavior that is specific to migration flow and allows
     /// the login and source sections(fo the migration tab) to share the same view model
     /// </summary>
-    public class MigrationBehavior : Behavior<Migration>
+    public class MigrationBehavior : Behavior<MigrationLayoutGroup>
     {
         /// <summary>
         /// The on attached event handler
