@@ -1,22 +1,22 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainView.xaml.cs">
+// <copyright file="StressGeneratorLayoutGroup.xaml.cs">
 //    Copyright (c) 2020
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4SAT.Views
+namespace CDP4SAT.Views.Tabs
 {
-    using System.Windows.Controls;
+    using DevExpress.Xpf.LayoutControl;
 
     /// <summary>
-    /// Interaction logic for MainView.xaml
+    /// Interaction logic for StressGeneratorLayoutGroup.xaml
     /// </summary>
-    public partial class MainView : UserControl
+    public partial class StressGeneratorLayoutGroup : LayoutGroup
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MainView"/> user control class.
+        /// Initializes a new instance of the <see cref="StressGeneratorLayoutGroup"/> class.
         /// </summary>
-        public MainView()
+        public StressGeneratorLayoutGroup()
         {
             InitializeComponent();
         }

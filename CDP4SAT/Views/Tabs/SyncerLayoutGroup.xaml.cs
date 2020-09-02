@@ -1,22 +1,22 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainView.xaml.cs">
+// <copyright file="SyncerLayoutGroup.xaml.cs">
 //    Copyright (c) 2020
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4SAT.Views
+namespace CDP4SAT.Views.Tabs
 {
-    using System.Windows.Controls;
+    using DevExpress.Xpf.LayoutControl;
 
     /// <summary>
-    /// Interaction logic for MainView.xaml
+    /// Interaction logic for SyncerLayoutGroup.xaml
     /// </summary>
-    public partial class MainView : UserControl
+    public partial class SyncerLayoutGroup : LayoutGroup
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MainView"/> user control class.
+        /// Initializes a new instance of the <see cref="SyncerLayoutGroup"/> class.
         /// </summary>
-        public MainView()
+        public SyncerLayoutGroup()
         {
             InitializeComponent();
         }
