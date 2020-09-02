@@ -201,14 +201,14 @@
     <Compile Include="Views\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Tabs\StressGenerator.xaml.cs">
-      <DependentUpon>StressGenerator.xaml</DependentUpon>
+    <Compile Include="Views\Tabs\StressGeneratorLayoutGroup.xaml.cs">
+      <DependentUpon>StressGeneratorLayoutGroup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Tabs\Syncer.xaml.cs">
-      <DependentUpon>Syncer.xaml</DependentUpon>
+    <Compile Include="Views\Tabs\SyncerLayoutGroup.xaml.cs">
+      <DependentUpon>SyncerLayoutGroup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Tabs\Migration.xaml.cs">
-      <DependentUpon>Migration.xaml</DependentUpon>
+    <Compile Include="Views\Tabs\MigrationLayoutGroup.xaml.cs">
+      <DependentUpon>MigrationLayoutGroup.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -231,15 +231,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Tabs\StressGenerator.xaml">
+    <Page Include="Views\Tabs\StressGeneratorLayoutGroup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Tabs\Syncer.xaml">
+    <Page Include="Views\Tabs\SyncerLayoutGroup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Tabs\Migration.xaml">
+    <Page Include="Views\Tabs\MigrationLayoutGroup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

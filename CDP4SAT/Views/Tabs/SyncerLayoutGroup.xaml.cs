@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Syncer.xaml.cs">
+// <copyright file="SyncerLayoutGroup.xaml.cs">
 //    Copyright (c) 2020
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -9,14 +9,14 @@ namespace CDP4SAT.Views.Tabs
     using DevExpress.Xpf.LayoutControl;
 
     /// <summary>
-    /// Interaction logic for Syncer.xaml
+    /// Interaction logic for SyncerLayoutGroup.xaml
     /// </summary>
-    public partial class Syncer : LayoutGroup
+    public partial class SyncerLayoutGroup : LayoutGroup
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Syncer"/> class.
+        /// Initializes a new instance of the <see cref="SyncerLayoutGroup"/> class.
         /// </summary>
-        public Syncer()
+        public SyncerLayoutGroup()
         {
             InitializeComponent();
         }

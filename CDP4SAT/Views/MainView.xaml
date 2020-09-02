@@ -20,13 +20,13 @@
             <dxlc:LayoutGroup Orientation="Vertical"
                         View="Tabs"
                         dxlc:LayoutControl.AllowHorizontalSizing="True">
-                <tabs:Migration>
+                <tabs:MigrationLayoutGroup>
                     <dxmvvm:Interaction.Behaviors>
                         <behaviors:MigrationBehavior />
                     </dxmvvm:Interaction.Behaviors>
-                </tabs:Migration>
-                <tabs:Syncer />
-                <tabs:StressGenerator />
+                </tabs:MigrationLayoutGroup>
+                <tabs:SyncerLayoutGroup />
+                <tabs:StressGeneratorLayoutGroup />
             </dxlc:LayoutGroup>
         </dxlc:LayoutControl>
     </Grid>
