@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="StressGenerator.cs">
+// <copyright file="StressGenerator.xaml.cs">
 //    Copyright (c) 2020
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -13,6 +13,9 @@ namespace CDP4SAT.Views.Tabs
     /// </summary>
     public partial class StressGenerator : LayoutGroup
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StressGenerator"/> class.
+        /// </summary>
         public StressGenerator()
         {
             InitializeComponent();

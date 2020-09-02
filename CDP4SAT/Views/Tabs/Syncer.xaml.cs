@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Syncer.cs">
+// <copyright file="Syncer.xaml.cs">
 //    Copyright (c) 2020
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -13,6 +13,9 @@ namespace CDP4SAT.Views.Tabs
     /// </summary>
     public partial class Syncer : LayoutGroup
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Syncer"/> class.
+        /// </summary>
         public Syncer()
         {
             InitializeComponent();
