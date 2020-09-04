@@ -178,14 +178,18 @@ namespace CDP4SAT.ViewModels.Common
         }
 
         /// <summary>
-        /// Gets the Ok Command
+        /// Out property for the <see cref="SelectAllModels"/> property
         /// </summary>
-        public ReactiveCommand<Unit> LoginCommand { get; private set; }
+        private bool selectAllModels;
 
         /// <summary>
-        /// Gets the Annex-C-3 zip file <see cref="IReactiveCommand"/>
+        /// Gets a value indicating whether all models are selected
         /// </summary>
-        public ReactiveCommand<object> LoadSourceFile { get; private set; }
+        public bool SelectAllModels
+        {
+            get { return this.selectAllModels; }
+            set => this.RaiseAndSetIfChanged(ref this.selectAllModels, value);
+        }
 
         /// <summary>
         /// Backing field for the <see cref="EngineeringModels"/> property
@@ -214,6 +218,21 @@ namespace CDP4SAT.ViewModels.Common
             get => this.siteReferenceDataLibraries;
             private set => this.RaiseAndSetIfChanged(ref this.siteReferenceDataLibraries, value);
         }
+
+        /// <summary>
+        /// Gets the server login command
+        /// </summary>
+        public ReactiveCommand<Unit> LoginCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the AnnexC-3 zip file command whcih loads json file as datasource<see cref="IReactiveCommand"/>
+        /// </summary>
+        public ReactiveCommand<object> LoadSourceFile { get; private set; }
+
+        /// <summary>
+        /// Gets the command to select/unselect all models for import
+        /// </summary>
+        public ReactiveCommand<object> CheckUncheckAllModel { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginViewModel"/> class.
@@ -252,9 +271,24 @@ namespace CDP4SAT.ViewModels.Common
                 this.JsonIsSelected = this.ServerType.Key != null && this.ServerType.Key.Equals("JSON");
             });
 
+            this.WhenAnyValue(vm => vm.SelectAllModels).Subscribe(selectAll =>
+            {
+                if (this.EngineeringModels is null)
+                {
+                    return;
+                }
+
+                foreach (var model in this.EngineeringModels)
+                {
+                    (model as EngineeringModelRowViewModel).IsSelected = this.SelectAllModels;
+                }
+            });
+
             this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, x => this.ExecuteLogin(), RxApp.MainThreadScheduler);
             this.LoadSourceFile = ReactiveCommand.Create();
             this.LoadSourceFile.Subscribe(_ => this.ExecuteLoadSourceFile());
+            this.CheckUncheckAllModel = ReactiveCommand.Create();
+            this.CheckUncheckAllModel.Subscribe(_ => this.ExecuteCheckUncheckModel());
 
             this.LoginSuccessfully = false;
             this.LoginFailed = false;
@@ -330,6 +364,8 @@ namespace CDP4SAT.ViewModels.Common
                     this.EngineeringModels.Add(new EngineeringModelRowViewModel(modelSetup));
                 }
             }
+
+            this.SelectAllModels = true;
         }
 
         /// <summary>
@@ -363,6 +399,14 @@ namespace CDP4SAT.ViewModels.Common
             {
                 this.Uri = openFileDialog.FileNames[0];
             }
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        private void ExecuteCheckUncheckModel()
+        {
+            this.selectAllModels = !(this.EngineeringModels.Where(em => !em.IsSelected).Count() > 0);
         }
 
         /// <summary>
