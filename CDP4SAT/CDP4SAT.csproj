@@ -216,8 +216,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Behaviors\MigrationBehavior.cs" />
+    <Compile Include="ViewModels\Rows\DefinedThingRowViewModel.cs" />
+    <Compile Include="ViewModels\Rows\EngineeringModelRowViewModel.cs" />
     <Compile Include="Utils\InverseBooleanConverter.cs" />
     <Compile Include="ViewModels\MigrationViewModel.cs" />
+    <Compile Include="ViewModels\Rows\SiteReferenceDataLibraryRowViewModel.cs" />
     <Compile Include="Views\Common\Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
     </Compile>
