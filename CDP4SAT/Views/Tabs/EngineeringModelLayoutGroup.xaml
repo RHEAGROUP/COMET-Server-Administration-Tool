@@ -3,10 +3,33 @@
                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                   xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+                  xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                   Header="Engineering models"
                   Orientation="Vertical"
                   mc:Ignorable="d"
                   VerticalAlignment="Stretch"
                   HorizontalAlignment="Stretch">
+    <dxlc:LayoutItem>
+        <dxg:GridControl EnableSmartColumnsGeneration="True" ItemsSource="{Binding EngineeringModels, UpdateSourceTrigger=PropertyChanged}" AutoGenerateColumns="None" Name="EngineeringModelGridControl">
+            <dxg:GridControl.View>
+                <dxg:TableView Name="EngineeringModelView"
+                               Height="150"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"
+                               AllowColumnMoving="False"
+                               AllowEditing="False"
+                               AllowGrouping="False"
+                               AutoWidth="True"
+                               ShowGroupPanel="False"
+                               VerticalScrollbarVisibility="Auto">
+                </dxg:TableView>
+            </dxg:GridControl.View>
+            <dxg:GridControl.Columns>
+                <dxg:GridColumn Binding="{Binding Name}" Header="Name"/>
+                <dxg:GridColumn Binding="{Binding ShortName}" Header="Short Name"/>
+                <dxg:GridColumn Binding="{Binding Kind}" Header="Kind" />
+          </dxg:GridControl.Columns>
+        </dxg:GridControl>
+    </dxlc:LayoutItem>
 </dxlc:LayoutGroup>

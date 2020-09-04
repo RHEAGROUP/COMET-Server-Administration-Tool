@@ -19,8 +19,9 @@ namespace CDP4SAT.ViewModels.Common
     using CDP4WspDal;
     using CDP4JsonFileDal;
     using Microsoft.Win32;
-    using System.Windows;
-    using DevExpress.XtraRichEdit.Model;
+    using System.Linq;
+    using CDP4SAT.ViewModels.Rows;
+    using CDP4Common.SiteDirectoryData;
 
     /// <summary>
     /// The view-model for the Login that allows users to connect to different datasources
@@ -167,7 +168,7 @@ namespace CDP4SAT.ViewModels.Common
         private string output;
 
         /// <summary>
-        ///
+        /// Gets or sets output panel log messages
         /// </summary>
         public string Output
         {
@@ -185,6 +186,34 @@ namespace CDP4SAT.ViewModels.Common
         /// Gets the Annex-C-3 zip file <see cref="IReactiveCommand"/>
         /// </summary>
         public ReactiveCommand<object> LoadSourceFile { get; private set; }
+
+        /// <summary>
+        /// Backing field for the <see cref="EngineeringModels"/> property
+        /// </summary>
+        private ReactiveList<EngineeringModelRowViewModel> engineeringModels;
+
+        /// <summary>
+        /// Gets or sets engineering models list
+        /// </summary>
+        public ReactiveList<EngineeringModelRowViewModel> EngineeringModels
+        {
+            get => this.engineeringModels;
+            private set => this.RaiseAndSetIfChanged(ref this.engineeringModels, value);
+        }
+
+        /// <summary>
+        /// Backing field for the <see cref="SiteReferenceDataLibraries"/> property
+        /// </summary>
+        private ReactiveList<SiteReferenceDataLibraryRowViewModel> siteReferenceDataLibraries;
+
+        /// <summary>
+        /// Gets or sets site reference data libraries
+        /// </summary>
+        public ReactiveList<SiteReferenceDataLibraryRowViewModel> SiteReferenceDataLibraries
+        {
+            get => this.siteReferenceDataLibraries;
+            private set => this.RaiseAndSetIfChanged(ref this.siteReferenceDataLibraries, value);
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginViewModel"/> class.
@@ -229,12 +258,16 @@ namespace CDP4SAT.ViewModels.Common
 
             this.LoginSuccessfully = false;
             this.LoginFailed = false;
+            this.EngineeringModels = new ReactiveList<EngineeringModelRowViewModel>();
+            this.EngineeringModels.ChangeTrackingEnabled = true;
+            this.SiteReferenceDataLibraries = new ReactiveList<SiteReferenceDataLibraryRowViewModel>();
+            this.SiteReferenceDataLibraries.ChangeTrackingEnabled = true;
         }
 
         /// <summary>
         /// Executes login command
         /// </summary>
-        /// <returns>The <see cref="Task"/>.</returns>
+        /// <returns>The <see cref="Task"/></returns>
         private async Task ExecuteLogin()
         {
             this.LoginSuccessfully = false;
@@ -267,12 +300,49 @@ namespace CDP4SAT.ViewModels.Common
                 await this.ServerSession.Open();
 
                 this.LoginSuccessfully = true;
+
+                var siteDirectory = this.ServerSession.RetrieveSiteDirectory();
+                this.BindEngineeringModels(siteDirectory);
+                this.BindSiteReferenceDataLibraries(siteDirectory);
             }
             catch (Exception ex)
             {
                 LogMessage(ex.Message);
 
                 this.LoginFailed = true;
+            }
+        }
+
+        /// <summary>
+        /// Bind engineering models to the reactive list
+        /// </summary>
+        /// <param name="siteDirectory">The <see cref="SiteDirectory"/> top container</param>
+        private void BindEngineeringModels(SiteDirectory siteDirectory)
+        {
+            this.EngineeringModels.Clear();
+
+            foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
+            {
+                var isParticipant = modelSetup.Participant.Any(x => x.Person == this.ServerSession.ActivePerson);
+
+                if (isParticipant)
+                {
+                    this.EngineeringModels.Add(new EngineeringModelRowViewModel(modelSetup));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Bind site reference data libraries to the reactive list
+        /// </summary>
+        /// <param name="siteDirectory">The <see cref="SiteDirectory"/> top container</param>
+        private void BindSiteReferenceDataLibraries(SiteDirectory siteDirectory)
+        {
+            this.SiteReferenceDataLibraries.Clear();
+
+            foreach (var rdl in siteDirectory.SiteReferenceDataLibrary.OrderBy(m => m.Name))
+            {
+                this.SiteReferenceDataLibraries.Add(new SiteReferenceDataLibraryRowViewModel(rdl));
             }
         }
 

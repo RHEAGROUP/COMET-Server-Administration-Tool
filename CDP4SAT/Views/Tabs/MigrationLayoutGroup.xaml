@@ -20,26 +20,27 @@
     <dxmvvm:Interaction.Behaviors>
         <dxmvvm:OpenFileDialogService />
     </dxmvvm:Interaction.Behaviors>
-    <GroupBox Header="Source" Height="320">
-        <StackPanel Margin="0">
-            <common:Login x:Name="LoginSource"></common:Login>
-            <CheckBox IsChecked="{Binding Path=FileIsChecked}" Margin="5" Content="File"></CheckBox>
-            <Grid HorizontalAlignment="Left">
+    <GroupBox Header="Source" Height="350">
+        <StackPanel Margin="0" HorizontalAlignment="Stretch">
+            <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <StackPanel Margin="5" Grid.Row="1"
+                <common:Login Grid.Row="0" Grid.Column="0" x:Name="LoginSource"></common:Login>
+                <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding Path=FileIsChecked}" Margin="5" Content="File"></CheckBox>
+                <StackPanel Margin="5" Grid.Row="2"
                     Grid.Column="0" Orientation="Horizontal">
                     <GroupBox Header="migration.json">
                         <StackPanel Margin="0" Orientation="Horizontal">
                             <dxe:TextEdit Height="Auto"
                                           Margin="5"
                                           FontSize="12"
-                                          Width="250"
+                                          Width="210"
                                           IsEnabled="{Binding FileIsChecked}"
                                           Text="{Binding MigrationFile}" />
                             <Button MinWidth="100"
@@ -61,8 +62,18 @@
             </Grid>
         </StackPanel>
     </GroupBox>
-    <GroupBox Header="Target" Height="210">
-        <common:Login x:Name="LoginTarget" JsonIsAvailable="False" />
+    <GroupBox Header="Target" Height="250">
+        <StackPanel Margin="0">
+            <Grid HorizontalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <common:Login Grid.Row="0" Grid.Column="0" x:Name="LoginTarget" JsonIsAvailable="False" />
+            </Grid>
+        </StackPanel>
     </GroupBox>
     <StackPanel Margin="0" HorizontalAlignment="Left" MaxHeight="30">
         <Button MinWidth="100"
