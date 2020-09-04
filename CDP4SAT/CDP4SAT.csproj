@@ -193,6 +193,7 @@
     </ApplicationDefinition>
     <Compile Include="Behaviors\MigrationBehavior.cs" />
     <Compile Include="Utils\InverseBooleanConverter.cs" />
+    <Compile Include="Utils\Migration.cs" />
     <Compile Include="ViewModels\MigrationViewModel.cs" />
     <Compile Include="Views\Common\Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
