@@ -17,6 +17,9 @@ namespace CDP4SAT.Utils
     using System.Threading.Tasks;
     using System.Diagnostics;
 
+    /// <summary>
+    /// Enumeration of the migration process steps
+    /// </summary>
     public enum MigrationStep { ImportStart, PackStart, PackEnd, ImportEnd, ExportStart, ExportEnd };
 
     /// <summary>
@@ -24,24 +27,61 @@ namespace CDP4SAT.Utils
     /// </summary>
     public sealed class Migration
     {
+        /// <summary>
+        /// Data Access Layer used during migration process
+        /// </summary>
         private JsonFileDal dal;
+
+        /// <summary>
+        /// This flag specify that the output of the grabing data process is one single zip file or mulltiple zip file(one per model)
+        /// </summary>
         private bool singleArchive;
 
+        /// <summary>
+        ///  Gets or sets session of the migration source server <see cref="ISession"/>
+        /// </summary>
         public ISession SourceSession { get; set; }
 
+        /// <summary>
+        /// Gets or sets session of the migration target server <see cref="ISession"/>
+        /// </summary>
         public ISession TargetSession { get; set; }
 
+        /// <summary>
+        /// Delegate used for notifying current operation migration progress message
+        /// </summary>
+        /// <param name="message"></param>
         public delegate void MessageDelegate(string message);
+
+
+        /// <summary>
+        /// Delegate used for notifying current operation migration progress step
+        /// </summary>
         public delegate void MigrationStepDelegate(MigrationStep step);
 
+        /// <summary>
+        /// Associated event with the <see cref="MessageDelegate"/>
+        /// </summary>
         public event MessageDelegate OperationMessageEvent;
+
+        /// <summary>
+        /// Associated event with the <see cref="MigrationStepDelegate"/>
+        /// </summary>
         public event MigrationStepDelegate OperationStepEvent;
 
+        /// <summary>
+        /// Invoke OperationMessageEvent
+        /// </summary>
+        /// <param name="message">progress message</param>
         private void NotifyMessage(string message)
         {
             OperationMessageEvent?.Invoke(message);
         }
 
+        /// <summary>
+        /// Invoke OperationStepEvent
+        /// </summary>
+        /// <param name="step">progress operation's step <see cref="MigrationStep"></param>
         private void NotifyStep(MigrationStep step)
         {
             OperationStepEvent?.Invoke(step);
@@ -165,12 +205,12 @@ namespace CDP4SAT.Utils
 
             try
             {
-                //TODO add result interpretation
+                //TODO #26 add result interpretation
                 await dal.Write(operationContainers);
             }
             catch (Exception ex)
             {
-                //TODO add proper exception handling and logging here
+                //TODO #27 add proper exception handling and logging here
                 Debug.WriteLine(ex.Message);
             }
         }
