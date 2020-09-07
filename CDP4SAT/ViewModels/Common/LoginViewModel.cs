@@ -232,7 +232,7 @@ namespace CDP4SAT.ViewModels.Common
         /// <summary>
         /// Gets the command to select/unselect all models for import
         /// </summary>
-        public ReactiveCommand<object> CheckUncheckAllModel { get; private set; }
+        public ReactiveCommand<object> CheckUncheckModel { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginViewModel"/> class.
@@ -271,24 +271,11 @@ namespace CDP4SAT.ViewModels.Common
                 this.JsonIsSelected = this.ServerType.Key != null && this.ServerType.Key.Equals("JSON");
             });
 
-            this.WhenAnyValue(vm => vm.SelectAllModels).Subscribe(selectAll =>
-            {
-                if (this.EngineeringModels is null)
-                {
-                    return;
-                }
-
-                foreach (var model in this.EngineeringModels)
-                {
-                    (model as EngineeringModelRowViewModel).IsSelected = this.SelectAllModels;
-                }
-            });
-
             this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, x => this.ExecuteLogin(), RxApp.MainThreadScheduler);
             this.LoadSourceFile = ReactiveCommand.Create();
             this.LoadSourceFile.Subscribe(_ => this.ExecuteLoadSourceFile());
-            this.CheckUncheckAllModel = ReactiveCommand.Create();
-            this.CheckUncheckAllModel.Subscribe(_ => this.ExecuteCheckUncheckModel());
+            this.CheckUncheckModel = ReactiveCommand.Create();
+            this.CheckUncheckModel.Subscribe(_ => this.ExecuteCheckUncheckModel());
 
             this.LoginSuccessfully = false;
             this.LoginFailed = false;
@@ -402,11 +389,11 @@ namespace CDP4SAT.ViewModels.Common
         }
 
         /// <summary>
-        ///
+        /// Select model for the migration procedure
         /// </summary>
         private void ExecuteCheckUncheckModel()
         {
-            this.selectAllModels = !(this.EngineeringModels.Where(em => !em.IsSelected).Count() > 0);
+            this.SelectAllModels = !(this.EngineeringModels.Where(em => !em.IsSelected).Count() > 0);
         }
 
         /// <summary>

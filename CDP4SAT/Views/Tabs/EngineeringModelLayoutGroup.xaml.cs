@@ -6,8 +6,10 @@
 
 namespace CDP4SAT.Views.Tabs
 {
+    using CDP4SAT.ViewModels.Rows;
     using DevExpress.Xpf.LayoutControl;
     using System.Windows;
+    using System.Windows.Controls;
 
     /// <summary>
     /// Interaction logic for EngineeringModelLayoutGroup.xaml
@@ -63,8 +65,17 @@ namespace CDP4SAT.Views.Tabs
             }
         }
 
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Select all checkbox event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SelectAll_Clicked(object sender, RoutedEventArgs e)
         {
+            foreach(var row in this.EngineeringModelGridControl.VisibleItems)
+            {
+                (row as EngineeringModelRowViewModel).IsSelected = (bool)(e.Source as CheckBox).IsChecked;
+            }
         }
     }
 }

@@ -30,12 +30,12 @@
                 <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowAutoFilter="False" Width="30">
                     <dxg:GridColumn.HeaderTemplate>
                         <DataTemplate>
-                            <CheckBox Checked="CheckBox_Checked" IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}, Path=DataContext.SelectAllModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <CheckBox Click="SelectAll_Clicked" IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}, Path=DataContext.SelectAllModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
                     </dxg:GridColumn.HeaderTemplate>
                     <dxg:GridColumn.DisplayTemplate>
                         <ControlTemplate>
-                            <CheckBox Margin="4 0 0 0" HorizontalContentAlignment="Center" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}, Path=DataContext.CheckUncheckAllModel}" IsChecked="{Binding RowData.Row.IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <CheckBox Margin="4 0 0 0" HorizontalContentAlignment="Center" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}, Path=DataContext.CheckUncheckModel}" IsChecked="{Binding RowData.Row.IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </ControlTemplate>
                     </dxg:GridColumn.DisplayTemplate>
                 </dxg:GridColumn>
