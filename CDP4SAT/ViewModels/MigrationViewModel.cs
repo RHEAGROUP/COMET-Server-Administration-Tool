@@ -160,8 +160,8 @@ namespace CDP4SAT.ViewModels
             this.FileIsChecked = false;
 
             this.migration = new Migration(false);
-            this.migration.OperationMessageEvent += UpdateOutput;
-            this.migration.OperationStepEvent += UpdateUI;
+            this.migration.OperationMessageEvent += this.UpdateOutput;
+            this.migration.OperationStepEvent += this.UpdateUI;
 
             this.LoadMigrationFile = ReactiveCommand.Create();
             this.LoadMigrationFile.Subscribe(_ => this.ExecuteLoadMigrationFile());
@@ -189,22 +189,22 @@ namespace CDP4SAT.ViewModels
         /// <summary>
         /// Add migration log to the output panel
         /// </summary>
-        /// <param name="step"></param>
+        /// <param name="step">Migration operation step <see cref="MigrationStep"/ ></param>
         private void UpdateUI(MigrationStep step)
         {
             switch (step)
             {
                 case MigrationStep.ImportStart:
-                    UpdateOutput("Import operation start");
+                    this.UpdateOutput("Import operation start");
                     break;
                 case MigrationStep.ImportEnd:
-                    UpdateOutput("Import operation end");
+                    this.UpdateOutput("Import operation end");
                     break;
                 case MigrationStep.ExportStart:
-                    UpdateOutput("Export operation start");
+                    this.UpdateOutput("Export operation start");
                     break;
                 case MigrationStep.ExportEnd:
-                    UpdateOutput("Export operation end");
+                    this.UpdateOutput("Export operation end");
                     break;
             }
         }

@@ -51,9 +51,8 @@ namespace CDP4SAT.Utils
         /// <summary>
         /// Delegate used for notifying current operation migration progress message
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="message">Progress message</param>
         public delegate void MessageDelegate(string message);
-
 
         /// <summary>
         /// Delegate used for notifying current operation migration progress step
@@ -91,7 +90,7 @@ namespace CDP4SAT.Utils
         /// <summary>
         /// Initializes a new instance of the <see cref="Migration"/> class
         /// </summary>
-        /// <param name="singleArchive"></param>
+        /// <param name="singleArchive">Parameter that specifies export type format: single/multiple</param>
         public Migration(bool singleArchive = true)
         {
             this.dal = new JsonFileDal(new Version("1.0.0"));
@@ -108,15 +107,17 @@ namespace CDP4SAT.Utils
         /// <summary>
         /// Implement import operation
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
         public async Task ImportData()
         {
             if (this.SourceSession is null)
             {
-                NotifyMessage("Please select source session");
+                this.NotifyMessage("Please select source session");
                 return;
             }
-            NotifyStep(MigrationStep.ImportStart);
+            this.NotifyStep(MigrationStep.ImportStart);
 
             var siteDirectory = this.SourceSession.RetrieveSiteDirectory();
             var archiveName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\Annex-C3.zip";
@@ -142,7 +143,7 @@ namespace CDP4SAT.Utils
                         tasks.Add(this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain).ContinueWith(t =>
                         {
                             string message = (!t.IsFaulted) ? $"Read iteration '{modelSetup.Name}'.'{iterationSetup.IterationIid}' succesfully." : $"Read iteration '{modelSetup.Name}'.'{iterationSetup.IterationIid}' failed. Exception: {t.Exception.Message}.";
-                            NotifyMessage(message);
+                            this.NotifyMessage(message);
                         }));
                     }
 
@@ -158,27 +159,30 @@ namespace CDP4SAT.Utils
                         archiveName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\{modelSetup.Name}.zip";
                         creds = new Credentials("admin", "pass", new Uri(archiveName));
                         exportSession = new Session(this.dal, creds);
-                        await PackData(model.Iteration.ToList());
+                        await this.PackData(model.Iteration.ToList());
                     }
                 }
             }
 
             if (this.singleArchive)
             {
-                await PackData();
+                await this.PackData();
             }
-            NotifyStep(MigrationStep.ImportEnd);
+
+            this.NotifyStep(MigrationStep.ImportEnd);
         }
 
         /// <summary>
         /// Implement export operation
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
         public async Task ExportData()
         {
             if (this.TargetSession is null)
             {
-                NotifyMessage("Please select the target session");
+                this.NotifyMessage("Please select the target session");
                 return;
             }
 
@@ -190,7 +194,9 @@ namespace CDP4SAT.Utils
         /// </summary>
         /// <returns></returns>
         /// <param name="iterations">Model iterations list <see cref="Iteration" /></param>
-        /// <returns></returns>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
         private async Task PackData(IEnumerable<Iteration> iterations = null)
         {
             var operationContainers = new List<OperationContainer>();
