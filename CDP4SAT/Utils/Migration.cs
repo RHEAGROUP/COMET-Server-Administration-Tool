@@ -195,7 +195,6 @@ namespace CDP4SAT.Utils
         {
             var operationContainers = new List<OperationContainer>();
             var openIterations = iterations != null ? this.SourceSession.OpenIterations.Select(i => i.Key).Where(oi => iterations.Any(i => i.Iid == oi.Iid)) : this.SourceSession.OpenIterations.Select(i => i.Key);
-            //this.dal.UpdateExchangeFileHeader(this.SourceSession.ActivePerson, "TEST Copyright information", "TEST Header Remark");
 
             foreach (var iteration in openIterations)
             {
