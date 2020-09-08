@@ -16,6 +16,7 @@ namespace CDP4SAT.Utils
     using CDP4Dal.Operations;
     using System.Threading.Tasks;
     using System.Diagnostics;
+    using CDP4Common.EngineeringModelData;
 
     /// <summary>
     /// Enumeration of the migration process steps
@@ -120,7 +121,7 @@ namespace CDP4SAT.Utils
             var siteDirectory = this.SourceSession.RetrieveSiteDirectory();
             var archiveName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\Annex-C3.zip";
             var creds = new Credentials("admin", "pass", new Uri(archiveName));
-            var exportSession = new Session(dal, creds);
+            var exportSession = new Session(this.dal, creds);
 
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
@@ -128,14 +129,14 @@ namespace CDP4SAT.Utils
 
                 if (isParticipant)
                 {
-                    var model = new CDP4Common.EngineeringModelData.EngineeringModel(modelSetup.EngineeringModelIid, this.SourceSession.Assembler.Cache, this.SourceSession.Credentials.Uri)
+                    var model = new EngineeringModel(modelSetup.EngineeringModelIid, this.SourceSession.Assembler.Cache, this.SourceSession.Credentials.Uri)
                     { EngineeringModelSetup = modelSetup };
                     var tasks = new List<Task>();
 
                     // Read iterations
                     foreach (var iterationSetup in modelSetup.IterationSetup)
                     {
-                        var iteration = new CDP4Common.EngineeringModelData.Iteration(iterationSetup.IterationIid, this.SourceSession.Assembler.Cache, this.SourceSession.Credentials.Uri);
+                        var iteration = new Iteration(iterationSetup.IterationIid, this.SourceSession.Assembler.Cache, this.SourceSession.Credentials.Uri);
 
                         model.Iteration.Add(iteration);
                         tasks.Add(this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain).ContinueWith(t =>
@@ -153,10 +154,11 @@ namespace CDP4SAT.Utils
 
                     if (!this.singleArchive)
                     {
+                        // Create export session for each model
                         archiveName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\{modelSetup.Name}.zip";
                         creds = new Credentials("admin", "pass", new Uri(archiveName));
-                        exportSession = new Session(dal, creds);
-                        await PackData();
+                        exportSession = new Session(this.dal, creds);
+                        await PackData(model.Iteration.ToList());
                     }
                 }
             }
@@ -187,10 +189,12 @@ namespace CDP4SAT.Utils
         /// Implement pack(zip) data operation
         /// </summary>
         /// <returns></returns>
-        private async Task PackData()
+        /// <param name="iterations">Model iterations list <see cref="Iteration" /></param>
+        /// <returns></returns>
+        private async Task PackData(IEnumerable<Iteration> iterations = null)
         {
             var operationContainers = new List<OperationContainer>();
-            var openIterations = this.SourceSession.OpenIterations.Select(i => i.Key);
+            var openIterations = iterations != null ? this.SourceSession.OpenIterations.Select(i => i.Key).Where(oi => iterations.Any(i => i.Iid == oi.Iid)) : this.SourceSession.OpenIterations.Select(i => i.Key);
             //this.dal.UpdateExchangeFileHeader(this.SourceSession.ActivePerson, "TEST Copyright information", "TEST Header Remark");
 
             foreach (var iteration in openIterations)
@@ -206,7 +210,7 @@ namespace CDP4SAT.Utils
             try
             {
                 //TODO #26 add result interpretation
-                await dal.Write(operationContainers);
+                await this.dal.Write(operationContainers);
             }
             catch (Exception ex)
             {
