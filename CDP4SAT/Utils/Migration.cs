@@ -126,41 +126,36 @@ namespace CDP4SAT.Utils
 
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
-                var isParticipant = modelSetup.Participant.Any(x => x.Person == this.SourceSession.ActivePerson);
+                var model = new EngineeringModel(modelSetup.EngineeringModelIid, this.SourceSession.Assembler.Cache, this.SourceSession.Credentials.Uri)
+                { EngineeringModelSetup = modelSetup };
+                var tasks = new List<Task>();
 
-                if (isParticipant)
+                // Read iterations
+                foreach (var iterationSetup in modelSetup.IterationSetup)
                 {
-                    var model = new EngineeringModel(modelSetup.EngineeringModelIid, this.SourceSession.Assembler.Cache, this.SourceSession.Credentials.Uri)
-                    { EngineeringModelSetup = modelSetup };
-                    var tasks = new List<Task>();
+                    var iteration = new Iteration(iterationSetup.IterationIid, this.SourceSession.Assembler.Cache, this.SourceSession.Credentials.Uri);
 
-                    // Read iterations
-                    foreach (var iterationSetup in modelSetup.IterationSetup)
+                    model.Iteration.Add(iteration);
+                    tasks.Add(this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain).ContinueWith(t =>
                     {
-                        var iteration = new Iteration(iterationSetup.IterationIid, this.SourceSession.Assembler.Cache, this.SourceSession.Credentials.Uri);
+                        string message = (!t.IsFaulted) ? $"Read iteration '{modelSetup.Name}'.'{iterationSetup.IterationIid}' succesfully." : $"Read iteration '{modelSetup.Name}'.'{iterationSetup.IterationIid}' failed. Exception: {t.Exception.Message}.";
+                        this.NotifyMessage(message);
+                    }));
+                }
 
-                        model.Iteration.Add(iteration);
-                        tasks.Add(this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain).ContinueWith(t =>
-                        {
-                            string message = (!t.IsFaulted) ? $"Read iteration '{modelSetup.Name}'.'{iterationSetup.IterationIid}' succesfully." : $"Read iteration '{modelSetup.Name}'.'{iterationSetup.IterationIid}' failed. Exception: {t.Exception.Message}.";
-                            this.NotifyMessage(message);
-                        }));
-                    }
+                while (tasks.Count > 0)
+                {
+                    var task = await Task.WhenAny(tasks);
+                    tasks.Remove(task);
+                }
 
-                    while (tasks.Count > 0)
-                    {
-                        var task = await Task.WhenAny(tasks);
-                        tasks.Remove(task);
-                    }
-
-                    if (!this.singleArchive)
-                    {
-                        // Create export session for each model
-                        archiveName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\{modelSetup.Name}.zip";
-                        creds = new Credentials("admin", "pass", new Uri(archiveName));
-                        exportSession = new Session(this.dal, creds);
-                        await this.PackData(model.Iteration.ToList());
-                    }
+                if (!this.singleArchive)
+                {
+                    // Create export session for each model
+                    archiveName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\{modelSetup.Name}.zip";
+                    creds = new Credentials("admin", "pass", new Uri(archiveName));
+                    exportSession = new Session(this.dal, creds);
+                    await this.PackData(model.Iteration.ToList());
                 }
             }
 
