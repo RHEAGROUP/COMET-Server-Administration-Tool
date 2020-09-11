@@ -344,12 +344,7 @@ namespace CDP4SAT.ViewModels.Common
 
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
-                var isParticipant = modelSetup.Participant.Any(x => x.Person == this.ServerSession.ActivePerson);
-
-                if (isParticipant)
-                {
-                    this.EngineeringModels.Add(new EngineeringModelRowViewModel(modelSetup));
-                }
+                this.EngineeringModels.Add(new EngineeringModelRowViewModel(modelSetup));
             }
 
             this.SelectAllModels = true;
