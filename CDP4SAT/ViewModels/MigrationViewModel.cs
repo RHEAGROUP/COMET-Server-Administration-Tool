@@ -182,7 +182,7 @@ namespace CDP4SAT.ViewModels
             this.ServerIsChecked = true;
             this.FileIsChecked = false;
 
-            this.migration = new Migration(false);
+            this.migration = new Migration();
             this.migration.OperationMessageEvent += this.UpdateOutput;
             this.migration.OperationStepEvent += this.UpdateUI;
 

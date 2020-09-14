@@ -29,14 +29,14 @@ namespace CDP4SAT.Utils
     public sealed class Migration
     {
         /// <summary>
+        /// Annex C3 Zip archive file name
+        /// </summary>
+        private static readonly string archiveName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\Annex-C3.zip";
+
+        /// <summary>
         /// Data Access Layer used during migration process
         /// </summary>
         private JsonFileDal dal;
-
-        /// <summary>
-        /// This flag specify that the output of the grabing data process is one single zip file or mulltiple zip file(one per model)
-        /// </summary>
-        private bool singleArchive;
 
         /// <summary>
         ///  Gets or sets session of the migration source server <see cref="ISession"/>
@@ -90,11 +90,9 @@ namespace CDP4SAT.Utils
         /// <summary>
         /// Initializes a new instance of the <see cref="Migration"/> class
         /// </summary>
-        /// <param name="singleArchive">Parameter that specifies export type format: single/multiple</param>
-        public Migration(bool singleArchive = true)
+        public Migration()
         {
             this.dal = new JsonFileDal(new Version("1.0.0"));
-            this.singleArchive = singleArchive;
 
             if (Directory.Exists("Import"))
             {
@@ -120,7 +118,6 @@ namespace CDP4SAT.Utils
             this.NotifyStep(MigrationStep.ImportStart);
 
             var siteDirectory = this.SourceSession.RetrieveSiteDirectory();
-            var archiveName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\Annex-C3.zip";
             var creds = new Credentials("admin", "pass", new Uri(archiveName));
             var exportSession = new Session(this.dal, creds);
 
@@ -148,21 +145,9 @@ namespace CDP4SAT.Utils
                     var task = await Task.WhenAny(tasks);
                     tasks.Remove(task);
                 }
-
-                if (!this.singleArchive)
-                {
-                    // Create export session for each model
-                    archiveName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\{modelSetup.Name}.zip";
-                    creds = new Credentials("admin", "pass", new Uri(archiveName));
-                    exportSession = new Session(this.dal, creds);
-                    await this.PackData(model.Iteration.ToList());
-                }
             }
 
-            if (this.singleArchive)
-            {
-                await this.PackData();
-            }
+            await this.PackData();
 
             this.NotifyStep(MigrationStep.ImportEnd);
         }
