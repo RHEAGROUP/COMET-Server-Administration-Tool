@@ -6,6 +6,7 @@
 
 namespace CDP4SAT.ViewModels
 {
+    using CDP4SAT.Utils;
     using CDP4SAT.ViewModels.Common;
     using Microsoft.Win32;
     using ReactiveUI;
@@ -17,6 +18,11 @@ namespace CDP4SAT.ViewModels
     /// </summary>
     public class MigrationViewModel : ReactiveObject
     {
+        /// <summary>
+        /// Migration class reference
+        /// </summary>
+        private Migration migration;
+
         /// <summary>
         /// Backing field for <see cref="ServerIsChecked"/>
         /// </summary>
@@ -139,13 +145,17 @@ namespace CDP4SAT.ViewModels
                 return loginSuccessfully && dataSourceSession != null;
             }).Where(canContinue => canContinue).Subscribe(_ =>
             {
+                this.migration.SourceSession = this.SourceViewModel.ServerSession;
             });
 
             this.WhenAnyValue(vm => vm.TargetViewModel.LoginSuccessfully, vm => vm.TargetViewModel.ServerSession, (loginSuccessfully, dataSourceSession) =>
             {
                 return loginSuccessfully && dataSourceSession != null;
-            }).Where(canContinue => canContinue).Subscribe(_ =>
+            }).Where(canContinue => canContinue).Subscribe(async _ =>
             {
+                this.migration.TargetSession = this.TargetViewModel.ServerSession;
+                await this.migration.ImportData();
+                await this.migration.ExportData();
             });
         }
 
@@ -172,6 +182,10 @@ namespace CDP4SAT.ViewModels
             this.ServerIsChecked = true;
             this.FileIsChecked = false;
 
+            this.migration = new Migration(false);
+            this.migration.OperationMessageEvent += this.UpdateOutput;
+            this.migration.OperationStepEvent += this.UpdateUI;
+
             this.LoadMigrationFile = ReactiveCommand.Create();
             this.LoadMigrationFile.Subscribe(_ => this.ExecuteLoadMigrationFile());
         }
@@ -192,6 +206,29 @@ namespace CDP4SAT.ViewModels
             if (dialogResult.HasValue && dialogResult.Value && openFileDialog.FileNames.Length == 1)
             {
                 this.MigrationFile = openFileDialog.FileNames[0];
+            }
+        }
+
+        /// <summary>
+        /// Add migration log to the output panel
+        /// </summary>
+        /// <param name="step">Migration operation step <see cref="MigrationStep"/ ></param>
+        private void UpdateUI(MigrationStep step)
+        {
+            switch (step)
+            {
+                case MigrationStep.ImportStart:
+                    this.UpdateOutput("Import operation start");
+                    break;
+                case MigrationStep.ImportEnd:
+                    this.UpdateOutput("Import operation end");
+                    break;
+                case MigrationStep.ExportStart:
+                    this.UpdateOutput("Export operation start");
+                    break;
+                case MigrationStep.ExportEnd:
+                    this.UpdateOutput("Export operation end");
+                    break;
             }
         }
 
