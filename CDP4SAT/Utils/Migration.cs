@@ -17,6 +17,8 @@ namespace CDP4SAT.Utils
     using System.Threading.Tasks;
     using System.Diagnostics;
     using CDP4Common.EngineeringModelData;
+    using ReactiveUI;
+    using CDP4SAT.ViewModels.Rows;
 
     /// <summary>
     /// Enumeration of the migration process steps
@@ -105,10 +107,11 @@ namespace CDP4SAT.Utils
         /// <summary>
         /// Implement import operation
         /// </summary>
+        /// <param name="selectedModels">Selected engineering models from the source server <see cref="EngineeringModelRowViewModel"/></param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task ImportData()
+        public async Task ImportData(ReactiveList<EngineeringModelRowViewModel> selectedModels)
         {
             if (this.SourceSession is null)
             {
@@ -123,6 +126,10 @@ namespace CDP4SAT.Utils
 
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
+                if (!selectedModels.ToList().Any(em => em.Iid == modelSetup.Iid && em.IsSelected))
+                {
+                    continue;
+                }
                 var model = new EngineeringModel(modelSetup.EngineeringModelIid, this.SourceSession.Assembler.Cache, this.SourceSession.Credentials.Uri)
                 { EngineeringModelSetup = modelSetup };
                 var tasks = new List<Task>();
@@ -201,6 +208,10 @@ namespace CDP4SAT.Utils
             {
                 //TODO #27 add proper exception handling and logging here
                 Debug.WriteLine(ex.Message);
+            }
+            finally
+            {
+                //TODO Inovoke: this.dal.Close(), or maybe we will close/reopen the session again
             }
         }
     }

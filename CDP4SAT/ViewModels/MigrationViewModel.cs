@@ -223,7 +223,7 @@ namespace CDP4SAT.ViewModels
         /// <returns>The <see cref="Task"/></returns>
         private async Task ExecuteMigration()
         {
-            await this.migration.ImportData();
+            await this.migration.ImportData(this.SourceViewModel.EngineeringModels);
             await this.migration.ExportData();
         }
 
