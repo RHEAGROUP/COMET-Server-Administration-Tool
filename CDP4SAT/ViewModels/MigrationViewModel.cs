@@ -11,7 +11,9 @@ namespace CDP4SAT.ViewModels
     using Microsoft.Win32;
     using ReactiveUI;
     using System;
+    using System.Reactive;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// The view-model for the Migration that lets users to migrate models between different data servers
@@ -151,11 +153,9 @@ namespace CDP4SAT.ViewModels
             this.WhenAnyValue(vm => vm.TargetViewModel.LoginSuccessfully, vm => vm.TargetViewModel.ServerSession, (loginSuccessfully, dataSourceSession) =>
             {
                 return loginSuccessfully && dataSourceSession != null;
-            }).Where(canContinue => canContinue).Subscribe(async _ =>
+            }).Where(canContinue => canContinue).Subscribe(_ =>
             {
                 this.migration.TargetSession = this.TargetViewModel.ServerSession;
-                await this.migration.ImportData();
-                await this.migration.ExportData();
             });
         }
 
@@ -165,11 +165,16 @@ namespace CDP4SAT.ViewModels
         public ReactiveCommand<object> LoadMigrationFile { get; private set; }
 
         /// <summary>
+        /// Gets the server migrate command
+        /// </summary>
+        public ReactiveCommand<Unit> MigrateCommand { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="MigrationViewModel"/> class
         /// </summary>
         public MigrationViewModel()
         {
-            this.WhenAnyValue(
+            var canExecuteMigrate = this.WhenAnyValue(
                 vm => vm.SourceViewModel.LoginSuccessfully,
                 vm => vm.SourceViewModel.ServerSession,
                 vm => vm.TargetViewModel.LoginSuccessfully,
@@ -177,7 +182,8 @@ namespace CDP4SAT.ViewModels
                 (sourceLoginSuccessfully, sourceSession, targetLoginSuccessfully, tagetSession) =>
                 {
                     return sourceLoginSuccessfully && sourceSession != null && targetLoginSuccessfully && tagetSession != null;
-                }).ToProperty(this, vm => vm.CanMigrate, out this.canMigrate);
+                });
+            canExecuteMigrate.ToProperty(this, vm => vm.CanMigrate, out this.canMigrate);
 
             this.ServerIsChecked = true;
             this.FileIsChecked = false;
@@ -188,6 +194,8 @@ namespace CDP4SAT.ViewModels
 
             this.LoadMigrationFile = ReactiveCommand.Create();
             this.LoadMigrationFile.Subscribe(_ => this.ExecuteLoadMigrationFile());
+
+            this.MigrateCommand = ReactiveCommand.CreateAsyncTask(canExecuteMigrate, x => this.ExecuteMigration(), RxApp.MainThreadScheduler);
         }
 
         /// <summary>
@@ -207,6 +215,16 @@ namespace CDP4SAT.ViewModels
             {
                 this.MigrationFile = openFileDialog.FileNames[0];
             }
+        }
+
+        /// <summary>
+        /// Executes migration command
+        /// </summary>
+        /// <returns>The <see cref="Task"/></returns>
+        private async Task ExecuteMigration()
+        {
+            await this.migration.ImportData();
+            await this.migration.ExportData();
         }
 
         /// <summary>
