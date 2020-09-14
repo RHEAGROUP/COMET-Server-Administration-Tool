@@ -108,6 +108,19 @@ namespace CDP4SAT.ViewModels
         }
 
         /// <summary>
+        /// Out property for the <see cref="CanMigrate"/> property
+        /// </summary>
+        private readonly ObservableAsPropertyHelper<bool> canMigrate;
+
+        /// <summary>
+        /// Gets a value indicating whether a migration operation can start
+        /// </summary>
+        public bool CanMigrate
+        {
+            get { return this.canMigrate.Value; }
+        }
+
+        /// <summary>
         /// Add subscription to the login viewmodels
         /// </summary>
         public void AddSubscriptions()
@@ -146,6 +159,16 @@ namespace CDP4SAT.ViewModels
         /// </summary>
         public MigrationViewModel()
         {
+            this.WhenAnyValue(
+                vm => vm.SourceViewModel.LoginSuccessfully,
+                vm => vm.SourceViewModel.ServerSession,
+                vm => vm.TargetViewModel.LoginSuccessfully,
+                vm => vm.TargetViewModel.ServerSession,
+                (sourceLoginSuccessfully, sourceSession, targetLoginSuccessfully, tagetSession) =>
+                {
+                    return sourceLoginSuccessfully && sourceSession != null && targetLoginSuccessfully && tagetSession != null;
+                }).ToProperty(this, vm => vm.CanMigrate, out this.canMigrate);
+
             this.ServerIsChecked = true;
             this.FileIsChecked = false;
 

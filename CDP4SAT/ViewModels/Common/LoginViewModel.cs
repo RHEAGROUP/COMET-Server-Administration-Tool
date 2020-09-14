@@ -19,8 +19,9 @@ namespace CDP4SAT.ViewModels.Common
     using CDP4WspDal;
     using CDP4JsonFileDal;
     using Microsoft.Win32;
-    using System.Windows;
-    using DevExpress.XtraRichEdit.Model;
+    using System.Linq;
+    using CDP4SAT.ViewModels.Rows;
+    using CDP4Common.SiteDirectoryData;
 
     /// <summary>
     /// The view-model for the Login that allows users to connect to different datasources
@@ -167,7 +168,7 @@ namespace CDP4SAT.ViewModels.Common
         private string output;
 
         /// <summary>
-        ///
+        /// Gets or sets output panel log messages
         /// </summary>
         public string Output
         {
@@ -177,14 +178,61 @@ namespace CDP4SAT.ViewModels.Common
         }
 
         /// <summary>
-        /// Gets the Ok Command
+        /// Out property for the <see cref="SelectAllModels"/> property
+        /// </summary>
+        private bool selectAllModels;
+
+        /// <summary>
+        /// Gets a value indicating whether all models are selected
+        /// </summary>
+        public bool SelectAllModels
+        {
+            get { return this.selectAllModels; }
+            set => this.RaiseAndSetIfChanged(ref this.selectAllModels, value);
+        }
+
+        /// <summary>
+        /// Backing field for the <see cref="EngineeringModels"/> property
+        /// </summary>
+        private ReactiveList<EngineeringModelRowViewModel> engineeringModels;
+
+        /// <summary>
+        /// Gets or sets engineering models list
+        /// </summary>
+        public ReactiveList<EngineeringModelRowViewModel> EngineeringModels
+        {
+            get => this.engineeringModels;
+            private set => this.RaiseAndSetIfChanged(ref this.engineeringModels, value);
+        }
+
+        /// <summary>
+        /// Backing field for the <see cref="SiteReferenceDataLibraries"/> property
+        /// </summary>
+        private ReactiveList<SiteReferenceDataLibraryRowViewModel> siteReferenceDataLibraries;
+
+        /// <summary>
+        /// Gets or sets site reference data libraries
+        /// </summary>
+        public ReactiveList<SiteReferenceDataLibraryRowViewModel> SiteReferenceDataLibraries
+        {
+            get => this.siteReferenceDataLibraries;
+            private set => this.RaiseAndSetIfChanged(ref this.siteReferenceDataLibraries, value);
+        }
+
+        /// <summary>
+        /// Gets the server login command
         /// </summary>
         public ReactiveCommand<Unit> LoginCommand { get; private set; }
 
         /// <summary>
-        /// Gets the Annex-C-3 zip file <see cref="IReactiveCommand"/>
+        /// Gets the AnnexC-3 zip file command whcih loads json file as datasource<see cref="IReactiveCommand"/>
         /// </summary>
         public ReactiveCommand<object> LoadSourceFile { get; private set; }
+
+        /// <summary>
+        /// Gets the command to select/unselect all models for import
+        /// </summary>
+        public ReactiveCommand<object> CheckUncheckModel { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginViewModel"/> class.
@@ -226,15 +274,21 @@ namespace CDP4SAT.ViewModels.Common
             this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, x => this.ExecuteLogin(), RxApp.MainThreadScheduler);
             this.LoadSourceFile = ReactiveCommand.Create();
             this.LoadSourceFile.Subscribe(_ => this.ExecuteLoadSourceFile());
+            this.CheckUncheckModel = ReactiveCommand.Create();
+            this.CheckUncheckModel.Subscribe(_ => this.ExecuteCheckUncheckModel());
 
             this.LoginSuccessfully = false;
             this.LoginFailed = false;
+            this.EngineeringModels = new ReactiveList<EngineeringModelRowViewModel>();
+            this.EngineeringModels.ChangeTrackingEnabled = true;
+            this.SiteReferenceDataLibraries = new ReactiveList<SiteReferenceDataLibraryRowViewModel>();
+            this.SiteReferenceDataLibraries.ChangeTrackingEnabled = true;
         }
 
         /// <summary>
         /// Executes login command
         /// </summary>
-        /// <returns>The <see cref="Task"/>.</returns>
+        /// <returns>The <see cref="Task"/></returns>
         private async Task ExecuteLogin()
         {
             this.LoginSuccessfully = false;
@@ -267,12 +321,46 @@ namespace CDP4SAT.ViewModels.Common
                 await this.ServerSession.Open();
 
                 this.LoginSuccessfully = true;
+
+                var siteDirectory = this.ServerSession.RetrieveSiteDirectory();
+                this.BindEngineeringModels(siteDirectory);
+                this.BindSiteReferenceDataLibraries(siteDirectory);
             }
             catch (Exception ex)
             {
                 LogMessage(ex.Message);
 
                 this.LoginFailed = true;
+            }
+        }
+
+        /// <summary>
+        /// Bind engineering models to the reactive list
+        /// </summary>
+        /// <param name="siteDirectory">The <see cref="SiteDirectory"/> top container</param>
+        private void BindEngineeringModels(SiteDirectory siteDirectory)
+        {
+            this.EngineeringModels.Clear();
+
+            foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
+            {
+                this.EngineeringModels.Add(new EngineeringModelRowViewModel(modelSetup));
+            }
+
+            this.SelectAllModels = true;
+        }
+
+        /// <summary>
+        /// Bind site reference data libraries to the reactive list
+        /// </summary>
+        /// <param name="siteDirectory">The <see cref="SiteDirectory"/> top container</param>
+        private void BindSiteReferenceDataLibraries(SiteDirectory siteDirectory)
+        {
+            this.SiteReferenceDataLibraries.Clear();
+
+            foreach (var rdl in siteDirectory.SiteReferenceDataLibrary.OrderBy(m => m.Name))
+            {
+                this.SiteReferenceDataLibraries.Add(new SiteReferenceDataLibraryRowViewModel(rdl));
             }
         }
 
@@ -293,6 +381,14 @@ namespace CDP4SAT.ViewModels.Common
             {
                 this.Uri = openFileDialog.FileNames[0];
             }
+        }
+
+        /// <summary>
+        /// Select model for the migration procedure
+        /// </summary>
+        private void ExecuteCheckUncheckModel()
+        {
+            this.SelectAllModels = !(this.EngineeringModels.Where(em => !em.IsSelected).Count() > 0);
         }
 
         /// <summary>
