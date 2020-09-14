@@ -225,6 +225,7 @@ namespace CDP4SAT.ViewModels
         {
             await this.migration.ImportData(this.SourceViewModel.EngineeringModels);
             await this.migration.ExportData();
+            //TODO add cleanup after migration
         }
 
         /// <summary>

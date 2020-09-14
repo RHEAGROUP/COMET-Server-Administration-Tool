@@ -19,6 +19,9 @@ namespace CDP4SAT.Utils
     using CDP4Common.EngineeringModelData;
     using ReactiveUI;
     using CDP4SAT.ViewModels.Rows;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
+    using System.Text;
 
     /// <summary>
     /// Enumeration of the migration process steps
@@ -173,7 +176,27 @@ namespace CDP4SAT.Utils
                 return;
             }
 
-            await Task.Delay(1000);
+            //TODO Replace this in the near future, I cannot logged in into CDP WebService empty server
+            //var serverUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
+            var serverUrl = $"http://localhost:5000/Data/Exchange";
+            try
+            {
+                using (var httpClient = this.CreateHttpClient(TargetSession.Credentials))
+                {
+                    using (var multipartContent = this.CreateMultipartContent())
+                    {
+                        using (var message = await httpClient.PostAsync(serverUrl, multipartContent))
+                        {
+                            var input = await message.Content.ReadAsStringAsync();
+                            //TODO add result interpretation
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //TODO add proper exception handling and logging here
+            }
         }
 
         /// <summary>
@@ -213,6 +236,60 @@ namespace CDP4SAT.Utils
             {
                 //TODO Inovoke: this.dal.Close(), or maybe we will close/reopen the session again
             }
+        }
+
+        /// <summary>
+        /// Create a new <see cref="HttpClient"/> instance
+        /// </summary>
+        /// <param name="credentials">
+        /// The <see cref="Credentials"/> used to set the connection and authentication settings
+        /// </param>
+        /// <returns>
+        /// An instance of <see cref="HttpClient"/>
+        /// </returns>
+        private HttpClient CreateHttpClient(Credentials credentials)
+        {
+            HttpClient result = new HttpClient();
+
+            result.BaseAddress = credentials.Uri;
+            result.DefaultRequestHeaders.Accept.Clear();
+            result.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            result.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes($"{credentials.UserName}:{credentials.Password}")));
+            result.DefaultRequestHeaders.Add("User-Agent", "SAT");
+
+            return result;
+        }
+
+        /// <summary>
+        /// Prepare request content as form data that will be send to the CDP4 server
+        /// </summary>
+        /// <returns>
+        /// An instance of <see cref="MultipartContent"/>
+        /// </returns>
+        private MultipartContent CreateMultipartContent()
+        {
+            var fileName = Path.GetFileName(archiveName);
+            var multipartContent = new MultipartFormDataContent();
+
+            using (var filestream = System.IO.File.OpenRead(archiveName))
+            {
+                var contentStream = new MemoryStream();
+                filestream.CopyTo(contentStream);
+                contentStream.Position = 0;
+
+                var streamContent = new StreamContent(contentStream);
+                streamContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                {
+                    Name = "\"file\"",
+                    FileName = "\"" + fileName + "\""
+                };
+                streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+
+                multipartContent.Add(streamContent, "file");
+                multipartContent.Add(new StringContent("pass", Encoding.UTF8), "password");
+            }
+
+            return multipartContent;
         }
     }
 }
