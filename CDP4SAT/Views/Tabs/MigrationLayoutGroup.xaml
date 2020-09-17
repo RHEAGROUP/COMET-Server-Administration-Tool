@@ -78,6 +78,7 @@
     <StackPanel Margin="0" HorizontalAlignment="Left" MaxHeight="30">
         <Button MinWidth="100"
                 IsEnabled="{Binding Path=CanMigrate}"
+                Command="{Binding Path=MigrateCommand}"
                 Height="Auto"
                 MaxWidth="100"
                 Margin="0 5 0 5"

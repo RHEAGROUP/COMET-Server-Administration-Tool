@@ -17,6 +17,11 @@ namespace CDP4SAT.Utils
     using System.Threading.Tasks;
     using System.Diagnostics;
     using CDP4Common.EngineeringModelData;
+    using ReactiveUI;
+    using CDP4SAT.ViewModels.Rows;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
+    using System.Text;
 
     /// <summary>
     /// Enumeration of the migration process steps
@@ -29,14 +34,14 @@ namespace CDP4SAT.Utils
     public sealed class Migration
     {
         /// <summary>
+        /// Annex C3 Zip archive file name
+        /// </summary>
+        private static readonly string archiveName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\Annex-C3.zip";
+
+        /// <summary>
         /// Data Access Layer used during migration process
         /// </summary>
         private JsonFileDal dal;
-
-        /// <summary>
-        /// This flag specify that the output of the grabing data process is one single zip file or mulltiple zip file(one per model)
-        /// </summary>
-        private bool singleArchive;
 
         /// <summary>
         ///  Gets or sets session of the migration source server <see cref="ISession"/>
@@ -90,11 +95,9 @@ namespace CDP4SAT.Utils
         /// <summary>
         /// Initializes a new instance of the <see cref="Migration"/> class
         /// </summary>
-        /// <param name="singleArchive">Parameter that specifies export type format: single/multiple</param>
-        public Migration(bool singleArchive = true)
+        public Migration()
         {
             this.dal = new JsonFileDal(new Version("1.0.0"));
-            this.singleArchive = singleArchive;
 
             if (Directory.Exists("Import"))
             {
@@ -107,10 +110,11 @@ namespace CDP4SAT.Utils
         /// <summary>
         /// Implement import operation
         /// </summary>
+        /// <param name="selectedModels">Selected engineering models from the source server <see cref="EngineeringModelRowViewModel"/></param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task ImportData()
+        public async Task ImportData(ReactiveList<EngineeringModelRowViewModel> selectedModels)
         {
             if (this.SourceSession is null)
             {
@@ -120,12 +124,15 @@ namespace CDP4SAT.Utils
             this.NotifyStep(MigrationStep.ImportStart);
 
             var siteDirectory = this.SourceSession.RetrieveSiteDirectory();
-            var archiveName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\Annex-C3.zip";
             var creds = new Credentials("admin", "pass", new Uri(archiveName));
             var exportSession = new Session(this.dal, creds);
 
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
+                if (!selectedModels.ToList().Any(em => em.Iid == modelSetup.Iid && em.IsSelected))
+                {
+                    continue;
+                }
                 var model = new EngineeringModel(modelSetup.EngineeringModelIid, this.SourceSession.Assembler.Cache, this.SourceSession.Credentials.Uri)
                 { EngineeringModelSetup = modelSetup };
                 var tasks = new List<Task>();
@@ -148,21 +155,9 @@ namespace CDP4SAT.Utils
                     var task = await Task.WhenAny(tasks);
                     tasks.Remove(task);
                 }
-
-                if (!this.singleArchive)
-                {
-                    // Create export session for each model
-                    archiveName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\{modelSetup.Name}.zip";
-                    creds = new Credentials("admin", "pass", new Uri(archiveName));
-                    exportSession = new Session(this.dal, creds);
-                    await this.PackData(model.Iteration.ToList());
-                }
             }
 
-            if (this.singleArchive)
-            {
-                await this.PackData();
-            }
+            await this.PackData();
 
             this.NotifyStep(MigrationStep.ImportEnd);
         }
@@ -181,7 +176,27 @@ namespace CDP4SAT.Utils
                 return;
             }
 
-            await Task.Delay(1000);
+            //TODO Replace this in the near future, I cannot logged in into CDP WebService empty server
+            //var serverUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
+            var serverUrl = $"http://localhost:5000/Data/Exchange";
+            try
+            {
+                using (var httpClient = this.CreateHttpClient(TargetSession.Credentials))
+                {
+                    using (var multipartContent = this.CreateMultipartContent())
+                    {
+                        using (var message = await httpClient.PostAsync(serverUrl, multipartContent))
+                        {
+                            var input = await message.Content.ReadAsStringAsync();
+                            //TODO add result interpretation
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //TODO add proper exception handling and logging here
+            }
         }
 
         /// <summary>
@@ -217,6 +232,64 @@ namespace CDP4SAT.Utils
                 //TODO #27 add proper exception handling and logging here
                 Debug.WriteLine(ex.Message);
             }
+            finally
+            {
+                //TODO Inovoke: this.dal.Close(), or maybe we will close/reopen the session again
+            }
+        }
+
+        /// <summary>
+        /// Create a new <see cref="HttpClient"/> instance
+        /// </summary>
+        /// <param name="credentials">
+        /// The <see cref="Credentials"/> used to set the connection and authentication settings
+        /// </param>
+        /// <returns>
+        /// An instance of <see cref="HttpClient"/>
+        /// </returns>
+        private HttpClient CreateHttpClient(Credentials credentials)
+        {
+            HttpClient result = new HttpClient();
+
+            result.BaseAddress = credentials.Uri;
+            result.DefaultRequestHeaders.Accept.Clear();
+            result.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            result.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes($"{credentials.UserName}:{credentials.Password}")));
+            result.DefaultRequestHeaders.Add("User-Agent", "SAT");
+
+            return result;
+        }
+
+        /// <summary>
+        /// Prepare request content as form data that will be send to the CDP4 server
+        /// </summary>
+        /// <returns>
+        /// An instance of <see cref="MultipartContent"/>
+        /// </returns>
+        private MultipartContent CreateMultipartContent()
+        {
+            var fileName = Path.GetFileName(archiveName);
+            var multipartContent = new MultipartFormDataContent();
+
+            using (var filestream = System.IO.File.OpenRead(archiveName))
+            {
+                var contentStream = new MemoryStream();
+                filestream.CopyTo(contentStream);
+                contentStream.Position = 0;
+
+                var streamContent = new StreamContent(contentStream);
+                streamContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                {
+                    Name = "\"file\"",
+                    FileName = "\"" + fileName + "\""
+                };
+                streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+
+                multipartContent.Add(streamContent, "file");
+                multipartContent.Add(new StringContent("pass", Encoding.UTF8), "password");
+            }
+
+            return multipartContent;
         }
     }
 }
