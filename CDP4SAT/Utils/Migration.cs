@@ -13,6 +13,7 @@ namespace CDP4SAT.Utils
     using CDP4JsonFileDal;
     using ViewModels.Rows;
     using ReactiveUI;
+    using NLog;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -33,6 +34,11 @@ namespace CDP4SAT.Utils
     /// </summary>
     public sealed class Migration
     {
+        /// <summary>
+        /// The NLog logger
+        /// </summary>
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// Annex C3 Zip archive file name
         /// </summary>
@@ -125,34 +131,54 @@ namespace CDP4SAT.Utils
                 this.NotifyMessage("Please select source session");
                 return;
             }
+
+            Logger.Info($"Retrieving SiteDirectory from {this.SourceSession.DataSourceUri}...");
             this.NotifyStep(MigrationStep.ImportStart);
 
             var siteDirectory = this.SourceSession.RetrieveSiteDirectory();
-            var credentials = new Credentials("admin", "pass", new Uri(ArchiveName));
-            var exportSession = new Session(this.dal, credentials);
+            // var credentials = new Credentials("admin", "pass", new Uri(ArchiveName));
+            // var exportSession = new Session(this.dal, credentials);
 
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
-                if (!selectedModels.ToList().Any(em => em.Iid == modelSetup.Iid && em.IsSelected))
+                if (!selectedModels.ToList().Any(em => em.Iid == modelSetup.Iid && em.IsSelected)) continue;
+
+                var model = new EngineeringModel(
+                        modelSetup.EngineeringModelIid,
+                        this.SourceSession.Assembler.Cache,
+                        this.SourceSession.Credentials.Uri)
                 {
-                    continue;
-                }
-                var model = new EngineeringModel(modelSetup.EngineeringModelIid, this.SourceSession.Assembler.Cache, this.SourceSession.Credentials.Uri)
-                { EngineeringModelSetup = modelSetup };
+                    EngineeringModelSetup = modelSetup
+                };
+
                 var tasks = new List<Task>();
 
                 // Read iterations
                 foreach (var iterationSetup in modelSetup.IterationSetup)
                 {
-                    var iteration = new Iteration(iterationSetup.IterationIid, this.SourceSession.Assembler.Cache, this.SourceSession.Credentials.Uri);
+                    var iteration = new Iteration(
+                        iterationSetup.IterationIid,
+                        this.SourceSession.Assembler.Cache,
+                        this.SourceSession.Credentials.Uri);
 
                     model.Iteration.Add(iteration);
                     tasks.Add(this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain).ContinueWith(t =>
                     {
-                        var message = (!t.IsFaulted)
-                            ? $"Read iteration '{modelSetup.Name}'.'{iterationSetup.IterationIid}' successfully."
-                            : $"Read iteration '{modelSetup.Name}'.'{iterationSetup.IterationIid}' failed. Exception: {t.Exception.Message}.";
+                        var iterationDescription = $"'{modelSetup.Name}'.'{iterationSetup.IterationIid}'";
+
+                        string message;
+
+                        if (t.IsFaulted)
+                        {
+                            message = $"Reading iteration {iterationDescription} failed. Exception: {t.Exception.Message}.";
+                            this.NotifyMessage(message);
+                            Logger.Warn(message);
+                            return;
+                        }
+
+                        message = $"Read iteration {iterationDescription} successfully.";
                         this.NotifyMessage(message);
+                        Logger.Info(message);
                     }));
                 }
 
@@ -165,6 +191,7 @@ namespace CDP4SAT.Utils
 
             await this.PackData();
 
+            Logger.Info("Finished pulling data");
             this.NotifyStep(MigrationStep.ImportEnd);
         }
 
@@ -183,25 +210,31 @@ namespace CDP4SAT.Utils
             }
 
             // TODO Replace this in the near future, I cannot log into CDP WebService empty server
-            // var serverUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
-            var serverUrl = $"http://localhost:5000/Data/Exchange";
+            // var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
+            var targetUrl = $"http://localhost:5000/Data/Exchange";
+
+            Logger.Info($"Pushing data to {targetUrl}");
+
             try
             {
                 using (var httpClient = this.CreateHttpClient(TargetSession.Credentials))
                 {
                     using (var multipartContent = this.CreateMultipartContent())
                     {
-                        using (var message = await httpClient.PostAsync(serverUrl, multipartContent))
+                        using (var message = await httpClient.PostAsync(targetUrl, multipartContent))
                         {
                             var input = await message.Content.ReadAsStringAsync();
                             // TODO add result interpretation
+
+                            Logger.Info($"Finished pushing data");
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                // TODO add proper exception handling and logging here
+                Logger.Error($"Could not push data. Exception: {ex}");
+                // TODO add proper exception handling
             }
         }
 
@@ -237,8 +270,8 @@ namespace CDP4SAT.Utils
             }
             catch (Exception ex)
             {
-                // TODO #27 add proper exception handling and logging here
-                Debug.WriteLine(ex.Message);
+                // TODO add proper exception handling
+                Logger.Error($"Could not pack data. Exception: {ex}");
             }
             finally
             {
