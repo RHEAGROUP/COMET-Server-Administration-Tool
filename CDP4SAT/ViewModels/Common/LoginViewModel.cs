@@ -6,22 +6,21 @@
 
 namespace CDP4SAT.ViewModels.Common
 {
-    using System;
-    using System.Diagnostics;
+    using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
     using CDP4Dal.DAL;
-    using System.Threading.Tasks;
-    using CDP4ServicesDal;
-    using System.Collections.Generic;
-    using System.Reactive;
-    using System.Reactive.Linq;
-    using ReactiveUI;
-    using CDP4WspDal;
     using CDP4JsonFileDal;
-    using Microsoft.Win32;
-    using System.Linq;
     using CDP4SAT.ViewModels.Rows;
-    using CDP4Common.SiteDirectoryData;
+    using CDP4ServicesDal;
+    using CDP4WspDal;
+    using Microsoft.Win32;
+    using ReactiveUI;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Reactive;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// The view-model for the Login that allows users to connect to different datasources
@@ -48,7 +47,6 @@ namespace CDP4SAT.ViewModels.Common
         public KeyValuePair<string, string> ServerType
         {
             get => this.serverType;
-
             set => this.RaiseAndSetIfChanged(ref this.serverType, value);
         }
 
@@ -63,7 +61,6 @@ namespace CDP4SAT.ViewModels.Common
         public string UserName
         {
             get => this.username;
-
             set => this.RaiseAndSetIfChanged(ref this.username, value);
         }
 
@@ -78,7 +75,6 @@ namespace CDP4SAT.ViewModels.Common
         public string Password
         {
             get => this.password;
-
             set => this.RaiseAndSetIfChanged(ref this.password, value);
         }
 
@@ -93,7 +89,6 @@ namespace CDP4SAT.ViewModels.Common
         public string Uri
         {
             get => this.uri;
-
             set => this.RaiseAndSetIfChanged(ref this.uri, value);
         }
 
@@ -108,12 +103,11 @@ namespace CDP4SAT.ViewModels.Common
         private ISession session;
 
         /// <summary>
-        /// Gets or sets login succesfully flag
+        /// Gets or sets login successfully flag
         /// </summary>
         public ISession ServerSession
         {
             get => this.session;
-
             private set => this.RaiseAndSetIfChanged(ref this.session, value);
         }
 
@@ -123,12 +117,11 @@ namespace CDP4SAT.ViewModels.Common
         private bool loginSuccessfully;
 
         /// <summary>
-        /// Gets or sets login succesfully flag
+        /// Gets or sets login successfully flag
         /// </summary>
         public bool LoginSuccessfully
         {
             get => this.loginSuccessfully;
-
             private set => this.RaiseAndSetIfChanged(ref this.loginSuccessfully, value);
         }
 
@@ -143,7 +136,6 @@ namespace CDP4SAT.ViewModels.Common
         public bool LoginFailed
         {
             get => this.loginFailed;
-
             private set => this.RaiseAndSetIfChanged(ref this.loginFailed, value);
         }
 
@@ -158,7 +150,6 @@ namespace CDP4SAT.ViewModels.Common
         public bool JsonIsSelected
         {
             get => this.jsonIsSelected;
-
             private set => this.RaiseAndSetIfChanged(ref this.jsonIsSelected, value);
         }
 
@@ -173,7 +164,6 @@ namespace CDP4SAT.ViewModels.Common
         public string Output
         {
             get => this.output;
-
             set => this.RaiseAndSetIfChanged(ref this.output, value);
         }
 
@@ -187,7 +177,7 @@ namespace CDP4SAT.ViewModels.Common
         /// </summary>
         public bool SelectAllModels
         {
-            get { return this.selectAllModels; }
+            get => this.selectAllModels;
             set => this.RaiseAndSetIfChanged(ref this.selectAllModels, value);
         }
 
@@ -225,7 +215,7 @@ namespace CDP4SAT.ViewModels.Common
         public ReactiveCommand<Unit> LoginCommand { get; private set; }
 
         /// <summary>
-        /// Gets the AnnexC-3 zip file command whcih loads json file as datasource<see cref="IReactiveCommand"/>
+        /// Gets the AnnexC-3 zip file command which loads json file as datasource <see cref="IReactiveCommand"/>
         /// </summary>
         public ReactiveCommand<object> LoadSourceFile { get; private set; }
 
@@ -250,19 +240,15 @@ namespace CDP4SAT.ViewModels.Common
 
             this.WhenAnyValue(vm => vm.LoginFailed).Subscribe((loginFailed) =>
             {
-                if (!loginFailed)
-                {
-                    return;
-                }
+                if (!loginFailed) return;
+
                 LogMessage($"Cannot login to {this.Uri}({this.ServerType.Value}) data-source");
             });
 
             this.WhenAnyValue(vm => vm.LoginSuccessfully).Subscribe(loginSuccessfully =>
             {
-                if (!loginSuccessfully)
-                {
-                    return;
-                }
+                if (!loginSuccessfully) return;
+
                 LogMessage($"Succesfully logged to {this.Uri}({this.ServerType.Value}) data-source");
             });
 
@@ -279,10 +265,14 @@ namespace CDP4SAT.ViewModels.Common
 
             this.LoginSuccessfully = false;
             this.LoginFailed = false;
-            this.EngineeringModels = new ReactiveList<EngineeringModelRowViewModel>();
-            this.EngineeringModels.ChangeTrackingEnabled = true;
-            this.SiteReferenceDataLibraries = new ReactiveList<SiteReferenceDataLibraryRowViewModel>();
-            this.SiteReferenceDataLibraries.ChangeTrackingEnabled = true;
+            this.EngineeringModels = new ReactiveList<EngineeringModelRowViewModel>
+            {
+                ChangeTrackingEnabled = true
+            };
+            this.SiteReferenceDataLibraries = new ReactiveList<SiteReferenceDataLibraryRowViewModel>
+            {
+                ChangeTrackingEnabled = true
+            };
         }
 
         /// <summary>
@@ -402,17 +392,14 @@ namespace CDP4SAT.ViewModels.Common
         }
 
         /// <summary>
-        /// Checki if a session is already open on the passed data source
+        /// Check if a session is already open on the passed data source
         /// </summary>
         /// <param name="dataSourceUri">Data source</param>
         /// <param name="username">Logged username</param>
         /// <returns>true/false</returns>
         private bool IsSessionOpen(string dataSourceUri, string username, string password)
         {
-            if (this.ServerSession is null)
-            {
-                return false;
-            }
+            if (this.ServerSession is null) return false;
 
             return this.TrimUri(this.ServerSession.Credentials.Uri.ToString()).Equals(this.TrimUri(dataSourceUri)) && this.ServerSession.Credentials.UserName.Equals(username) && this.ServerSession.Credentials.Password.Equals(password);
         }

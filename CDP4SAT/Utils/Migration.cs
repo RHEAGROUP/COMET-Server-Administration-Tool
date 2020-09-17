@@ -6,22 +6,22 @@
 
 namespace CDP4SAT.Utils
 {
+    using CDP4Common.EngineeringModelData;
     using CDP4Dal;
     using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
     using CDP4JsonFileDal;
+    using ViewModels.Rows;
+    using ReactiveUI;
+    using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System;
-    using CDP4Dal.Operations;
-    using System.Threading.Tasks;
-    using System.Diagnostics;
-    using CDP4Common.EngineeringModelData;
-    using ReactiveUI;
-    using CDP4SAT.ViewModels.Rows;
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Text;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Enumeration of the migration process steps
@@ -36,12 +36,12 @@ namespace CDP4SAT.Utils
         /// <summary>
         /// Annex C3 Zip archive file name
         /// </summary>
-        private static readonly string archiveName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\Annex-C3.zip";
+        private static readonly string ArchiveName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\Annex-C3.zip";
 
         /// <summary>
         /// Data Access Layer used during migration process
         /// </summary>
-        private JsonFileDal dal;
+        private readonly JsonFileDal dal;
 
         /// <summary>
         ///  Gets or sets session of the migration source server <see cref="ISession"/>
@@ -86,7 +86,9 @@ namespace CDP4SAT.Utils
         /// <summary>
         /// Invoke OperationStepEvent
         /// </summary>
-        /// <param name="step">progress operation's step <see cref="MigrationStep"></param>
+        /// <param name="step">
+        /// progress operation's step <see cref="MigrationStep"/>
+        /// </param>
         private void NotifyStep(MigrationStep step)
         {
             OperationStepEvent?.Invoke(step);
@@ -110,7 +112,9 @@ namespace CDP4SAT.Utils
         /// <summary>
         /// Implement import operation
         /// </summary>
-        /// <param name="selectedModels">Selected engineering models from the source server <see cref="EngineeringModelRowViewModel"/></param>
+        /// <param name="selectedModels">
+        /// Selected engineering models from the source server <see cref="EngineeringModelRowViewModel"/>
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
@@ -124,8 +128,8 @@ namespace CDP4SAT.Utils
             this.NotifyStep(MigrationStep.ImportStart);
 
             var siteDirectory = this.SourceSession.RetrieveSiteDirectory();
-            var creds = new Credentials("admin", "pass", new Uri(archiveName));
-            var exportSession = new Session(this.dal, creds);
+            var credentials = new Credentials("admin", "pass", new Uri(ArchiveName));
+            var exportSession = new Session(this.dal, credentials);
 
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
@@ -145,7 +149,9 @@ namespace CDP4SAT.Utils
                     model.Iteration.Add(iteration);
                     tasks.Add(this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain).ContinueWith(t =>
                     {
-                        string message = (!t.IsFaulted) ? $"Read iteration '{modelSetup.Name}'.'{iterationSetup.IterationIid}' succesfully." : $"Read iteration '{modelSetup.Name}'.'{iterationSetup.IterationIid}' failed. Exception: {t.Exception.Message}.";
+                        var message = (!t.IsFaulted)
+                            ? $"Read iteration '{modelSetup.Name}'.'{iterationSetup.IterationIid}' successfully."
+                            : $"Read iteration '{modelSetup.Name}'.'{iterationSetup.IterationIid}' failed. Exception: {t.Exception.Message}.";
                         this.NotifyMessage(message);
                     }));
                 }
@@ -176,8 +182,8 @@ namespace CDP4SAT.Utils
                 return;
             }
 
-            //TODO Replace this in the near future, I cannot logged in into CDP WebService empty server
-            //var serverUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
+            // TODO Replace this in the near future, I cannot log into CDP WebService empty server
+            // var serverUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
             var serverUrl = $"http://localhost:5000/Data/Exchange";
             try
             {
@@ -188,14 +194,14 @@ namespace CDP4SAT.Utils
                         using (var message = await httpClient.PostAsync(serverUrl, multipartContent))
                         {
                             var input = await message.Content.ReadAsStringAsync();
-                            //TODO add result interpretation
+                            // TODO add result interpretation
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                //TODO add proper exception handling and logging here
+                // TODO add proper exception handling and logging here
             }
         }
 
@@ -203,7 +209,9 @@ namespace CDP4SAT.Utils
         /// Implement pack(zip) data operation
         /// </summary>
         /// <returns></returns>
-        /// <param name="iterations">Model iterations list <see cref="Iteration" /></param>
+        /// <param name="iterations">
+        /// Model iterations list <see cref="Iteration"/>
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
@@ -224,17 +232,17 @@ namespace CDP4SAT.Utils
 
             try
             {
-                //TODO #26 add result interpretation
+                // TODO #26 add result interpretation
                 await this.dal.Write(operationContainers);
             }
             catch (Exception ex)
             {
-                //TODO #27 add proper exception handling and logging here
+                // TODO #27 add proper exception handling and logging here
                 Debug.WriteLine(ex.Message);
             }
             finally
             {
-                //TODO Inovoke: this.dal.Close(), or maybe we will close/reopen the session again
+                // TODO Invoke this.dal.Close(), or maybe we will close/reopen the session again
             }
         }
 
@@ -249,15 +257,17 @@ namespace CDP4SAT.Utils
         /// </returns>
         private HttpClient CreateHttpClient(Credentials credentials)
         {
-            HttpClient result = new HttpClient();
+            var client = new HttpClient
+            {
+                BaseAddress = credentials.Uri
+            };
 
-            result.BaseAddress = credentials.Uri;
-            result.DefaultRequestHeaders.Accept.Clear();
-            result.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            result.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes($"{credentials.UserName}:{credentials.Password}")));
-            result.DefaultRequestHeaders.Add("User-Agent", "SAT");
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes($"{credentials.UserName}:{credentials.Password}")));
+            client.DefaultRequestHeaders.Add("User-Agent", "SAT");
 
-            return result;
+            return client;
         }
 
         /// <summary>
@@ -268,13 +278,13 @@ namespace CDP4SAT.Utils
         /// </returns>
         private MultipartContent CreateMultipartContent()
         {
-            var fileName = Path.GetFileName(archiveName);
+            var fileName = Path.GetFileName(ArchiveName);
             var multipartContent = new MultipartFormDataContent();
 
-            using (var filestream = System.IO.File.OpenRead(archiveName))
+            using (var fileStream = System.IO.File.OpenRead(ArchiveName))
             {
                 var contentStream = new MemoryStream();
-                filestream.CopyTo(contentStream);
+                fileStream.CopyTo(contentStream);
                 contentStream.Position = 0;
 
                 var streamContent = new StreamContent(contentStream);
