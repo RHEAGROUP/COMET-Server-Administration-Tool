@@ -77,9 +77,11 @@ namespace CDP4SAT.ViewModels.Rows
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefinedThingRowViewModel"/> class
+        /// Initializes a new instance of the <see cref="DefinedThingRowViewModel{T}"/> class
         /// </summary>
-        /// <param name="T">The <see cref="DefinedThing"/> associated with this row</param>
+        /// <param name="thing">
+        /// The <see cref="DefinedThing"/> associated with this row
+        /// </param>
         protected DefinedThingRowViewModel(T thing)
         {
             this.Thing = thing;

@@ -7,6 +7,7 @@
 namespace CDP4SAT.Utils
 {
     using System;
+    using System.Globalization;
     using System.Windows.Data;
 
     /// <summary>
@@ -18,13 +19,12 @@ namespace CDP4SAT.Utils
         /// <summary>
         /// Returns the opposite of the boolean value provided
         /// </summary>
-        /// <param name="value">The boolean value that will be inversed</param>
+        /// <param name="value">The boolean value that will be inverted</param>
         /// <param name="targetType">Target type (bool)</param>
         /// <param name="parameter">The parameter is not used.</param>
         /// <param name="culture">The parameter is not used.</param>
         /// <returns></returns>
-        public object Convert(object value, Type targetType, object parameter,
-            System.Globalization.CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (targetType != typeof(bool))
                 throw new InvalidOperationException("The target must be a boolean");
@@ -40,8 +40,7 @@ namespace CDP4SAT.Utils
         /// <param name="parameter">The parameter is not used</param>
         /// <param name="culture">The parameter is not used</param>
         /// <returns></returns>
-        public object ConvertBack(object value, Type targetType, object parameter,
-            System.Globalization.CultureInfo culture)
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotSupportedException();
         }

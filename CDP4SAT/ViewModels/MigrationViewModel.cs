@@ -23,7 +23,7 @@ namespace CDP4SAT.ViewModels
         /// <summary>
         /// Migration class reference
         /// </summary>
-        private Migration migration;
+        private readonly Migration migration;
 
         /// <summary>
         /// Backing field for <see cref="ServerIsChecked"/>
@@ -36,7 +36,6 @@ namespace CDP4SAT.ViewModels
         public bool ServerIsChecked
         {
             get => this.serverIsChecked;
-
             set => this.RaiseAndSetIfChanged(ref this.serverIsChecked, value);
         }
 
@@ -51,7 +50,6 @@ namespace CDP4SAT.ViewModels
         public bool FileIsChecked
         {
             get => this.fileIsChecked;
-
             set => this.RaiseAndSetIfChanged(ref this.fileIsChecked, value);
         }
 
@@ -66,7 +64,6 @@ namespace CDP4SAT.ViewModels
         public LoginViewModel SourceViewModel
         {
             get => this.loginSourceViewModel;
-
             set => this.RaiseAndSetIfChanged(ref this.loginSourceViewModel, value);
         }
 
@@ -81,7 +78,6 @@ namespace CDP4SAT.ViewModels
         public LoginViewModel TargetViewModel
         {
             get => this.loginTargetViewModel;
-
             set => this.RaiseAndSetIfChanged(ref this.loginTargetViewModel, value);
         }
 
@@ -96,7 +92,6 @@ namespace CDP4SAT.ViewModels
         public string Output
         {
             get => this.output;
-
             set => this.RaiseAndSetIfChanged(ref this.output, value);
         }
 
@@ -111,7 +106,6 @@ namespace CDP4SAT.ViewModels
         public string MigrationFile
         {
             get => this.migrationFile;
-
             set => this.RaiseAndSetIfChanged(ref this.migrationFile, value);
         }
 
@@ -123,37 +117,32 @@ namespace CDP4SAT.ViewModels
         /// <summary>
         /// Gets a value indicating whether a migration operation can start
         /// </summary>
-        public bool CanMigrate
-        {
-            get { return this.canMigrate.Value; }
-        }
+        public bool CanMigrate => this.canMigrate.Value;
 
         /// <summary>
         /// Add subscription to the login viewmodels
         /// </summary>
         public void AddSubscriptions()
         {
-            this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(message =>
-            {
-                UpdateOutput(message);
-            });
-            this.WhenAnyValue(vm => vm.TargetViewModel.Output).Subscribe(message =>
-            {
-                UpdateOutput(message);
-            });
+            this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(UpdateOutput);
+            this.WhenAnyValue(vm => vm.TargetViewModel.Output).Subscribe(UpdateOutput);
 
-            this.WhenAnyValue(vm => vm.SourceViewModel.LoginSuccessfully, vm => vm.SourceViewModel.ServerSession, (loginSuccessfully, dataSourceSession) =>
-            {
-                return loginSuccessfully && dataSourceSession != null;
-            }).Where(canContinue => canContinue).Subscribe(_ =>
+            this.WhenAnyValue(
+                vm => vm.SourceViewModel.LoginSuccessfully,
+                vm => vm.SourceViewModel.ServerSession,
+                (loginSuccessfully, dataSourceSession) => loginSuccessfully && dataSourceSession != null)
+                .Where(canContinue => canContinue)
+                .Subscribe(_ =>
             {
                 this.migration.SourceSession = this.SourceViewModel.ServerSession;
             });
 
-            this.WhenAnyValue(vm => vm.TargetViewModel.LoginSuccessfully, vm => vm.TargetViewModel.ServerSession, (loginSuccessfully, dataSourceSession) =>
-            {
-                return loginSuccessfully && dataSourceSession != null;
-            }).Where(canContinue => canContinue).Subscribe(_ =>
+            this.WhenAnyValue(
+                vm => vm.TargetViewModel.LoginSuccessfully,
+                vm => vm.TargetViewModel.ServerSession,
+                (loginSuccessfully, dataSourceSession) => loginSuccessfully && dataSourceSession != null)
+                .Where(canContinue => canContinue)
+                .Subscribe(_ =>
             {
                 this.migration.TargetSession = this.TargetViewModel.ServerSession;
             });
@@ -179,9 +168,9 @@ namespace CDP4SAT.ViewModels
                 vm => vm.SourceViewModel.ServerSession,
                 vm => vm.TargetViewModel.LoginSuccessfully,
                 vm => vm.TargetViewModel.ServerSession,
-                (sourceLoginSuccessfully, sourceSession, targetLoginSuccessfully, tagetSession) =>
+                (sourceLoginSuccessfully, sourceSession, targetLoginSuccessfully, targetSession) =>
                 {
-                    return sourceLoginSuccessfully && sourceSession != null && targetLoginSuccessfully && tagetSession != null;
+                    return sourceLoginSuccessfully && sourceSession != null && targetLoginSuccessfully && targetSession != null;
                 });
             canExecuteMigrate.ToProperty(this, vm => vm.CanMigrate, out this.canMigrate);
 
@@ -225,13 +214,15 @@ namespace CDP4SAT.ViewModels
         {
             await this.migration.ImportData(this.SourceViewModel.EngineeringModels);
             await this.migration.ExportData();
-            //TODO add cleanup after migration
+            // TODO add cleanup after migration
         }
 
         /// <summary>
         /// Add migration log to the output panel
         /// </summary>
-        /// <param name="step">Migration operation step <see cref="MigrationStep"/ ></param>
+        /// <param name="step">
+        /// Migration operation step <see cref="MigrationStep"/>
+        /// </param>
         private void UpdateUI(MigrationStep step)
         {
             switch (step)
@@ -257,10 +248,7 @@ namespace CDP4SAT.ViewModels
         /// <param name="message">The text message</param>
         private void UpdateOutput(string message)
         {
-            if (string.IsNullOrEmpty(message))
-            {
-                return;
-            }
+            if (string.IsNullOrEmpty(message)) return;
 
             this.Output += $"{DateTime.Now:HH:mm:ss} {message}{Environment.NewLine}";
         }

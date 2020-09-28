@@ -16,8 +16,11 @@ namespace CDP4SAT.ViewModels.Rows
         /// <summary>
         /// Initializes a new instance of the <see cref="SiteReferenceDataLibraryRowViewModel"/> class
         /// </summary>
-        /// <param name="modelSetup">The <see cref="SiteReferenceDataLibrary"/> associated with this row</param>
-        public SiteReferenceDataLibraryRowViewModel(SiteReferenceDataLibrary siteReferenceDataLibrary) : base(siteReferenceDataLibrary)
+        /// <param name="siteReferenceDataLibrary">
+        /// The <see cref="SiteReferenceDataLibrary"/> associated with this row
+        /// </param>
+        public SiteReferenceDataLibraryRowViewModel(SiteReferenceDataLibrary siteReferenceDataLibrary)
+            : base(siteReferenceDataLibrary)
         {
         }
     }

@@ -26,25 +26,20 @@ namespace CDP4SAT.Behaviors
         {
             base.OnAttached();
 
-            var currentDataContext = AssociatedObject.DataContext as MigrationViewModel;
+            if (!(AssociatedObject.DataContext is MigrationViewModel currentDataContext)) return;
 
-            if (currentDataContext != null)
-            {
-                currentDataContext.SourceViewModel = AssociatedObject.LoginSource.DataContext as LoginViewModel;
-                currentDataContext.TargetViewModel = AssociatedObject.LoginTarget.DataContext as LoginViewModel;
-                currentDataContext.AddSubscriptions();
-            }
+            currentDataContext.SourceViewModel = AssociatedObject.LoginSource.DataContext as LoginViewModel;
+            currentDataContext.TargetViewModel = AssociatedObject.LoginTarget.DataContext as LoginViewModel;
+            currentDataContext.AddSubscriptions();
         }
 
         /// <summary>
-        /// The on dettached event handler
+        /// The on detached event handler
         /// </summary>
         [ExcludeFromCodeCoverage]
         protected override void OnDetaching()
         {
-            var currentDataContext = AssociatedObject.DataContext as MigrationViewModel;
-
-            if (currentDataContext != null)
+            if (AssociatedObject.DataContext is MigrationViewModel currentDataContext)
             {
                 currentDataContext.SourceViewModel = null;
                 currentDataContext.TargetViewModel = null;
