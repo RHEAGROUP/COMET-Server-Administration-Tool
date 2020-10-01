@@ -136,8 +136,6 @@ namespace CDP4SAT.Utils
             this.NotifyStep(MigrationStep.ImportStart);
 
             var siteDirectory = this.SourceSession.RetrieveSiteDirectory();
-            // var credentials = new Credentials("admin", "pass", new Uri(ArchiveName));
-            // var exportSession = new Session(this.dal, credentials);
 
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
@@ -209,7 +207,7 @@ namespace CDP4SAT.Utils
                 return;
             }
 
-            // TODO Replace this in the near future, I cannot log into CDP WebService empty server
+            // TODO #34 Replace this in the near future, I cannot log into CDP WebService empty server
             // var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
             var targetUrl = $"http://localhost:5000/Data/Exchange";
 
@@ -224,7 +222,7 @@ namespace CDP4SAT.Utils
                         using (var message = await httpClient.PostAsync(targetUrl, multipartContent))
                         {
                             var input = await message.Content.ReadAsStringAsync();
-                            // TODO add result interpretation
+                            // TODO #35 add result interpretation
 
                             Logger.Info($"Finished pushing data");
                         }
@@ -234,7 +232,7 @@ namespace CDP4SAT.Utils
             catch (Exception ex)
             {
                 Logger.Error($"Could not push data. Exception: {ex}");
-                // TODO add proper exception handling
+                // TODO #36 add proper exception handling
             }
         }
 
@@ -270,12 +268,12 @@ namespace CDP4SAT.Utils
             }
             catch (Exception ex)
             {
-                // TODO add proper exception handling
+                // TODO #37 add proper exception handling
                 Logger.Error($"Could not pack data. Exception: {ex}");
             }
             finally
             {
-                // TODO Invoke this.dal.Close(), or maybe we will close/reopen the session again
+                // TODO #38 Invoke this.dal.Close(), or maybe we will close/reopen the session again
             }
         }
 
