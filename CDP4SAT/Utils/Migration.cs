@@ -16,7 +16,6 @@ namespace CDP4SAT.Utils
     using NLog;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Net.Http;
@@ -248,6 +247,9 @@ namespace CDP4SAT.Utils
         /// </returns>
         private async Task PackData(IEnumerable<Iteration> iterations = null)
         {
+            var zipCredentials = new Credentials("admin", "pass", new Uri(ArchiveName));
+            var zipSession = new Session(this.dal, zipCredentials);
+
             var operationContainers = new List<OperationContainer>();
             var openIterations = iterations != null ? this.SourceSession.OpenIterations.Select(i => i.Key).Where(oi => iterations.Any(i => i.Iid == oi.Iid)) : this.SourceSession.OpenIterations.Select(i => i.Key);
 
