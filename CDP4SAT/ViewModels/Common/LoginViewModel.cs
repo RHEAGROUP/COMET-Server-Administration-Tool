@@ -10,6 +10,7 @@ namespace CDP4SAT.ViewModels.Common
     using CDP4Dal;
     using CDP4Dal.DAL;
     using CDP4JsonFileDal;
+    using CDP4Rules;
     using CDP4SAT.ViewModels.Rows;
     using CDP4ServicesDal;
     using CDP4WspDal;
@@ -210,6 +211,34 @@ namespace CDP4SAT.ViewModels.Common
         }
 
         /// <summary>
+        /// Backing field for the <see cref="POCOErrors"/> property
+        /// </summary>
+        private ReactiveList<POCOErrorRowViewModel> pocoErrors;
+
+        /// <summary>
+        /// Gets or sets poco erorrs list
+        /// </summary>
+        public ReactiveList<POCOErrorRowViewModel> POCOErrors
+        {
+            get => this.pocoErrors;
+            private set => this.RaiseAndSetIfChanged(ref this.pocoErrors, value);
+        }
+
+        /// <summary>
+        /// Backing field for the <see cref="RuleCheckerErrors"/> property
+        /// </summary>
+        private ReactiveList<RuleCheckerErrorRowViewModel> ruleCheckerErrors;
+
+        /// <summary>
+        /// Gets or sets rule checker errors list
+        /// </summary>
+        public ReactiveList<RuleCheckerErrorRowViewModel> RuleCheckerErrors
+        {
+            get => this.ruleCheckerErrors;
+            private set => this.RaiseAndSetIfChanged(ref this.ruleCheckerErrors, value);
+        }
+
+        /// <summary>
         /// Gets the server login command
         /// </summary>
         public ReactiveCommand<Unit> LoginCommand { get; private set; }
@@ -273,6 +302,14 @@ namespace CDP4SAT.ViewModels.Common
             {
                 ChangeTrackingEnabled = true
             };
+            this.POCOErrors = new ReactiveList<POCOErrorRowViewModel>
+            {
+                ChangeTrackingEnabled = true
+            };
+            this.RuleCheckerErrors = new ReactiveList<RuleCheckerErrorRowViewModel>
+            {
+                ChangeTrackingEnabled = true
+            };
         }
 
         /// <summary>
@@ -313,8 +350,11 @@ namespace CDP4SAT.ViewModels.Common
                 this.LoginSuccessfully = true;
 
                 var siteDirectory = this.ServerSession.RetrieveSiteDirectory();
+
                 this.BindEngineeringModels(siteDirectory);
                 this.BindSiteReferenceDataLibraries(siteDirectory);
+                this.BindPOCOErrors();
+                this.BindEngineeringModelErrors();
             }
             catch (Exception ex)
             {
@@ -351,6 +391,38 @@ namespace CDP4SAT.ViewModels.Common
             foreach (var rdl in siteDirectory.SiteReferenceDataLibrary.OrderBy(m => m.Name))
             {
                 this.SiteReferenceDataLibraries.Add(new SiteReferenceDataLibraryRowViewModel(rdl));
+            }
+        }
+
+        /// <summary>
+        /// Apply PocoCardinality & PocoProperties to the E10-25 dataset and bind errors to the reactive list
+        /// </summary>
+        private void BindPOCOErrors()
+        {
+            this.POCOErrors.Clear();
+
+            foreach (var thing in this.ServerSession.Assembler.Cache.Select(item => item.Value.Value).Where(t => t.ValidationErrors.Any()))
+            {
+                foreach (var error in thing.ValidationErrors)
+                {
+                    this.POCOErrors.Add(new POCOErrorRowViewModel(thing, error));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Apply RuleCheckerEngine to the E10-25 dataset and bind errors to the reactive list
+        /// </summary>
+        private void BindEngineeringModelErrors()
+        {
+            var ruleCheckerEngine = new RuleCheckerEngine();
+            var resultList = ruleCheckerEngine.Run(this.ServerSession.Assembler.Cache.Select(item => item.Value.Value));
+
+            this.RuleCheckerErrors.Clear();
+
+            foreach (var result in resultList)
+            {
+                this.RuleCheckerErrors.Add(new RuleCheckerErrorRowViewModel(result.Thing, result.Id, result.Description, result.Severity));
             }
         }
 

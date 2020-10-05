@@ -152,6 +152,8 @@
             <dxlc:LayoutGroup Orientation="Vertical" View="Tabs" Margin="0 5 0 0" Visibility="{Binding Path=LoginSuccessfully, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
                 <tabs:EngineeringModelLayoutGroup GridSelectionIsAvailable="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=JsonIsAvailable}" />
                 <tabs:SiteRdlLayoutGroup />
+                <tabs:POCOErrorLayoutGroup x:Name="pocoErrorsLayoutGroup" />
+                <tabs:ModelErrorLayoutGroup x:Name="modelErrorsLayoutGroup" />
             </dxlc:LayoutGroup>
         </StackPanel>
     </Grid>
