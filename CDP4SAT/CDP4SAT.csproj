@@ -317,6 +317,20 @@
   <ItemGroup>
     <Resource Include="Resources\cdplogo3d_48x48.png" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Modules\Migration\Migration.csproj">
+      <Project>{72b5cde8-c1b4-423e-b717-7a472957e55c}</Project>
+      <Name>Migration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Modules\StressGenerator\StressGenerator.csproj">
+      <Project>{e65b83a1-1cf0-45be-a1fe-6d60c2f844cd}</Project>
+      <Name>StressGenerator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Modules\Syncer\Syncer.csproj">
+      <Project>{984bd61a-3256-4aca-8953-7751fc454790}</Project>
+      <Name>Syncer</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
