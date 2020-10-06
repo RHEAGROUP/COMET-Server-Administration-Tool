@@ -1,20 +1,20 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SyncerLayoutGroup.xaml.cs">
+// <copyright file="Layout.xaml.cs">
 //    Copyright (c) 2020
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Migration.Views.Tabs
+namespace Syncer.Views
 {
     /// <summary>
-    /// Interaction logic for SyncerLayoutGroup.xaml
+    /// Interaction logic for Layout.xaml
     /// </summary>
-    public partial class SyncerLayoutGroup
+    public partial class Layout
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="SyncerLayoutGroup"/> class.
+        /// Initializes a new instance of the <see cref="Layout"/> class.
         /// </summary>
-        public SyncerLayoutGroup()
+        public Layout()
         {
             InitializeComponent();
         }
