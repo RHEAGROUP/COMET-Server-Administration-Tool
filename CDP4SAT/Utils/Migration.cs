@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Migration.cs">
 //    Copyright (c) 2020
 // </copyright>
@@ -16,7 +16,6 @@ namespace CDP4SAT.Utils
     using NLog;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Net.Http;
@@ -136,8 +135,6 @@ namespace CDP4SAT.Utils
             this.NotifyStep(MigrationStep.ImportStart);
 
             var siteDirectory = this.SourceSession.RetrieveSiteDirectory();
-            // var credentials = new Credentials("admin", "pass", new Uri(ArchiveName));
-            // var exportSession = new Session(this.dal, credentials);
 
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
@@ -209,7 +206,7 @@ namespace CDP4SAT.Utils
                 return;
             }
 
-            // TODO Replace this in the near future, I cannot log into CDP WebService empty server
+            // TODO #34 Replace this in the near future, I cannot log into CDP WebService empty server
             // var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
             var targetUrl = $"http://localhost:5000/Data/Exchange";
 
@@ -224,7 +221,7 @@ namespace CDP4SAT.Utils
                         using (var message = await httpClient.PostAsync(targetUrl, multipartContent))
                         {
                             var input = await message.Content.ReadAsStringAsync();
-                            // TODO add result interpretation
+                            // TODO #35 add result interpretation
 
                             Logger.Info($"Finished pushing data");
                         }
@@ -234,7 +231,7 @@ namespace CDP4SAT.Utils
             catch (Exception ex)
             {
                 Logger.Error($"Could not push data. Exception: {ex}");
-                // TODO add proper exception handling
+                // TODO #36 add proper exception handling
             }
             finally
             {
@@ -254,6 +251,9 @@ namespace CDP4SAT.Utils
         /// </returns>
         private async Task PackData(IEnumerable<Iteration> iterations = null)
         {
+            var zipCredentials = new Credentials("admin", "pass", new Uri(ArchiveName));
+            var zipSession = new Session(this.dal, zipCredentials);
+
             var operationContainers = new List<OperationContainer>();
             var openIterations = iterations != null ? this.SourceSession.OpenIterations.Select(i => i.Key).Where(oi => iterations.Any(i => i.Iid == oi.Iid)) : this.SourceSession.OpenIterations.Select(i => i.Key);
 
@@ -274,7 +274,7 @@ namespace CDP4SAT.Utils
             }
             catch (Exception ex)
             {
-                // TODO add proper exception handling
+                // TODO #37 add proper exception handling
                 Logger.Error($"Could not pack data. Exception: {ex}");
             }
             finally
