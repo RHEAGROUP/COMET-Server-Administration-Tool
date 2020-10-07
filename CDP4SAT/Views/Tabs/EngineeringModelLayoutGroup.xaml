@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
-    Header="Engineering models"
+    Header="Models"
     Orientation="Vertical"
     mc:Ignorable="d"
     VerticalAlignment="Stretch"
