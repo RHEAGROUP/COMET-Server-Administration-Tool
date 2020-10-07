@@ -294,18 +294,22 @@ namespace CDP4SAT.ViewModels.Common
 
             this.LoginSuccessfully = false;
             this.LoginFailed = false;
+
             this.EngineeringModels = new ReactiveList<EngineeringModelRowViewModel>
             {
                 ChangeTrackingEnabled = true
             };
+
             this.SiteReferenceDataLibraries = new ReactiveList<SiteReferenceDataLibraryRowViewModel>
             {
                 ChangeTrackingEnabled = true
             };
+
             this.POCOErrors = new ReactiveList<POCOErrorRowViewModel>
             {
                 ChangeTrackingEnabled = true
             };
+
             this.RuleCheckerErrors = new ReactiveList<RuleCheckerErrorRowViewModel>
             {
                 ChangeTrackingEnabled = true
