@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Migration.cs">
 //    Copyright (c) 2020
 // </copyright>
@@ -233,6 +233,10 @@ namespace CDP4SAT.Utils
                 Logger.Error($"Could not push data. Exception: {ex}");
                 // TODO #36 add proper exception handling
             }
+            finally
+            {
+                await this.TargetSession.Close();
+            }
         }
 
         /// <summary>
@@ -275,7 +279,7 @@ namespace CDP4SAT.Utils
             }
             finally
             {
-                // TODO #38 Invoke this.dal.Close(), or maybe we will close/reopen the session again
+                await this.SourceSession.Close();
             }
         }
 
