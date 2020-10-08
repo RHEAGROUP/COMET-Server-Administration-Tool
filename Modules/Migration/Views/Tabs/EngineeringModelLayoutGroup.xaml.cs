@@ -73,7 +73,7 @@ namespace Migration.Views.Tabs
         {
             foreach(var row in this.EngineeringModelGridControl.VisibleItems)
             {
-                var isChecked = ((CheckBox) e.Source).IsChecked;
+                var isChecked = ((CheckBox)e.Source).IsChecked;
                 if (isChecked != null)
                 {
                     ((EngineeringModelRowViewModel)row).IsSelected = (bool)isChecked;
