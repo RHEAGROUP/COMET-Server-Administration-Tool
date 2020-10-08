@@ -1,8 +1,8 @@
 ﻿
-namespace CDP4SAT.Tests
-{
-    using NUnit.Framework;
+using NUnit.Framework;
 
+namespace App.Tests
+{
     [TestFixture]
     public class UnitTest1
     {

@@ -8,8 +8,8 @@
     <ProjectGuid>{64124677-EBB7-4484-9CC3-2E0A9A6482DA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CDP4SAT.Tests</RootNamespace>
-    <AssemblyName>CDP4SAT.Tests</AssemblyName>
+    <RootNamespace>App.Tests</RootNamespace>
+    <AssemblyName>App.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -120,9 +120,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CDP4SAT\CDP4SAT.csproj">
+    <ProjectReference Include="..\CDP4SAT\App.csproj">
       <Project>{4e672ac5-a95e-4e5e-b35d-8a4b0e8b5340}</Project>
-      <Name>CDP4SAT</Name>
+      <Name>App</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
