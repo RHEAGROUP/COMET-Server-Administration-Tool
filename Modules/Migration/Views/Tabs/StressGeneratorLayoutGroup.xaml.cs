@@ -1,23 +1,22 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainViewModel.cs">
+// <copyright file="StressGeneratorLayoutGroup.xaml.cs">
 //    Copyright (c) 2020
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace App.ViewModels
+namespace Migration.Views.Tabs
 {
-    using DevExpress.Mvvm;
-
     /// <summary>
-    /// The view-model for the Main window
+    /// Interaction logic for StressGeneratorLayoutGroup.xaml
     /// </summary>
-    public class MainViewModel : ViewModelBase
+    public partial class StressGeneratorLayoutGroup
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MainViewModel"/> class.
+        /// Initializes a new instance of the <see cref="StressGeneratorLayoutGroup"/> class.
         /// </summary>
-        public MainViewModel()
+        public StressGeneratorLayoutGroup()
         {
+            InitializeComponent();
         }
     }
 }

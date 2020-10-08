@@ -1,23 +1,22 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainViewModel.cs">
+// <copyright file="MigrationLayoutGroup.xaml.cs">
 //    Copyright (c) 2020
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace App.ViewModels
+namespace Migration.Views.Tabs
 {
-    using DevExpress.Mvvm;
-
     /// <summary>
-    /// The view-model for the Main window
+    /// Interaction logic for MigrationLayoutGroup.xaml.cs
     /// </summary>
-    public class MainViewModel : ViewModelBase
+    public partial class MigrationLayoutGroup
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MainViewModel"/> class.
+        /// Initializes a new instance of the <see cref="MigrationLayoutGroup"/> class.
         /// </summary>
-        public MainViewModel()
+        public MigrationLayoutGroup()
         {
+            InitializeComponent();
         }
     }
 }

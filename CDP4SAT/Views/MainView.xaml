@@ -1,18 +1,15 @@
 ﻿<UserControl
-    x:Class="CDP4SAT.Views.MainView"
+    x:Class="App.Views.MainView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
-    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-    xmlns:tabs="clr-namespace:CDP4SAT.Views.Tabs"
-    xmlns:viewModels="clr-namespace:CDP4SAT.ViewModels"
-    xmlns:behaviors="clr-namespace:CDP4SAT.Behaviors"
+    xmlns:tabs="clr-namespace:Migration.Views.Tabs;assembly=Migration"
+    xmlns:viewModels="clr-namespace:App.ViewModels"
     mc:Ignorable="d"
     d:DesignHeight="300"
-    d:DesignWidth="300"
-    >
+    d:DesignWidth="300">
     <UserControl.DataContext>
         <viewModels:MainViewModel />
     </UserControl.DataContext>
@@ -20,18 +17,12 @@
         <dxlc:LayoutControl
             Margin="5"
             Orientation="Vertical"
-            ScrollBars="None" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-            >
+            ScrollBars="None" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
             <dxlc:LayoutGroup
                 Orientation="Vertical"
                 View="Tabs"
-                dxlc:LayoutControl.AllowHorizontalSizing="True"
-                >
-                <tabs:MigrationLayoutGroup>
-                    <dxmvvm:Interaction.Behaviors>
-                        <behaviors:MigrationBehavior />
-                    </dxmvvm:Interaction.Behaviors>
-                </tabs:MigrationLayoutGroup>
+                dxlc:LayoutControl.AllowHorizontalSizing="True">
+                <tabs:MigrationLayoutGroup />
                 <tabs:SyncerLayoutGroup />
                 <tabs:StressGeneratorLayoutGroup />
             </dxlc:LayoutGroup>

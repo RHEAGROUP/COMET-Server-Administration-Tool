@@ -1,23 +1,22 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainViewModel.cs">
+// <copyright file="SyncerLayoutGroup.xaml.cs">
 //    Copyright (c) 2020
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace App.ViewModels
+namespace Migration.Views.Tabs
 {
-    using DevExpress.Mvvm;
-
     /// <summary>
-    /// The view-model for the Main window
+    /// Interaction logic for SyncerLayoutGroup.xaml
     /// </summary>
-    public class MainViewModel : ViewModelBase
+    public partial class SyncerLayoutGroup
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MainViewModel"/> class.
+        /// Initializes a new instance of the <see cref="SyncerLayoutGroup"/> class.
         /// </summary>
-        public MainViewModel()
+        public SyncerLayoutGroup()
         {
+            InitializeComponent();
         }
     }
 }

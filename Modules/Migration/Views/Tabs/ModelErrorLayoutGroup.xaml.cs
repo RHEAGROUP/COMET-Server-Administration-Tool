@@ -1,23 +1,22 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainViewModel.cs">
+// <copyright file="ModelErrorLayoutGroup.xaml.cs">
 //    Copyright (c) 2020
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace App.ViewModels
+namespace Migration.Views.Tabs
 {
-    using DevExpress.Mvvm;
-
     /// <summary>
-    /// The view-model for the Main window
+    /// Interaction logic for ModelErrorLayoutGroup.xaml
     /// </summary>
-    public class MainViewModel : ViewModelBase
+    public partial class ModelErrorLayoutGroup
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MainViewModel"/> class.
+        /// Initializes a new instance of the <see cref="ModelErrorLayoutGroup"/> class.
         /// </summary>
-        public MainViewModel()
+        public ModelErrorLayoutGroup()
         {
+            InitializeComponent();
         }
     }
 }

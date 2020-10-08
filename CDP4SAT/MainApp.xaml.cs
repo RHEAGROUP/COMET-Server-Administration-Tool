@@ -1,21 +1,18 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainWindow.xaml.cs">
+// <copyright file="App.xaml.cs">
 //    Copyright (c) 2020
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+
 namespace App
 {
-    using DevExpress.Xpf.Core;
+    using System.Windows;
 
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for App.xaml
     /// </summary>
-    public partial class MainWindow : ThemedWindow
+    public partial class MainApp : Application
     {
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
     }
 }
