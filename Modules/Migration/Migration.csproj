@@ -236,7 +236,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Tabs\POCOErrorLayoutGroup.xaml">
+    <Page Include="Views\Tabs\PocoErrorLayoutGroup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -261,7 +261,7 @@
     <Compile Include="ViewModels\MigrationViewModel.cs" />
     <Compile Include="Utils\Rows\DefinedThingRowViewModel.cs" />
     <Compile Include="Utils\Rows\EngineeringModelRowViewModel.cs" />
-    <Compile Include="Utils\Rows\POCOErrorRowViewModel.cs" />
+    <Compile Include="Utils\Rows\PocoErrorRowViewModel.cs" />
     <Compile Include="Utils\Rows\RuleCheckerErrorRowViewModel.cs" />
     <Compile Include="Utils\Rows\SiteReferenceDataLibraryRowViewModel.cs" />
     <Compile Include="Views\Common\Login.xaml.cs">
@@ -276,8 +276,8 @@
     <Compile Include="Views\Tabs\ModelErrorLayoutGroup.xaml.cs">
       <DependentUpon>ModelErrorLayoutGroup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Tabs\POCOErrorLayoutGroup.xaml.cs">
-      <DependentUpon>POCOErrorLayoutGroup.xaml</DependentUpon>
+    <Compile Include="Views\Tabs\PocoErrorLayoutGroup.xaml.cs">
+      <DependentUpon>PocoErrorLayoutGroup.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Tabs\SiteRdlLayoutGroup.xaml.cs">
       <DependentUpon>SiteRdlLayoutGroup.xaml</DependentUpon>

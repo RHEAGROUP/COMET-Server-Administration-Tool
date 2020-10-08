@@ -6,12 +6,10 @@
 
 namespace Migration.Views.Tabs
 {
-    using DevExpress.Xpf.LayoutControl;
-
     /// <summary>
     /// Interaction logic for MigrationLayoutGroup.xaml.cs
     /// </summary>
-    public partial class MigrationLayoutGroup : LayoutGroup
+    public partial class MigrationLayoutGroup
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MigrationLayoutGroup"/> class.

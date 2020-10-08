@@ -170,7 +170,7 @@
                 <tabs:EngineeringModelLayoutGroup
                     GridSelectionIsAvailable="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=JsonIsAvailable}" />
                 <tabs:SiteRdlLayoutGroup />
-                <tabs:POCOErrorLayoutGroup x:Name="pocoErrorsLayoutGroup" />
+                <tabs:PocoErrorLayoutGroup x:Name="pocoErrorsLayoutGroup" />
                 <tabs:ModelErrorLayoutGroup x:Name="modelErrorsLayoutGroup" />
             </dxlc:LayoutGroup>
         </StackPanel>

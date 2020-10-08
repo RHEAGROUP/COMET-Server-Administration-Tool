@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="POCOErrorRowViewModel.cs">
+// <copyright file="PocoErrorRowViewModel.cs">
 //    Copyright (c) 2020
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -12,9 +12,9 @@ namespace Migration.Utils.Rows
     using System;
 
     /// <summary>
-    /// Row class representing a <see cref="POCOErrorRowViewModel"/> as a plain object
+    /// Row class representing a <see cref="PocoErrorRowViewModel"/> as a plain object
     /// </summary>
-    public class POCOErrorRowViewModel : ReactiveObject
+    public class PocoErrorRowViewModel : ReactiveObject
     {
         /// <summary>
         /// Gets the <see cref="ClassKind"/> of the <see cref="Thing"/> that contains the error.
@@ -32,7 +32,7 @@ namespace Migration.Utils.Rows
         public string Path { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="POCOErrorRowViewModel"/> class
+        /// Initializes a new instance of the <see cref="PocoErrorRowViewModel"/> class
         /// <param name="thing">
         /// The thing <see cref="Thing" />.
         /// </param>
@@ -40,8 +40,7 @@ namespace Migration.Utils.Rows
         /// The error content.
         /// </param>
         /// </summary>
-        public POCOErrorRowViewModel(Thing thing, string error)
-            : base()
+        public PocoErrorRowViewModel(Thing thing, string error)
         {
             this.ContainerThingClassKind = thing.ClassKind.ToString();
             this.Error = error;

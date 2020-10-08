@@ -6,12 +6,10 @@
 
 namespace Migration.Views.Tabs
 {
-    using DevExpress.Xpf.LayoutControl;
-
     /// <summary>
     /// Interaction logic for SyncerLayoutGroup.xaml
     /// </summary>
-    public partial class SyncerLayoutGroup : LayoutGroup
+    public partial class SyncerLayoutGroup
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncerLayoutGroup"/> class.

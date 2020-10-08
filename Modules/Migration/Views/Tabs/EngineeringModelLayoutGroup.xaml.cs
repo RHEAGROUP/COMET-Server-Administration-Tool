@@ -6,15 +6,14 @@
 
 namespace Migration.Views.Tabs
 {
-    using Migration.Utils.Rows;
-    using DevExpress.Xpf.LayoutControl;
+    using Utils.Rows;
     using System.Windows;
     using System.Windows.Controls;
 
     /// <summary>
     /// Interaction logic for EngineeringModelLayoutGroup.xaml
     /// </summary>
-    public partial class EngineeringModelLayoutGroup : LayoutGroup
+    public partial class EngineeringModelLayoutGroup
     {
         /// <summary>
         /// <see cref="DependencyProperty"/> that can be set in XAML to indicate that the JsonIsAvailable is available
@@ -23,7 +22,7 @@ namespace Migration.Views.Tabs
             "GridSelectionIsAvailable",
             typeof(bool),
             typeof(EngineeringModelLayoutGroup),
-            new PropertyMetadata(true, new PropertyChangedCallback(OnGridSelectionIsAvailableChanged)));
+            new PropertyMetadata(true, OnGridSelectionIsAvailableChanged));
 
         /// <summary>
         /// Gets or sets the <see cref="GridSelectionIsAvailableProperty"/> dependency property.
@@ -50,7 +49,7 @@ namespace Migration.Views.Tabs
         /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
         private static void OnGridSelectionIsAvailableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            (d as EngineeringModelLayoutGroup).OnInstanceChanged(e);
+            (d as EngineeringModelLayoutGroup)?.OnInstanceChanged(e);
         }
 
         /// <summary>
@@ -74,7 +73,11 @@ namespace Migration.Views.Tabs
         {
             foreach(var row in this.EngineeringModelGridControl.VisibleItems)
             {
-                (row as EngineeringModelRowViewModel).IsSelected = (bool)(e.Source as CheckBox).IsChecked;
+                var isChecked = ((CheckBox) e.Source).IsChecked;
+                if (isChecked != null)
+                {
+                    ((EngineeringModelRowViewModel)row).IsSelected = (bool)isChecked;
+                }
             }
         }
     }

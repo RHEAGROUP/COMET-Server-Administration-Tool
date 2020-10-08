@@ -29,7 +29,7 @@ namespace Migration.Utils
             if (targetType != typeof(bool))
                 throw new InvalidOperationException("The target must be a boolean");
 
-            return !(bool)value;
+            return value != null && !(bool)value;
         }
 
         /// <summary>

@@ -6,12 +6,10 @@
 
 namespace Migration.Views.Tabs
 {
-    using DevExpress.Xpf.LayoutControl;
-
     /// <summary>
     /// Interaction logic for SiteRdlLayoutGroup.xaml
     /// </summary>
-    public partial class SiteRdlLayoutGroup : LayoutGroup
+    public partial class SiteRdlLayoutGroup
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SiteRdlLayoutGroup"/> class.

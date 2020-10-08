@@ -1,22 +1,20 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="POCOErrorLayoutGroup.xaml.cs">
+// <copyright file="PocoErrorLayoutGroup.xaml.cs">
 //    Copyright (c) 2020
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace Migration.Views.Tabs
 {
-    using DevExpress.Xpf.LayoutControl;
-
     /// <summary>
-    /// Interaction logic for POCOErrorLayoutGroup.xaml
+    /// Interaction logic for PocoErrorLayoutGroup.xaml
     /// </summary>
-    public partial class POCOErrorLayoutGroup : LayoutGroup
+    public partial class PocoErrorLayoutGroup
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="POCOErrorLayoutGroup"/> class.
+        /// Initializes a new instance of the <see cref="PocoErrorLayoutGroup"/> class.
         /// </summary>
-        public POCOErrorLayoutGroup()
+        public PocoErrorLayoutGroup()
         {
             InitializeComponent();
         }

@@ -11,7 +11,9 @@
                   VerticalAlignment="Stretch"
                   HorizontalAlignment="Stretch">
     <dxlc:LayoutItem>
-        <dxg:GridControl EnableSmartColumnsGeneration="True" ItemsSource="{Binding RuleCheckerErrors, UpdateSourceTrigger=PropertyChanged}" AutoGenerateColumns="None" Name="ModelErrorGridControl">
+        <dxg:GridControl EnableSmartColumnsGeneration="True"
+                         ItemsSource="{Binding RuleCheckerErrors, UpdateSourceTrigger=PropertyChanged}"
+                         AutoGenerateColumns="None" Name="ModelErrorGridControl">
             <dxg:GridControl.View>
                 <dxg:TableView Name="ModelErrorView"
                                Height="150"
@@ -26,9 +28,9 @@
                 </dxg:TableView>
             </dxg:GridControl.View>
             <dxg:GridControl.Columns>
-                <dxg:GridColumn AllowGrouping="True" Binding="{Binding ContainerThingClassKind}" Header="Class Kind"/>
-                <dxg:GridColumn Binding="{Binding Description}" Header="Content"/>
-                <dxg:GridColumn Binding="{Binding Severity}" Header="Severity"/>
+                <dxg:GridColumn AllowGrouping="True" Binding="{Binding ContainerThingClassKind}" Header="Class Kind" />
+                <dxg:GridColumn Binding="{Binding Description}" Header="Content" />
+                <dxg:GridColumn Binding="{Binding Severity}" Header="Severity" />
             </dxg:GridControl.Columns>
         </dxg:GridControl>
     </dxlc:LayoutItem>

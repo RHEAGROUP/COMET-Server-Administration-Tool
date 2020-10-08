@@ -6,12 +6,10 @@
 
 namespace Migration.Views.Tabs
 {
-    using DevExpress.Xpf.LayoutControl;
-
     /// <summary>
     /// Interaction logic for ModelErrorLayoutGroup.xaml
     /// </summary>
-    public partial class ModelErrorLayoutGroup : LayoutGroup
+    public partial class ModelErrorLayoutGroup
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ModelErrorLayoutGroup"/> class.

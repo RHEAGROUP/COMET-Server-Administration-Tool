@@ -23,17 +23,17 @@ namespace Migration.Utils.Rows
         /// <summary>
         /// Gets or sets the identifier or code of the Rule that may have been broken
         /// </summary>
-        public string Id { get; set; }
+        private string Id { get; set; }
 
         /// <summary>
         /// Gets or sets the description of the Rule that may have been broken
         /// </summary>
-        public string Description { get; set; }
+        public string Description { get; private set; }
 
         /// <summary>
         /// Gets or sets the <see cref="SeverityKind"/>
         /// </summary>
-        public SeverityKind Severity { get; set; }
+        public SeverityKind Severity { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RuleCheckerErrorRowViewModel"/> class
@@ -51,7 +51,6 @@ namespace Migration.Utils.Rows
         /// the <see cref="SeverityKind"/>
         /// </param>
         public RuleCheckerErrorRowViewModel(Thing thing, string id, string description, SeverityKind severity)
-            : base()
         {
             this.ContainerThingClassKind = thing.ClassKind.ToString();
             this.Id = id;

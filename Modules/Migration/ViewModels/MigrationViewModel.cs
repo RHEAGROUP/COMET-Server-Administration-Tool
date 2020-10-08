@@ -6,8 +6,8 @@
 
 namespace Migration.ViewModels
 {
-    using Migration.Utils;
-    using Migration.ViewModels.Common;
+    using Utils;
+    using Common;
     using Microsoft.Win32;
     using ReactiveUI;
     using System;
@@ -24,20 +24,6 @@ namespace Migration.ViewModels
         /// Migration class reference
         /// </summary>
         private readonly Migration migration;
-
-        /// <summary>
-        /// Backing field for <see cref="ServerIsChecked"/>
-        /// </summary>
-        private bool serverIsChecked;
-
-        /// <summary>
-        /// Gets or sets server source as option for migration
-        /// </summary>
-        public bool ServerIsChecked
-        {
-            get => this.serverIsChecked;
-            set => this.RaiseAndSetIfChanged(ref this.serverIsChecked, value);
-        }
 
         /// <summary>
         /// Backing field for <see cref="FileIsChecked"/>
@@ -59,7 +45,7 @@ namespace Migration.ViewModels
         private LoginViewModel loginSourceViewModel;
 
         /// <summary>
-        /// Gets or sets the loging source view model
+        /// Gets or sets the logging source view model
         /// </summary>
         public LoginViewModel SourceViewModel
         {
@@ -120,7 +106,7 @@ namespace Migration.ViewModels
         public bool CanMigrate => this.canMigrate.Value;
 
         /// <summary>
-        /// Add subscription to the login viewmodels
+        /// Add subscription to the login view models
         /// </summary>
         public void AddSubscriptions()
         {
@@ -174,12 +160,12 @@ namespace Migration.ViewModels
                 });
             canExecuteMigrate.ToProperty(this, vm => vm.CanMigrate, out this.canMigrate);
 
-            this.ServerIsChecked = true;
+            //this.ServerIsChecked = true;
             this.FileIsChecked = false;
 
             this.migration = new Migration();
             this.migration.OperationMessageEvent += this.UpdateOutput;
-            this.migration.OperationStepEvent += this.UpdateUI;
+            this.migration.OperationStepEvent += this.UpdateUi;
 
             this.LoadMigrationFile = ReactiveCommand.Create();
             this.LoadMigrationFile.Subscribe(_ => this.ExecuteLoadMigrationFile());
@@ -192,7 +178,7 @@ namespace Migration.ViewModels
         /// </summary>
         private void ExecuteLoadMigrationFile()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog()
+            var openFileDialog = new OpenFileDialog()
             {
                 InitialDirectory = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\",
                 Filter = "Json files (*.json)|*.json"
@@ -223,7 +209,7 @@ namespace Migration.ViewModels
         /// <param name="step">
         /// Migration operation step <see cref="MigrationStep"/>
         /// </param>
-        private void UpdateUI(MigrationStep step)
+        private void UpdateUi(MigrationStep step)
         {
             switch (step)
             {

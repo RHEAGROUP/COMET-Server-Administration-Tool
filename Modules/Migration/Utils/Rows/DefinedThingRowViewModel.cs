@@ -31,16 +31,6 @@ namespace Migration.Utils.Rows
         private string shortName;
 
         /// <summary>
-        /// Backing field for <see cref="RevisionNumber"/>
-        /// </summary>
-        private int revisionNumber;
-
-        /// <summary>
-        /// Get or sets the <see cref="Thing"/>
-        /// </summary>
-        public T Thing { get; private set; }
-
-        /// <summary>
         /// Gets or sets the iid
         /// </summary>
         public Guid Iid
@@ -68,15 +58,6 @@ namespace Migration.Utils.Rows
         }
 
         /// <summary>
-        /// Gets or sets the revisionNumber
-        /// </summary>
-        public int RevisionNumber
-        {
-            get => this.revisionNumber;
-            private set => this.RaiseAndSetIfChanged(ref this.revisionNumber, value);
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="DefinedThingRowViewModel{T}"/> class
         /// </summary>
         /// <param name="thing">
@@ -84,11 +65,9 @@ namespace Migration.Utils.Rows
         /// </param>
         protected DefinedThingRowViewModel(T thing)
         {
-            this.Thing = thing;
             this.Iid = thing.Iid;
             this.Name = thing.Name;
             this.ShortName = thing.ShortName;
-            this.RevisionNumber = thing.RevisionNumber;
         }
     }
 }

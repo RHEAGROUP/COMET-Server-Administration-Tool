@@ -6,12 +6,10 @@
 
 namespace Migration.Views.Tabs
 {
-    using DevExpress.Xpf.LayoutControl;
-
     /// <summary>
     /// Interaction logic for StressGeneratorLayoutGroup.xaml
     /// </summary>
-    public partial class StressGeneratorLayoutGroup : LayoutGroup
+    public partial class StressGeneratorLayoutGroup
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="StressGeneratorLayoutGroup"/> class.

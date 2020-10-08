@@ -24,12 +24,12 @@ namespace Migration.ViewModels.Common
     using System.Threading.Tasks;
 
     /// <summary>
-    /// The view-model for the Login that allows users to connect to different datasources
+    /// The view-model for the Login that allows users to connect to different data sources
     /// </summary>
     public class LoginViewModel : ReactiveObject
     {
         /// <summary>
-        /// Gets or sets datasource server type
+        /// Gets or sets data source server type
         /// </summary>
         public static KeyValuePair<string, string>[] DataSourceList { get; } = {
             new KeyValuePair<string, string>("CDP", "CDP4 WebServices"),
@@ -52,7 +52,7 @@ namespace Migration.ViewModels.Common
         }
 
         /// <summary>
-        /// Backing field for the <see cref="Username"/> property
+        /// Backing field for the <see cref="UserName"/> property
         /// </summary>
         private string username;
 
@@ -165,7 +165,7 @@ namespace Migration.ViewModels.Common
         public string Output
         {
             get => this.output;
-            set => this.RaiseAndSetIfChanged(ref this.output, value);
+            private set => this.RaiseAndSetIfChanged(ref this.output, value);
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace Migration.ViewModels.Common
         /// <summary>
         /// Gets a value indicating whether all models are selected
         /// </summary>
-        public bool SelectAllModels
+        private bool SelectAllModels
         {
             get => this.selectAllModels;
             set => this.RaiseAndSetIfChanged(ref this.selectAllModels, value);
@@ -211,14 +211,14 @@ namespace Migration.ViewModels.Common
         }
 
         /// <summary>
-        /// Backing field for the <see cref="POCOErrors"/> property
+        /// Backing field for the <see cref="PocoErrors"/> property
         /// </summary>
-        private ReactiveList<POCOErrorRowViewModel> pocoErrors;
+        private ReactiveList<PocoErrorRowViewModel> pocoErrors;
 
         /// <summary>
-        /// Gets or sets poco erorrs list
+        /// Gets or sets poco errors list
         /// </summary>
-        public ReactiveList<POCOErrorRowViewModel> POCOErrors
+        public ReactiveList<PocoErrorRowViewModel> PocoErrors
         {
             get => this.pocoErrors;
             private set => this.RaiseAndSetIfChanged(ref this.pocoErrors, value);
@@ -244,7 +244,7 @@ namespace Migration.ViewModels.Common
         public ReactiveCommand<Unit> LoginCommand { get; private set; }
 
         /// <summary>
-        /// Gets the AnnexC-3 zip file command which loads json file as datasource <see cref="IReactiveCommand"/>
+        /// Gets the AnnexC-3 zip file command which loads json file as data source <see cref="IReactiveCommand"/>
         /// </summary>
         public ReactiveCommand<object> LoadSourceFile { get; private set; }
 
@@ -278,7 +278,7 @@ namespace Migration.ViewModels.Common
             {
                 if (!loginSuccessfully) return;
 
-                LogMessage($"Succesfully logged to {this.Uri}({this.ServerType.Value}) data-source");
+                LogMessage($"Successfully logged to {this.Uri}({this.ServerType.Value}) data-source");
             });
 
             this.WhenAnyValue(vm => vm.ServerType).Subscribe(_ =>
@@ -305,7 +305,7 @@ namespace Migration.ViewModels.Common
                 ChangeTrackingEnabled = true
             };
 
-            this.POCOErrors = new ReactiveList<POCOErrorRowViewModel>
+            this.PocoErrors = new ReactiveList<PocoErrorRowViewModel>
             {
                 ChangeTrackingEnabled = true
             };
@@ -357,7 +357,7 @@ namespace Migration.ViewModels.Common
 
                 this.BindEngineeringModels(siteDirectory);
                 this.BindSiteReferenceDataLibraries(siteDirectory);
-                this.BindPOCOErrors();
+                this.BindPocoErrors();
                 this.BindEngineeringModelErrors();
             }
             catch (Exception ex)
@@ -399,23 +399,23 @@ namespace Migration.ViewModels.Common
         }
 
         /// <summary>
-        /// Apply PocoCardinality & PocoProperties to the E10-25 dataset and bind errors to the reactive list
+        /// Apply PocoCardinality & PocoProperties to the E10-25 data set and bind errors to the reactive list
         /// </summary>
-        private void BindPOCOErrors()
+        private void BindPocoErrors()
         {
-            this.POCOErrors.Clear();
+            this.PocoErrors.Clear();
 
             foreach (var thing in this.ServerSession.Assembler.Cache.Select(item => item.Value.Value).Where(t => t.ValidationErrors.Any()))
             {
                 foreach (var error in thing.ValidationErrors)
                 {
-                    this.POCOErrors.Add(new POCOErrorRowViewModel(thing, error));
+                    this.PocoErrors.Add(new PocoErrorRowViewModel(thing, error));
                 }
             }
         }
 
         /// <summary>
-        /// Apply RuleCheckerEngine to the E10-25 dataset and bind errors to the reactive list
+        /// Apply RuleCheckerEngine to the E10-25 data set and bind errors to the reactive list
         /// </summary>
         private void BindEngineeringModelErrors()
         {
@@ -471,13 +471,14 @@ namespace Migration.ViewModels.Common
         /// Check if a session is already open on the passed data source
         /// </summary>
         /// <param name="dataSourceUri">Data source</param>
-        /// <param name="username">Logged username</param>
+        /// <param name="dataSourceUsername">Data source username</param>
+        /// <param name="dataSourcePassword">Data source username</param>
         /// <returns>true/false</returns>
-        private bool IsSessionOpen(string dataSourceUri, string username, string password)
+        private bool IsSessionOpen(string dataSourceUri, string dataSourceUsername, string dataSourcePassword)
         {
             if (this.ServerSession is null) return false;
 
-            return this.TrimUri(this.ServerSession.Credentials.Uri.ToString()).Equals(this.TrimUri(dataSourceUri)) && this.ServerSession.Credentials.UserName.Equals(username) && this.ServerSession.Credentials.Password.Equals(password);
+            return this.TrimUri(this.ServerSession.Credentials.Uri.ToString()).Equals(this.TrimUri(dataSourceUri)) && this.ServerSession.Credentials.UserName.Equals(dataSourceUsername) && this.ServerSession.Credentials.Password.Equals(dataSourcePassword);
         }
 
         /// <summary>

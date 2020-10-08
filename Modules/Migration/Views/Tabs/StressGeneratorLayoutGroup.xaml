@@ -9,6 +9,5 @@
     Orientation="Vertical"
     mc:Ignorable="d"
     VerticalAlignment="Stretch"
-    HorizontalAlignment="Stretch"
-    >
+    HorizontalAlignment="Stretch">
 </dxlc:LayoutGroup>
