@@ -44,6 +44,10 @@
       <Project>{8c7936c7-8fe8-4dc2-a20c-388b55c08fa5}</Project>
       <Name>Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Migration\Migration.csproj">
+      <Project>{72b5cde8-c1b4-423e-b717-7a472957e55c}</Project>
+      <Name>Migration</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="DevExpress.Xpf.Core.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
