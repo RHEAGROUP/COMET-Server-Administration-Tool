@@ -14,7 +14,7 @@ namespace Migration.Behaviors
 
     /// <summary>
     /// The purpose of this class is to implement a behavior that is specific to migration flow and allows
-    /// the login and source sections(fo the migration tab) to share the same view model
+    /// the login and source sections (of the migration tab) to share the same view model
     /// </summary>
     public class MigrationBehavior : Behavior<MigrationLayoutGroup>
     {
