@@ -39,7 +39,7 @@
                         Content="ClassKind" />
                 </StackPanel>
                 <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
-                    <!-- TODO ComboBox: SelectedItem, ItemsSource -->
+                    <!-- TODO #9 ComboBox: SelectedItem, ItemsSource -->
                     <ComboBox
                         FontSize="12"
                         Name="ThingType"
@@ -73,7 +73,7 @@
     </GroupBox>
 
     <StackPanel Margin="0" HorizontalAlignment="Left" MaxHeight="30">
-        <!-- TODO Button: IsEnabled, Command -->
+        <!-- TODO #9 Button: IsEnabled, Command -->
         <Button
             MinWidth="100"
             Height="Auto"
@@ -88,7 +88,7 @@
     </StackPanel>
 
     <GroupBox Header="Output" HorizontalAlignment="Stretch">
-        <!-- TODO TextEdit: Text="Binding Path... -->
+        <!-- TODO #9 TextEdit: Text="Binding Path... -->
         <dxe:TextEdit
             Height="Auto"
             FontSize="12"
@@ -100,6 +100,6 @@
             />
     </GroupBox>
 
-    <!-- TODO interaction behavior -->
+    <!-- TODO #9 interaction behavior -->
 
 </dxlc:LayoutGroup>
