@@ -244,10 +244,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Tabs\StressGeneratorLayoutGroup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Behaviors\MigrationBehavior.cs" />
@@ -277,9 +273,6 @@
     </Compile>
     <Compile Include="Views\Tabs\SiteRdlLayoutGroup.xaml.cs">
       <DependentUpon>SiteRdlLayoutGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Tabs\StressGeneratorLayoutGroup.xaml.cs">
-      <DependentUpon>StressGeneratorLayoutGroup.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup />

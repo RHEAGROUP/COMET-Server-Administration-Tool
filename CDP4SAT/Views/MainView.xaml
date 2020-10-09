@@ -8,7 +8,7 @@
     xmlns:viewModels="clr-namespace:App.ViewModels"
     xmlns:migrationViews="clr-namespace:Migration.Views;assembly=Migration"
     xmlns:syncerViews="clr-namespace:Syncer.Views;assembly=Syncer"
-    xmlns:migrationViewsTabs="clr-namespace:Migration.Views.Tabs;assembly=Migration"
+    xmlns:stressGeneratorViews="clr-namespace:StressGenerator.Views;assembly=StressGenerator"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300">
@@ -26,7 +26,7 @@
                 dxlc:LayoutControl.AllowHorizontalSizing="True">
                 <migrationViews:Layout />
                 <syncerViews:Layout />
-                <migrationViewsTabs:StressGeneratorLayoutGroup />
+                <stressGeneratorViews:Layout />
             </dxlc:LayoutGroup>
         </dxlc:LayoutControl>
     </Grid>

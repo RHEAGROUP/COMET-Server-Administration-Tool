@@ -1,20 +1,20 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="StressGeneratorLayoutGroup.xaml.cs">
+// <copyright file="Layout.xaml.cs">
 //    Copyright (c) 2020
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Migration.Views.Tabs
+namespace StressGenerator.Views
 {
     /// <summary>
-    /// Interaction logic for StressGeneratorLayoutGroup.xaml
+    /// Interaction logic for Layout.xaml
     /// </summary>
-    public partial class StressGeneratorLayoutGroup
+    public partial class Layout
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="StressGeneratorLayoutGroup"/> class.
+        /// Initializes a new instance of the <see cref="Layout"/> class.
         /// </summary>
-        public StressGeneratorLayoutGroup()
+        public Layout()
         {
             InitializeComponent();
         }
