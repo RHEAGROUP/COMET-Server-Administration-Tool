@@ -1,20 +1,20 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MigrationLayoutGroup.xaml.cs">
+// <copyright file="Layout.xaml.cs">
 //    Copyright (c) 2020
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Migration.Views.Tabs
+namespace Migration.Views
 {
     /// <summary>
-    /// Interaction logic for MigrationLayoutGroup.xaml.cs
+    /// Interaction logic for Layout.xaml.cs
     /// </summary>
-    public partial class MigrationLayoutGroup
+    public partial class Layout
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MigrationLayoutGroup"/> class.
+        /// Initializes a new instance of the <see cref="Layout"/> class.
         /// </summary>
-        public MigrationLayoutGroup()
+        public Layout()
         {
             InitializeComponent();
         }

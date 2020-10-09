@@ -228,7 +228,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Tabs\MigrationLayoutGroup.xaml">
+    <Page Include="Views\Layout.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -266,8 +266,8 @@
     <Compile Include="Views\Tabs\EngineeringModelLayoutGroup.xaml.cs">
       <DependentUpon>EngineeringModelLayoutGroup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Tabs\MigrationLayoutGroup.xaml.cs">
-      <DependentUpon>MigrationLayoutGroup.xaml</DependentUpon>
+    <Compile Include="Views\Layout.xaml.cs">
+      <DependentUpon>Layout.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Tabs\ModelErrorLayoutGroup.xaml.cs">
       <DependentUpon>ModelErrorLayoutGroup.xaml</DependentUpon>

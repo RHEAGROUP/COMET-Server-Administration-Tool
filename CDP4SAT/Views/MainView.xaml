@@ -5,9 +5,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
-    xmlns:tabs="clr-namespace:Migration.Views.Tabs;assembly=Migration"
     xmlns:viewModels="clr-namespace:App.ViewModels"
+    xmlns:migrationViews="clr-namespace:Migration.Views;assembly=Migration"
     xmlns:syncerViews="clr-namespace:Syncer.Views;assembly=Syncer"
+    xmlns:migrationViewsTabs="clr-namespace:Migration.Views.Tabs;assembly=Migration"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="300">
@@ -23,9 +24,9 @@
                 Orientation="Vertical"
                 View="Tabs"
                 dxlc:LayoutControl.AllowHorizontalSizing="True">
-                <tabs:MigrationLayoutGroup />
+                <migrationViews:Layout />
                 <syncerViews:Layout />
-                <tabs:StressGeneratorLayoutGroup />
+                <migrationViewsTabs:StressGeneratorLayoutGroup />
             </dxlc:LayoutGroup>
         </dxlc:LayoutControl>
     </Grid>
