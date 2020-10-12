@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Migration.Views.Tabs
+namespace Common.Views.Tabs
 {
     /// <summary>
     /// Interaction logic for PocoErrorLayoutGroup.xaml

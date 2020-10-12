@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Migration.Utils.Rows
+namespace Common.ViewModels.PlainObjects
 {
     using CDP4Common.CommonData;
     using CDP4Rules.Common;

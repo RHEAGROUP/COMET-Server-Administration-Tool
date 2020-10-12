@@ -4,9 +4,9 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Migration.Views.Tabs
+namespace Common.Views.Tabs
 {
-    using Utils.Rows;
+    using ViewModels.PlainObjects;
     using System.Windows;
     using System.Windows.Controls;
 

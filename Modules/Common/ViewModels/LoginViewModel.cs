@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Migration.ViewModels.Common
+namespace Common.ViewModels
 {
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
@@ -14,7 +14,6 @@ namespace Migration.ViewModels.Common
     using CDP4ServicesDal;
     using CDP4WspDal;
     using Microsoft.Win32;
-    using Utils.Rows;
     using ReactiveUI;
     using System;
     using System.Collections.Generic;
@@ -22,6 +21,7 @@ namespace Migration.ViewModels.Common
     using System.Linq;
     using System.Reactive;
     using System.Threading.Tasks;
+    using PlainObjects;
 
     /// <summary>
     /// The view-model for the Login that allows users to connect to different data sources
@@ -31,7 +31,8 @@ namespace Migration.ViewModels.Common
         /// <summary>
         /// Gets or sets data source server type
         /// </summary>
-        public static KeyValuePair<string, string>[] DataSourceList { get; } = {
+        public static KeyValuePair<string, string>[] DataSourceList { get; } =
+        {
             new KeyValuePair<string, string>("CDP", "CDP4 WebServices"),
             new KeyValuePair<string, string>("OCDT", "OCDT WSP Server"),
             new KeyValuePair<string, string>("JSON", "JSON")
@@ -264,7 +265,8 @@ namespace Migration.ViewModels.Common
                 vm => vm.Password,
                 vm => vm.Uri,
                 (serverType, username, password, uri) =>
-                    !string.IsNullOrEmpty(serverType.Value) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) &&
+                    !string.IsNullOrEmpty(serverType.Value) && !string.IsNullOrEmpty(username) &&
+                    !string.IsNullOrEmpty(password) &&
                     !string.IsNullOrEmpty(uri));
 
             this.WhenAnyValue(vm => vm.LoginFailed).Subscribe((loginFailed) =>
@@ -286,7 +288,8 @@ namespace Migration.ViewModels.Common
                 this.JsonIsSelected = this.ServerType.Key != null && this.ServerType.Key.Equals("JSON");
             });
 
-            this.LoginCommand = ReactiveCommand.CreateAsyncTask(canLogin, x => this.ExecuteLogin(), RxApp.MainThreadScheduler);
+            this.LoginCommand =
+                ReactiveCommand.CreateAsyncTask(canLogin, x => this.ExecuteLogin(), RxApp.MainThreadScheduler);
             this.LoadSourceFile = ReactiveCommand.Create();
             this.LoadSourceFile.Subscribe(_ => this.ExecuteLoadSourceFile());
             this.CheckUncheckModel = ReactiveCommand.Create();
@@ -332,6 +335,7 @@ namespace Migration.ViewModels.Common
                     LogMessage("The user is already logged on this server. Closing the session.");
                     await this.ServerSession.Close();
                 }
+
                 var credentials = new Credentials(this.UserName, this.Password, new Uri(this.Uri));
 
                 switch (this.ServerType.Key)
@@ -405,7 +409,8 @@ namespace Migration.ViewModels.Common
         {
             this.PocoErrors.Clear();
 
-            foreach (var thing in this.ServerSession.Assembler.Cache.Select(item => item.Value.Value).Where(t => t.ValidationErrors.Any()))
+            foreach (var thing in this.ServerSession.Assembler.Cache.Select(item => item.Value.Value)
+                .Where(t => t.ValidationErrors.Any()))
             {
                 foreach (var error in thing.ValidationErrors)
                 {
@@ -426,7 +431,8 @@ namespace Migration.ViewModels.Common
 
             foreach (var result in resultList)
             {
-                this.RuleCheckerErrors.Add(new RuleCheckerErrorRowViewModel(result.Thing, result.Id, result.Description, result.Severity));
+                this.RuleCheckerErrors.Add(new RuleCheckerErrorRowViewModel(result.Thing, result.Id, result.Description,
+                    result.Severity));
             }
         }
 
@@ -472,13 +478,15 @@ namespace Migration.ViewModels.Common
         /// </summary>
         /// <param name="dataSourceUri">Data source</param>
         /// <param name="dataSourceUsername">Data source username</param>
-        /// <param name="dataSourcePassword">Data source username</param>
+        /// <param name="dataSourcePassword">Data source password</param>
         /// <returns>true/false</returns>
         private bool IsSessionOpen(string dataSourceUri, string dataSourceUsername, string dataSourcePassword)
         {
             if (this.ServerSession is null) return false;
 
-            return this.TrimUri(this.ServerSession.Credentials.Uri.ToString()).Equals(this.TrimUri(dataSourceUri)) && this.ServerSession.Credentials.UserName.Equals(dataSourceUsername) && this.ServerSession.Credentials.Password.Equals(dataSourcePassword);
+            return TrimUri(this.ServerSession.Credentials.Uri.ToString()).Equals(TrimUri(dataSourceUri)) &&
+                   this.ServerSession.Credentials.UserName.Equals(dataSourceUsername) &&
+                   this.ServerSession.Credentials.Password.Equals(dataSourcePassword);
         }
 
         /// <summary>
@@ -486,7 +494,7 @@ namespace Migration.ViewModels.Common
         /// </summary>
         /// <param name="input">The original Uri</param>
         /// <returns>The trimmed uri or the original if there is no slash.</returns>
-        private string TrimUri(string input)
+        private static string TrimUri(string input)
         {
             return input.EndsWith("/") ? input.Substring(0, input.Length - 1) : input;
         }

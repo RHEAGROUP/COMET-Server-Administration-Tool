@@ -1,20 +1,20 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SiteRdlLayoutGroup.xaml.cs">
+// <copyright file="ModelErrorLayoutGroup.xaml.cs">
 //    Copyright (c) 2020
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Migration.Views.Tabs
+namespace Common.Views.Tabs
 {
     /// <summary>
-    /// Interaction logic for SiteRdlLayoutGroup.xaml
+    /// Interaction logic for ModelErrorLayoutGroup.xaml
     /// </summary>
-    public partial class SiteRdlLayoutGroup
+    public partial class ModelErrorLayoutGroup
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="SiteRdlLayoutGroup"/> class.
+        /// Initializes a new instance of the <see cref="ModelErrorLayoutGroup"/> class.
         /// </summary>
-        public SiteRdlLayoutGroup()
+        public ModelErrorLayoutGroup()
         {
             InitializeComponent();
         }
