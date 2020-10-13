@@ -5,11 +5,15 @@
                   xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
                   xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                  xmlns:model="clr-namespace:Common.ViewModels"
                   Header="POCO Errors"
                   Orientation="Vertical"
                   mc:Ignorable="d"
                   VerticalAlignment="Stretch"
                   HorizontalAlignment="Stretch">
+    <dxlc:LayoutGroup.DataContext>
+        <model:ErrorViewModel />
+    </dxlc:LayoutGroup.DataContext>
     <dxlc:LayoutItem>
         <dxg:GridControl EnableSmartColumnsGeneration="True"
                          ItemsSource="{Binding PocoErrors, UpdateSourceTrigger=PropertyChanged}"

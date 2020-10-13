@@ -212,20 +212,6 @@ namespace Common.ViewModels
         }
 
         /// <summary>
-        /// Backing field for the <see cref="PocoErrors"/> property
-        /// </summary>
-        private ReactiveList<PocoErrorRowViewModel> pocoErrors;
-
-        /// <summary>
-        /// Gets or sets poco errors list
-        /// </summary>
-        public ReactiveList<PocoErrorRowViewModel> PocoErrors
-        {
-            get => this.pocoErrors;
-            private set => this.RaiseAndSetIfChanged(ref this.pocoErrors, value);
-        }
-
-        /// <summary>
         /// Backing field for the <see cref="RuleCheckerErrors"/> property
         /// </summary>
         private ReactiveList<RuleCheckerErrorRowViewModel> ruleCheckerErrors;
@@ -309,11 +295,6 @@ namespace Common.ViewModels
                 ChangeTrackingEnabled = true
             };
 
-            this.PocoErrors = new ReactiveList<PocoErrorRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
-
             this.RuleCheckerErrors = new ReactiveList<RuleCheckerErrorRowViewModel>
             {
                 ChangeTrackingEnabled = true
@@ -362,7 +343,6 @@ namespace Common.ViewModels
 
                 this.BindEngineeringModels(siteDirectory);
                 this.BindSiteReferenceDataLibraries(siteDirectory);
-                this.BindPocoErrors();
                 this.BindEngineeringModelErrors();
             }
             catch (Exception ex)
@@ -400,23 +380,6 @@ namespace Common.ViewModels
             foreach (var rdl in siteDirectory.SiteReferenceDataLibrary.OrderBy(m => m.Name))
             {
                 this.SiteReferenceDataLibraries.Add(new SiteReferenceDataLibraryRowViewModel(rdl));
-            }
-        }
-
-        /// <summary>
-        /// Apply PocoCardinality & PocoProperties to the E10-25 data set and bind errors to the reactive list
-        /// </summary>
-        private void BindPocoErrors()
-        {
-            this.PocoErrors.Clear();
-
-            foreach (var thing in this.ServerSession.Assembler.Cache.Select(item => item.Value.Value)
-                .Where(t => t.ValidationErrors.Any()))
-            {
-                foreach (var error in thing.ValidationErrors)
-                {
-                    this.PocoErrors.Add(new PocoErrorRowViewModel(thing, error));
-                }
             }
         }
 

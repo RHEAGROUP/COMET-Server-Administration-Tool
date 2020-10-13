@@ -6,6 +6,7 @@
 
 namespace Migration.Views
 {
+    using Common.ViewModels;
     using System.Windows;
     using System.Windows.Controls;
 
@@ -15,13 +16,22 @@ namespace Migration.Views
     public partial class ServerInfo : UserControl
     {
         /// <summary>
-        /// <see cref="DependencyProperty"/> that can be set in XAML to indicate that the JsonIsAvailable is available
+        /// <see cref="DependencyProperty"/> that can be set in XAML to indicate that the JsonIsAvailable is set
         /// </summary>
         public static readonly DependencyProperty ShowErrorsProperty = DependencyProperty.RegisterAttached(
             "ShowErrors",
             typeof(bool),
             typeof(ServerInfo),
-            new PropertyMetadata(true, new PropertyChangedCallback(ShowErrorsPropertyChanged)));
+            new PropertyMetadata(true, PropertyChanged));
+
+        /// <summary>
+        /// <see cref="DependencyProperty"/> that can be set in XAML to indicate that the LoginSuccessfully is set
+        /// </summary>
+        public static readonly DependencyProperty LoginSuccessfullyProperty = DependencyProperty.RegisterAttached(
+            "LoginSuccessfully",
+            typeof(bool),
+            typeof(ServerInfo),
+            new PropertyMetadata(false, PropertyChanged));
 
         /// <summary>
         /// Gets or sets the <see cref="ShowErrorsProperty"/> dependency property.
@@ -32,6 +42,14 @@ namespace Migration.Views
             set => this.SetValue(ShowErrorsProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the <see cref="LoginSuccessfullyProperty"/> dependency property.
+        /// </summary>
+        public bool LoginSuccessfully
+        {
+            get => (bool)this.GetValue(LoginSuccessfullyProperty);
+            set => this.SetValue(LoginSuccessfullyProperty, value);
+        }
 
         public ServerInfo()
         {
@@ -43,21 +61,43 @@ namespace Migration.Views
         /// </summary>
         /// <param name="d">The dependency object user control <see cref="DependencyObject" /></param>
         /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
-        private static void ShowErrorsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            (d as ServerInfo)?.ShowErrorValueChanged(e);
+            if (!(d is ServerInfo))
+                return;
+
+            if (e.Property.Name == "ShowErrors")
+            {
+                ((ServerInfo) d).ShowErrorsValueChanged(e);
+            }
+            else if (e.Property.Name == "LoginSuccessfully")
+            {
+                ((ServerInfo) d).LoginSuccessfullyValueChanged(e);
+            }
         }
 
         /// <summary>
         /// Instance handler which will handle any changes that occur to a particular instance.
         /// </summary>
         /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
-        private void ShowErrorValueChanged(DependencyPropertyChangedEventArgs e)
+        private void ShowErrorsValueChanged(DependencyPropertyChangedEventArgs e)
         {
             if ((bool)e.NewValue) return;
 
             this.PocoErrorsLayoutGroup.Visibility = Visibility.Hidden;
             this.ModelErrorsLayoutGroup.Visibility = Visibility.Hidden;
+        }
+
+        /// <summary>
+        /// Instance handler which will handle any changes that occur to a particular instance.
+        /// </summary>
+        /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
+        private void LoginSuccessfullyValueChanged(DependencyPropertyChangedEventArgs e)
+        {
+            if ((bool)e.NewValue && this.PocoErrorsLayoutGroup.DataContext is ErrorViewModel errorViewModel)
+            {
+                errorViewModel.ServerSession = (this.DataContext as LoginViewModel)?.ServerSession;
+            }
         }
     }
 }

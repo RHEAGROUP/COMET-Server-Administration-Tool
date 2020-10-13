@@ -82,6 +82,9 @@
                 </StackPanel>
                 <StackPanel Grid.Row="0" Grid.Column="1">
                     <views:ServerInfo
+                        LoginSuccessfully="{Binding
+                          Path=LoginSuccessfully,
+                          UpdateSourceTrigger=PropertyChanged}"
                         Visibility="{Binding
                         Path=LoginSuccessfully,
                         Converter={dxmvvm:BooleanToVisibilityConverter},
