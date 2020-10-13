@@ -177,7 +177,7 @@ namespace Common.ViewModels
         /// <summary>
         /// Gets a value indicating whether all models are selected
         /// </summary>
-        private bool SelectAllModels
+        public bool SelectAllModels
         {
             get => this.selectAllModels;
             set => this.RaiseAndSetIfChanged(ref this.selectAllModels, value);
