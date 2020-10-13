@@ -265,7 +265,8 @@ namespace Common.ViewModels
                 vm => vm.Password,
                 vm => vm.Uri,
                 (serverType, username, password, uri) =>
-                    !string.IsNullOrEmpty(serverType.Value) && !string.IsNullOrEmpty(username) &&
+                    !string.IsNullOrEmpty(serverType.Value) &&
+                    !string.IsNullOrEmpty(username) &&
                     !string.IsNullOrEmpty(password) &&
                     !string.IsNullOrEmpty(uri));
 

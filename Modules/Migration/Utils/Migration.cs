@@ -21,7 +21,7 @@ namespace Migration.Utils
     using System.Net.Http.Headers;
     using System.Text;
     using System.Threading.Tasks;
-    using global::Common.ViewModels.PlainObjects;
+    using Common.ViewModels.PlainObjects;
 
     /// <summary>
     /// Enumeration of the migration process steps

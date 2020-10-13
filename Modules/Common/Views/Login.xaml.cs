@@ -63,8 +63,6 @@ namespace Common.Views
 
             this.ServerType.ItemsSource = LoginViewModel.DataSourceList.Where(item => item.Key != "JSON");
             this.BrowseJson.Visibility = Visibility.Hidden;
-            //this.pocoErrorsLayoutGroup.Visibility = Visibility.Hidden;
-            //this.modelErrorsLayoutGroup.Visibility = Visibility.Hidden;
         }
     }
 }

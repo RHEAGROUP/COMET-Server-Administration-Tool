@@ -1,4 +1,8 @@
-﻿
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ServerInfo.xaml.cs">
+//    Copyright (c) 2020
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace Migration.Views
 {
@@ -25,7 +29,6 @@ namespace Migration.Views
         public bool ShowErrors
         {
             get => (bool)this.GetValue(ShowErrorsProperty);
-
             set => this.SetValue(ShowErrorsProperty, value);
         }
 
