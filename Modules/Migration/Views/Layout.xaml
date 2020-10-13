@@ -1,5 +1,5 @@
 ﻿<dxlc:LayoutGroup
-    x:Class="Migration.Views.Tabs.MigrationLayoutGroup"
+    x:Class="Migration.Views.Layout"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -28,15 +28,23 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <common:Login Grid.Row="0" Grid.Column="0" x:Name="LoginSource"></common:Login>
+                <common:Login
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    x:Name="LoginSource" />
 
-                <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding Path=FileIsChecked}" Margin="5"
-                          Content="File">
-                </CheckBox>
+                <CheckBox
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    IsChecked="{Binding Path=FileIsChecked}"
+                    Margin="5"
+                    Content="File" />
+
                 <StackPanel Margin="5" Grid.Row="2"
                             Grid.Column="0" Orientation="Horizontal">
                     <GroupBox Header="migration.json">
@@ -75,10 +83,16 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <common:Login Grid.Row="0" Grid.Column="0" x:Name="LoginTarget" JsonIsAvailable="False" />
+
+                <common:Login
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    x:Name="LoginTarget"
+                    JsonIsAvailable="False" />
             </Grid>
         </StackPanel>
     </GroupBox>
