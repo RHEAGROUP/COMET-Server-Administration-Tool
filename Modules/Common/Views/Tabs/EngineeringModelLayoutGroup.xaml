@@ -17,7 +17,7 @@
                          AutoGenerateColumns="None" Name="EngineeringModelGridControl">
             <dxg:GridControl.View>
                 <dxg:TableView
-                    Height="150"
+                    Height="140"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     AllowColumnMoving="False"

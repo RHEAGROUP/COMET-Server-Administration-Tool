@@ -17,8 +17,7 @@
                          AutoGenerateColumns="None" Name="SiteRdlGridControl">
             <dxg:GridControl.View>
                 <dxg:TableView
-                    Name="SiteRdlView"
-                    Height="150"
+                    Height="140"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     AllowColumnMoving="False"
