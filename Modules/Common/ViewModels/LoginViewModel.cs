@@ -10,7 +10,6 @@ namespace Common.ViewModels
     using CDP4Dal;
     using CDP4Dal.DAL;
     using CDP4JsonFileDal;
-    using CDP4Rules;
     using CDP4ServicesDal;
     using CDP4WspDal;
     using Microsoft.Win32;
@@ -212,20 +211,6 @@ namespace Common.ViewModels
         }
 
         /// <summary>
-        /// Backing field for the <see cref="RuleCheckerErrors"/> property
-        /// </summary>
-        private ReactiveList<RuleCheckerErrorRowViewModel> ruleCheckerErrors;
-
-        /// <summary>
-        /// Gets or sets rule checker errors list
-        /// </summary>
-        public ReactiveList<RuleCheckerErrorRowViewModel> RuleCheckerErrors
-        {
-            get => this.ruleCheckerErrors;
-            private set => this.RaiseAndSetIfChanged(ref this.ruleCheckerErrors, value);
-        }
-
-        /// <summary>
         /// Gets the server login command
         /// </summary>
         public ReactiveCommand<Unit> LoginCommand { get; private set; }
@@ -294,11 +279,6 @@ namespace Common.ViewModels
             {
                 ChangeTrackingEnabled = true
             };
-
-            this.RuleCheckerErrors = new ReactiveList<RuleCheckerErrorRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
         }
 
         /// <summary>
@@ -343,7 +323,6 @@ namespace Common.ViewModels
 
                 this.BindEngineeringModels(siteDirectory);
                 this.BindSiteReferenceDataLibraries(siteDirectory);
-                this.BindEngineeringModelErrors();
             }
             catch (Exception ex)
             {
@@ -380,23 +359,6 @@ namespace Common.ViewModels
             foreach (var rdl in siteDirectory.SiteReferenceDataLibrary.OrderBy(m => m.Name))
             {
                 this.SiteReferenceDataLibraries.Add(new SiteReferenceDataLibraryRowViewModel(rdl));
-            }
-        }
-
-        /// <summary>
-        /// Apply RuleCheckerEngine to the E10-25 data set and bind errors to the reactive list
-        /// </summary>
-        private void BindEngineeringModelErrors()
-        {
-            var ruleCheckerEngine = new RuleCheckerEngine();
-            var resultList = ruleCheckerEngine.Run(this.ServerSession.Assembler.Cache.Select(item => item.Value.Value));
-
-            this.RuleCheckerErrors.Clear();
-
-            foreach (var result in resultList)
-            {
-                this.RuleCheckerErrors.Add(new RuleCheckerErrorRowViewModel(result.Thing, result.Id, result.Description,
-                    result.Severity));
             }
         }
 

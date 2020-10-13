@@ -94,9 +94,15 @@ namespace Migration.Views
         /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
         private void LoginSuccessfullyValueChanged(DependencyPropertyChangedEventArgs e)
         {
-            if ((bool)e.NewValue && this.PocoErrorsLayoutGroup.DataContext is ErrorViewModel errorViewModel)
+            if (!(bool)e.NewValue) return;
+
+            if (this.PocoErrorsLayoutGroup.DataContext is ErrorViewModel pocoErrorsViewModel)
             {
-                errorViewModel.ServerSession = (this.DataContext as LoginViewModel)?.ServerSession;
+                pocoErrorsViewModel.ServerSession = (this.DataContext as LoginViewModel)?.ServerSession;
+            }
+            if (this.ModelErrorsLayoutGroup.DataContext is ErrorViewModel modelErrorsViewModel)
+            {
+                modelErrorsViewModel.ServerSession = (this.DataContext as LoginViewModel)?.ServerSession;
             }
         }
     }
