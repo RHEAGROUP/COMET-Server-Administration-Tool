@@ -8,7 +8,8 @@
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
-    xmlns:common="clr-namespace:Migration.Views.Common"
+    xmlns:common="clr-namespace:Common.Views;assembly=Common"
+    xmlns:views="clr-namespace:Migration.Views"
     xmlns:viewModels="clr-namespace:Migration.ViewModels"
     xmlns:behaviors="clr-namespace:Migration.Behaviors"
     Header="Migration"
@@ -20,64 +21,77 @@
         <viewModels:MigrationViewModel />
     </dxlc:LayoutGroup.DataContext>
 
-    <GroupBox Header="Source" Height="350">
+    <GroupBox Header="Source" Height="300">
         <StackPanel Margin="0" HorizontalAlignment="Stretch">
             <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-
-                <common:Login
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    x:Name="LoginSource" />
-
-                <CheckBox
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    IsChecked="{Binding Path=FileIsChecked}"
-                    Margin="5"
-                    Content="File" />
-
-                <StackPanel Margin="5" Grid.Row="2"
-                            Grid.Column="0" Orientation="Horizontal">
-                    <GroupBox Header="migration.json">
-                        <StackPanel Margin="0" Orientation="Horizontal">
-                            <dxe:TextEdit
-                                Height="Auto"
-                                Margin="5"
-                                FontSize="12"
-                                Width="210"
-                                IsEnabled="{Binding FileIsChecked}"
-                                Text="{Binding MigrationFile}" />
-
-                            <Button
-                                MinWidth="100"
-                                Height="Auto"
-                                MaxWidth="100"
-                                Command="{Binding LoadMigrationFile}"
-                                Margin="5"
-                                FontSize="12"
-                                HorizontalAlignment="Right"
-                                IsEnabled="{Binding FileIsChecked}">
-                                <StackPanel Orientation="Horizontal">
-                                    <Image Source="{dx:DXImage Image=Open_16x16.png}" Stretch="Uniform" />
-                                    <TextBlock Text="Browse" VerticalAlignment="Center" Margin="5 0 0 0" />
+                <StackPanel Grid.Row="0" Grid.Column="0">
+                    <Grid HorizontalAlignment="Stretch">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <common:Login Grid.Row="0" Grid.Column="0"
+                            x:Name="LoginSource" />
+                        <CheckBox
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            IsChecked="{Binding Path=FileIsChecked}"
+                            Margin="5"
+                            Content="File" />
+                        <StackPanel Grid.Row="2"
+                                    Grid.Column="0" Orientation="Horizontal">
+                            <GroupBox Header="migration.json">
+                                <StackPanel Margin="0" Orientation="Horizontal">
+                                    <dxe:TextEdit
+                                        Height="Auto"
+                                        Margin="5"
+                                        FontSize="12"
+                                        Width="210"
+                                        IsEnabled="{Binding FileIsChecked}"
+                                        Text="{Binding MigrationFile}" />
+                                    <Button
+                                        MinWidth="100"
+                                        Height="Auto"
+                                        MaxWidth="100"
+                                        Command="{Binding LoadMigrationFile}"
+                                        Margin="5"
+                                        FontSize="12"
+                                        HorizontalAlignment="Right"
+                                        IsEnabled="{Binding FileIsChecked}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Source="{dx:DXImage Image=Open_16x16.png}" Stretch="Uniform" />
+                                            <TextBlock Text="Browse" VerticalAlignment="Center" Margin="5 0 0 0" />
+                                        </StackPanel>
+                                    </Button>
                                 </StackPanel>
-                            </Button>
+                            </GroupBox>
                         </StackPanel>
-                    </GroupBox>
+                    </Grid>
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="1">
+                    <views:ServerInfo
+                        Visibility="{Binding
+                        Path=LoginSuccessfully,
+                        Converter={dxmvvm:BooleanToVisibilityConverter},
+                        UpdateSourceTrigger=PropertyChanged}"
+                        DataContext="{Binding SourceViewModel}" />
                 </StackPanel>
             </Grid>
         </StackPanel>
     </GroupBox>
-    <GroupBox Header="Target" Height="250">
+    <GroupBox Header="Target" Height="230">
         <StackPanel Margin="0">
             <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
@@ -85,14 +99,23 @@
                 </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-
-                <common:Login
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    x:Name="LoginTarget"
-                    JsonIsAvailable="False" />
+                <StackPanel Grid.Row="0" Grid.Column="0">
+                    <common:Login
+                        x:Name="LoginTarget"
+                        JsonIsAvailable="False" />
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="1">
+                    <views:ServerInfo
+                        ShowErrors="False"
+                        Visibility="{Binding
+                        Path=LoginSuccessfully,
+                        Converter={dxmvvm:BooleanToVisibilityConverter},
+                        UpdateSourceTrigger=PropertyChanged}"
+                        DataContext="{Binding TargetViewModel}" />
+                </StackPanel>
             </Grid>
         </StackPanel>
     </GroupBox>

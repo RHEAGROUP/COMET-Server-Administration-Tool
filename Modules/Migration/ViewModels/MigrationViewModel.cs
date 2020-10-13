@@ -7,13 +7,13 @@
 namespace Migration.ViewModels
 {
     using Utils;
-    using Common;
     using Microsoft.Win32;
     using ReactiveUI;
     using System;
     using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using Common.ViewModels;
 
     /// <summary>
     /// The view-model for the Migration that lets users to migrate models between different data servers
@@ -155,12 +155,9 @@ namespace Migration.ViewModels
                 vm => vm.TargetViewModel.LoginSuccessfully,
                 vm => vm.TargetViewModel.ServerSession,
                 (sourceLoginSuccessfully, sourceSession, targetLoginSuccessfully, targetSession) =>
-                {
-                    return sourceLoginSuccessfully && sourceSession != null && targetLoginSuccessfully && targetSession != null;
-                });
+                    sourceLoginSuccessfully && sourceSession != null && targetLoginSuccessfully && targetSession != null);
             canExecuteMigrate.ToProperty(this, vm => vm.CanMigrate, out this.canMigrate);
 
-            //this.ServerIsChecked = true;
             this.FileIsChecked = false;
 
             this.migration = new Migration();
@@ -170,7 +167,8 @@ namespace Migration.ViewModels
             this.LoadMigrationFile = ReactiveCommand.Create();
             this.LoadMigrationFile.Subscribe(_ => this.ExecuteLoadMigrationFile());
 
-            this.MigrateCommand = ReactiveCommand.CreateAsyncTask(canExecuteMigrate, x => this.ExecuteMigration(), RxApp.MainThreadScheduler);
+            this.MigrateCommand = ReactiveCommand.CreateAsyncTask(canExecuteMigrate,
+                x => this.ExecuteMigration(), RxApp.MainThreadScheduler);
         }
 
         /// <summary>

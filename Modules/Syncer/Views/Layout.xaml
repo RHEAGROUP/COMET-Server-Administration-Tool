@@ -7,7 +7,7 @@
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
-    xmlns:commonViews="clr-namespace:Migration.Views.Common;assembly=Migration"
+    xmlns:views="clr-namespace:Common.Views;assembly=Common"
     Header="Syncer"
     Orientation="Vertical"
     mc:Ignorable="d"
@@ -15,7 +15,7 @@
     HorizontalAlignment="Stretch"
     >
 
-    <GroupBox Header="Source" Height="350">
+    <GroupBox Header="Source" Height="300">
         <StackPanel Margin="0" HorizontalAlignment="Stretch">
             <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
@@ -28,7 +28,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <commonViews:Login
+                <views:Login
                     Grid.Row="0"
                     Grid.Column="0"
                     x:Name="LoginSource" />
@@ -52,7 +52,7 @@
         </StackPanel>
     </GroupBox>
 
-    <GroupBox Header="Target" Height="250">
+    <GroupBox Header="Target" Height="230">
         <StackPanel Margin="0">
             <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
@@ -63,7 +63,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <commonViews:Login
+                <views:Login
                     Grid.Row="0"
                     Grid.Column="0"
                     x:Name="LoginTarget"

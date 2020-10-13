@@ -4,10 +4,10 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Migration.Views.Common
+namespace Common.Views
 {
-    using Migration.ViewModels.Common;
     using System.Linq;
+    using ViewModels;
     using System.Windows;
     using System.Windows.Controls;
 
@@ -50,7 +50,7 @@ namespace Migration.Views.Common
         /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
         private static void OnSetJsonIsAvailableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            (d as Login).OnSetTextChanged(e);
+            (d as Login)?.OnSetTextChanged(e);
         }
 
         /// <summary>
@@ -59,13 +59,10 @@ namespace Migration.Views.Common
         /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
         private void OnSetTextChanged(DependencyPropertyChangedEventArgs e)
         {
-            if (!(bool)e.NewValue)
-            {
-                this.ServerType.ItemsSource = LoginViewModel.DataSourceList.Where(item => item.Key != "JSON");
-                this.BrowseJson.Visibility = Visibility.Hidden;
-                this.pocoErrorsLayoutGroup.Visibility = Visibility.Hidden;
-                this.modelErrorsLayoutGroup.Visibility = Visibility.Hidden;
-            }
+            if ((bool) e.NewValue) return;
+
+            this.ServerType.ItemsSource = LoginViewModel.DataSourceList.Where(item => item.Key != "JSON");
+            this.BrowseJson.Visibility = Visibility.Hidden;
         }
     }
 }

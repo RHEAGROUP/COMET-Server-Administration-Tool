@@ -1,5 +1,5 @@
 ﻿<dxlc:LayoutGroup
-    x:Class="Migration.Views.Tabs.EngineeringModelLayoutGroup"
+    x:Class="Common.Views.Tabs.EngineeringModelLayoutGroup"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -17,8 +17,7 @@
                          AutoGenerateColumns="None" Name="EngineeringModelGridControl">
             <dxg:GridControl.View>
                 <dxg:TableView
-                    Name="EngineeringModelView"
-                    Height="150"
+                    Height="140"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     AllowColumnMoving="False"

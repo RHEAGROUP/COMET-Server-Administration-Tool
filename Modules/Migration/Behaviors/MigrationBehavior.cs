@@ -6,8 +6,8 @@
 
 namespace Migration.Behaviors
 {
+    using Common.ViewModels;
     using ViewModels;
-    using ViewModels.Common;
     using Views;
     using DevExpress.Mvvm.UI.Interactivity;
     using System.Diagnostics.CodeAnalysis;

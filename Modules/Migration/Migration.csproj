@@ -209,59 +209,24 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\Common\Login.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="Views\ServerInfo.xaml">
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Tabs\EngineeringModelLayoutGroup.xaml">
       <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Layout.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Tabs\ModelErrorLayoutGroup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Tabs\PocoErrorLayoutGroup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Tabs\SiteRdlLayoutGroup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Behaviors\MigrationBehavior.cs" />
-    <Compile Include="Utils\InverseBooleanConverter.cs" />
     <Compile Include="Utils\Migration.cs" />
-    <Compile Include="ViewModels\Common\LoginViewModel.cs" />
     <Compile Include="ViewModels\MigrationViewModel.cs" />
-    <Compile Include="Utils\Rows\DefinedThingRowViewModel.cs" />
-    <Compile Include="Utils\Rows\EngineeringModelRowViewModel.cs" />
-    <Compile Include="Utils\Rows\PocoErrorRowViewModel.cs" />
-    <Compile Include="Utils\Rows\RuleCheckerErrorRowViewModel.cs" />
-    <Compile Include="Utils\Rows\SiteReferenceDataLibraryRowViewModel.cs" />
-    <Compile Include="Views\Common\Login.xaml.cs">
-      <DependentUpon>Login.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Tabs\EngineeringModelLayoutGroup.xaml.cs">
-      <DependentUpon>EngineeringModelLayoutGroup.xaml</DependentUpon>
+    <Compile Include="Views\ServerInfo.xaml.cs">
+      <DependentUpon>ServerInfo.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Layout.xaml.cs">
       <DependentUpon>Layout.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Tabs\ModelErrorLayoutGroup.xaml.cs">
-      <DependentUpon>ModelErrorLayoutGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Tabs\PocoErrorLayoutGroup.xaml.cs">
-      <DependentUpon>PocoErrorLayoutGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Tabs\SiteRdlLayoutGroup.xaml.cs">
-      <DependentUpon>SiteRdlLayoutGroup.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup />

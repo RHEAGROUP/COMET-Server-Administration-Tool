@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Migration.Utils
+namespace Common.Utils
 {
     using System;
     using System.Globalization;
