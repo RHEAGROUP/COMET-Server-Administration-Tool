@@ -15,7 +15,7 @@
     HorizontalAlignment="Stretch"
     >
 
-    <GroupBox Header="Source" Height="350">
+    <GroupBox Header="Source" Height="300">
         <StackPanel Margin="0" HorizontalAlignment="Stretch">
             <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
@@ -52,7 +52,7 @@
         </StackPanel>
     </GroupBox>
 
-    <GroupBox Header="Target" Height="250">
+    <GroupBox Header="Target" Height="230">
         <StackPanel Margin="0">
             <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
