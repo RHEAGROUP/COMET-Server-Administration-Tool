@@ -6,24 +6,34 @@
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:tabs="clr-namespace:Common.Views.Tabs;assembly=Common"
              mc:Ignorable="d">
-    <dxlc:LayoutGroup
-        Orientation="Vertical"
-        View="Tabs"
-        Margin="0 0 0 0">
-        <tabs:EngineeringModelLayoutGroup
-            GridSelectionIsAvailable="{Binding
-                        RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}},
-                        Path=ShowErrors}" />
-        <tabs:SiteRdlLayoutGroup />
-        <tabs:PocoErrorLayoutGroup
-            Visibility="{Binding
-                        RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}},
-                        Path=ShowErrors}"
-            x:Name="PocoErrorsLayoutGroup" />
-        <tabs:ModelErrorLayoutGroup
-            Visibility="{Binding
-                        RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}},
-                        Path=ShowErrors}"
-            x:Name="ModelErrorsLayoutGroup" />
-    </dxlc:LayoutGroup>
+    <Grid HorizontalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <dxlc:LayoutGroup
+            Grid.Row="0" Grid.Column="0"
+            Orientation="Vertical"
+            View="Tabs"
+            Margin="0 0 0 0">
+            <tabs:EngineeringModelLayoutGroup
+                GridSelectionIsAvailable="{Binding
+                            RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}},
+                            Path=ShowErrors}" />
+            <tabs:SiteRdlLayoutGroup />
+            <tabs:PocoErrorLayoutGroup
+                Visibility="{Binding
+                            RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}},
+                            Path=ShowErrors}"
+                x:Name="PocoErrorsLayoutGroup" />
+            <tabs:ModelErrorLayoutGroup
+                Visibility="{Binding
+                            RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}},
+                            Path=ShowErrors}"
+                x:Name="ModelErrorsLayoutGroup" />
+        </dxlc:LayoutGroup>
+    </Grid>
 </UserControl>
