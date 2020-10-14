@@ -4,6 +4,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
+
 namespace Common.ViewModels.PlainObjects
 {
     using CDP4Common.CommonData;
@@ -56,6 +58,15 @@ namespace Common.ViewModels.PlainObjects
             this.Id = id;
             this.Description = description;
             this.Severity = severity;
+        }
+
+        /// <summary>
+        /// Override ToString() method
+        /// </summary>
+        /// <returns>string object representation</returns>
+        public override string ToString()
+        {
+            return $"{this.ContainerThingClassKind}({this.Id}){Environment.NewLine}Error:{this.Description}";
         }
     }
 }

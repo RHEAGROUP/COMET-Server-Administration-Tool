@@ -17,6 +17,11 @@ namespace Common.ViewModels.PlainObjects
     public class PocoErrorRowViewModel : ReactiveObject
     {
         /// <summary>
+        /// Gets or sets the identifier or code of the Rule that may have been broken
+        /// </summary>
+        private string Id { get; set; }
+
+        /// <summary>
         /// Gets the <see cref="ClassKind"/> of the <see cref="Thing"/> that contains the error.
         /// </summary>
         public string ContainerThingClassKind { get; private set; }
@@ -44,6 +49,7 @@ namespace Common.ViewModels.PlainObjects
         {
             this.ContainerThingClassKind = thing.ClassKind.ToString();
             this.Error = error;
+            this.Id = thing.Iid.ToString();
 
             try
             {
@@ -56,6 +62,15 @@ namespace Common.ViewModels.PlainObjects
             {
                 this.Path = ex.Message;
             }
+        }
+
+        /// <summary>
+        /// Override ToString() method
+        /// </summary>
+        /// <returns>string object representation</returns>
+        public override string ToString()
+        {
+            return $"{this.ContainerThingClassKind}({this.Id}){Environment.NewLine}Error:{this.Error}";
         }
     }
 }

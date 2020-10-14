@@ -224,6 +224,9 @@
     <Compile Include="Views\Tabs\EngineeringModelLayoutGroup.xaml.cs">
       <DependentUpon>EngineeringModelLayoutGroup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Tabs\ErrorDetail.xaml.cs">
+      <DependentUpon>ErrorDetail.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Tabs\ModelErrorLayoutGroup.xaml.cs">
       <DependentUpon>ModelErrorLayoutGroup.xaml</DependentUpon>
     </Compile>
@@ -242,6 +245,10 @@
     <Page Include="Views\Tabs\EngineeringModelLayoutGroup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Tabs\ErrorDetail.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Tabs\ModelErrorLayoutGroup.xaml">
       <Generator>MSBuild:Compile</Generator>

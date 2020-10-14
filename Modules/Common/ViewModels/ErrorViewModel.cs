@@ -4,11 +4,10 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using CDP4Rules;
-
 namespace Common.ViewModels
 {
     using CDP4Dal;
+    using CDP4Rules;
     using System;
     using System.Linq;
     using PlainObjects;
@@ -62,6 +61,54 @@ namespace Common.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets the selected error item inside errors poco grid
+        /// </summary>
+        public PocoErrorRowViewModel CurrentPocoError { get; set; }
+
+        /// <summary>
+        /// Gets or sets the selected error item inside errors model grid
+        /// </summary>
+        public RuleCheckerErrorRowViewModel CurrentModelError { get; set; }
+
+        /// <summary>
+        /// Gets or sets the poco grid row double click command
+        /// </summary>
+        public ReactiveCommand<object> PocoSelectRowCommand { get; private set; }
+
+        /// <summary>
+        /// Gets or sets  the grid row double click command
+        /// </summary>
+        public ReactiveCommand<object> ModelSelectRowCommand { get; private set; }
+
+        /// <summary>
+        /// Out property for the <see cref="IsDetailsVisible"/> property
+        /// </summary>
+        private bool isDetailsVisible;
+
+        /// <summary>
+        /// Gets a value indicating whether error details should be displayed
+        /// </summary>
+        public bool IsDetailsVisible
+        {
+            get => this.isDetailsVisible;
+            set => this.RaiseAndSetIfChanged(ref this.isDetailsVisible, value);
+        }
+
+        /// <summary>
+        /// Out property for the <see cref="ErrorDetails"/> property
+        /// </summary>
+        private string errorDetails;
+
+        /// <summary>
+        /// Gets or sets error details that will be displayed inside error details group
+        /// </summary>
+        public string ErrorDetails
+        {
+            get => this.errorDetails;
+            set => this.RaiseAndSetIfChanged(ref this.errorDetails, value);
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ErrorViewModel"/> class.
         /// </summary>
         public ErrorViewModel()
@@ -76,11 +123,50 @@ namespace Common.ViewModels
                 ChangeTrackingEnabled = true
             };
 
+            this.IsDetailsVisible = false;
+            this.ErrorDetails = string.Empty;
+
             this.WhenAnyValue(vm => vm.ServerSession).Subscribe(serverSession =>
             {
                 BindPocoErrors(serverSession);
                 BindRuleCheckerErrors(serverSession);
             });
+
+            this.PocoSelectRowCommand = ReactiveCommand.Create();
+            this.PocoSelectRowCommand.Subscribe(_ => this.ExecuteSelectErrorPocoRow());
+
+            this.ModelSelectRowCommand = ReactiveCommand.Create();
+            this.ModelSelectRowCommand.Subscribe(_ => this.ExecuteSelectErrorModelRow());
+        }
+
+        /// <summary>
+        /// Execute selection grid command
+        /// </summary>
+        private void ExecuteSelectErrorPocoRow()
+        {
+            if (this.CurrentPocoError is null)
+            {
+                this.IsDetailsVisible = false;
+                return;
+            }
+
+            this.IsDetailsVisible = true;
+            this.ErrorDetails = this.CurrentPocoError.ToString();
+        }
+
+        /// <summary>
+        /// Execute selection grid command
+        /// </summary>
+        private void ExecuteSelectErrorModelRow()
+        {
+            if (this.CurrentModelError is null)
+            {
+                this.IsDetailsVisible = false;
+                return;
+            }
+
+            this.IsDetailsVisible = true;
+            this.ErrorDetails = this.CurrentModelError.ToString();
         }
 
         /// <summary>

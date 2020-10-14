@@ -35,5 +35,8 @@
                             Path=ShowErrors}"
                 x:Name="ModelErrorsLayoutGroup" />
         </dxlc:LayoutGroup>
+        <StackPanel Grid.Row="1" Grid.Column="0">
+            <tabs:ErrorDetail />
+        </StackPanel>
     </Grid>
 </UserControl>

@@ -6,6 +6,7 @@
                   xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                   xmlns:model="clr-namespace:Common.ViewModels"
+                  xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                   Header="POCO Errors"
                   Orientation="Vertical"
                   mc:Ignorable="d"
@@ -15,12 +16,18 @@
         <model:ErrorViewModel />
     </dxlc:LayoutGroup.DataContext>
     <dxlc:LayoutItem>
-        <dxg:GridControl EnableSmartColumnsGeneration="True"
-                         ItemsSource="{Binding PocoErrors, UpdateSourceTrigger=PropertyChanged}"
-                         AutoGenerateColumns="None">
+        <dxg:GridControl
+            AllowLiveDataShaping="False"
+            SelectedItem="{Binding CurrentPocoError,
+            Mode=TwoWay,
+            UpdateSourceTrigger=PropertyChanged}"
+            SelectionMode="Row"
+            ItemsSource="{Binding PocoErrors, UpdateSourceTrigger=PropertyChanged}"
+            AutoGenerateColumns="None">
             <dxg:GridControl.View>
                 <dxg:TableView
                     Height="140"
+                    ShowIndicator="False"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     AllowColumnMoving="False"
@@ -28,13 +35,19 @@
                     AllowGrouping="False"
                     AutoWidth="True"
                     ShowGroupPanel="False"
+                    IsDetailButtonVisibleBinding="{x:Null}"
                     VerticalScrollbarVisibility="Auto">
                 </dxg:TableView>
             </dxg:GridControl.View>
+            <dxmvvm:Interaction.Behaviors>
+                <dxmvvm:EventToCommand EventName="SelectionChanged"
+                                       Command="{Binding PocoSelectRowCommand, UpdateSourceTrigger=PropertyChanged}">
+                </dxmvvm:EventToCommand>
+            </dxmvvm:Interaction.Behaviors>
             <dxg:GridControl.Columns>
-                <dxg:GridColumn AllowGrouping="True" Binding="{Binding ContainerThingClassKind}" Header="Class Kind" />
-                <dxg:GridColumn Binding="{Binding Error}" Header="Content" />
-                <dxg:GridColumn Binding="{Binding Path}" Header="Path" />
+                <dxg:GridColumn AllowGrouping="True" FieldName="ContainerThingClassKind" Header="Class Kind" />
+                <dxg:GridColumn AllowColumnFiltering="False" FieldName="Error" Header="Content" />
+                <dxg:GridColumn AllowColumnFiltering="False" FieldName="Path" Header="Path" />
             </dxg:GridControl.Columns>
         </dxg:GridControl>
     </dxlc:LayoutItem>
