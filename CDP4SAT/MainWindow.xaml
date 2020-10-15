@@ -9,7 +9,7 @@
     Width="850"
     ResizeMode="CanMinimize"
     WindowStartupLocation="CenterScreen"
-    Icon="pack://application:,,,/CDP4SAT;component/Resources/cdplogo3d_48x48.png">
+    Icon="pack://application:,,,/App;component/Resources/cdplogo3d_48x48.png">
     <Grid>
         <views:MainView />
     </Grid>
