@@ -9,6 +9,7 @@ namespace Syncer.ViewModels
     using Common.ViewModels;
     using ReactiveUI;
     using Syncer.Utils;
+    using Syncer.Utils.Sync;
     using System;
     using System.Collections.Generic;
     using System.Reactive;
@@ -61,6 +62,8 @@ namespace Syncer.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.output, value);
         }
 
+        private SyncerFactory syncerFactory = new SyncerFactory();
+
         public SyncerViewModel()
         {
             var canExecuteSync = this.WhenAnyValue(
@@ -91,7 +94,12 @@ namespace Syncer.ViewModels
 
         private async Task ExecuteSync()
         {
-            // TODO add business logic
+            var syncer = syncerFactory.CreateSyncer(
+                this.SelectedThingType,
+                this.SourceViewModel.ServerSession,
+                this.TargetViewModel.ServerSession);
+
+            await syncer.Sync();
         }
     }
 }

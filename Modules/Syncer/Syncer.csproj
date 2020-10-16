@@ -92,6 +92,9 @@
   <ItemGroup>
     <Compile Include="Behaviors\SyncerBehavior.cs" />
     <Compile Include="Utils\ThingType.cs" />
+    <Compile Include="Utils\Sync\DomainOfExpertiseSyncer.cs" />
+    <Compile Include="Utils\Sync\SiteReferenceDataLibrarySyncer.cs" />
+    <Compile Include="Utils\Sync\Syncer.cs" />
     <Compile Include="ViewModels\SyncerViewModel.cs" />
     <Compile Include="Views\Layout.xaml.cs">
       <DependentUpon>Layout.xaml</DependentUpon>
