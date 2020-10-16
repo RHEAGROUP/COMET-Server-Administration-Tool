@@ -5,16 +5,17 @@
                   xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
                   xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                  xmlns:model="clr-namespace:Common.ViewModels"
                   xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                  xmlns:utils="clr-namespace:Common.Utils"
+                  xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
                   Header="Model Errors"
                   Orientation="Vertical"
                   mc:Ignorable="d"
                   VerticalAlignment="Stretch"
                   HorizontalAlignment="Stretch">
-    <dxlc:LayoutGroup.DataContext>
-        <model:ErrorViewModel />
-    </dxlc:LayoutGroup.DataContext>
+    <dxlc:LayoutGroup.Resources>
+        <utils:SeverityToImageConverter x:Key="SeverityToImageConverter" />
+    </dxlc:LayoutGroup.Resources>
     <dxlc:LayoutItem>
         <dxg:GridControl
             SelectedItem="{Binding CurrentModelError,
@@ -45,7 +46,15 @@
                 <dxg:GridColumn AllowColumnFiltering="False" FieldName="Id" Width="50" Header="ID" />
                 <dxg:GridColumn FieldName="ContainerThingClassKind" Header="Class Kind" />
                 <dxg:GridColumn AllowColumnFiltering="False" FieldName="Description" Header="Content" />
-                <dxg:GridColumn AllowColumnFiltering="False" FieldName="Severity" Header="Severity" />
+                <dxg:GridColumn AllowColumnFiltering="False" Width="60" Header="Severity" ToolTip="{Binding Severity}" FieldName="Severity">
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image HorizontalAlignment="Center" VerticalAlignment="Center" Width="16" Height="16"
+                            Source="{Binding Path=Value, Converter={StaticResource SeverityToImageConverter}}">
+                            </Image>
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
             </dxg:GridControl.Columns>
         </dxg:GridControl>
     </dxlc:LayoutItem>

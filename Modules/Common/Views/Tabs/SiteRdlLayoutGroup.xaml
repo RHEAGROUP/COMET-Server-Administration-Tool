@@ -18,6 +18,7 @@
             <dxg:GridControl.View>
                 <dxg:TableView
                     Height="140"
+                    ShowIndicator="False"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     AllowColumnMoving="False"

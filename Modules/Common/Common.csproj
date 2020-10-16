@@ -211,6 +211,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Utils\InverseBooleanConverter.cs" />
+    <Compile Include="Utils\SeverityToImageConverter.cs" />
     <Compile Include="ViewModels\ErrorViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\PlainObjects\DefinedThingRowViewModel.cs" />

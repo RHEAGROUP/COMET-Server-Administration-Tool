@@ -21,15 +21,15 @@ namespace Common.ViewModels
         /// <summary>
         /// Backing field for the <see cref="ISession"/> property
         /// </summary>
-        private ISession session;
+        private ISession serverSession;
 
         /// <summary>
-        /// Gets or sets login successfully flag
+        /// Gets or sets server session
         /// </summary>
         public ISession ServerSession
         {
-            private get => this.session;
-            set => this.RaiseAndSetIfChanged(ref this.session, value);
+            private get => this.serverSession;
+            set => this.RaiseAndSetIfChanged(ref this.serverSession, value);
         }
 
         /// <summary>
@@ -111,8 +111,10 @@ namespace Common.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="ErrorViewModel"/> class.
         /// </summary>
-        public ErrorViewModel()
+        public ErrorViewModel(ISession serverSession)
         {
+            this.serverSession = serverSession;
+
             this.PocoErrors = new ReactiveList<PocoErrorRowViewModel>
             {
                 ChangeTrackingEnabled = true
@@ -125,11 +127,13 @@ namespace Common.ViewModels
 
             this.IsDetailsVisible = false;
             this.ErrorDetails = string.Empty;
+            this.CurrentPocoError = null;
+            this.CurrentModelError = null;
 
-            this.WhenAnyValue(vm => vm.ServerSession).Subscribe(serverSession =>
+            this.WhenAnyValue(vm => vm.ServerSession).Subscribe(session =>
             {
-                BindPocoErrors(serverSession);
-                BindRuleCheckerErrors(serverSession);
+                BindPocoErrors(session);
+                BindRuleCheckerErrors(session);
             });
 
             this.PocoSelectRowCommand = ReactiveCommand.Create();
