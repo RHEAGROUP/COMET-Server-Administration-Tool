@@ -22,21 +22,13 @@
             <tabs:EngineeringModelLayoutGroup
                 GridSelectionIsAvailable="{Binding
                             RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}},
-                            Path=ShowErrors}" />
+                            Path=DisplayErrorsTabs}" />
             <tabs:SiteRdlLayoutGroup />
-            <tabs:PocoErrorLayoutGroup
-                Visibility="{Binding
-                            RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}},
-                            Path=ShowErrors}"
-                x:Name="PocoErrorsLayoutGroup" />
-            <tabs:ModelErrorLayoutGroup
-                Visibility="{Binding
-                            RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}},
-                            Path=ShowErrors}"
-                x:Name="ModelErrorsLayoutGroup" />
+            <tabs:PocoErrorLayoutGroup x:Name="PocoErrorsLayoutGroup" DataContext="{x:Null}" />
+            <tabs:ModelErrorLayoutGroup x:Name="ModelErrorsLayoutGroup" DataContext="{x:Null}" />
         </dxlc:LayoutGroup>
         <StackPanel Grid.Row="1" Grid.Column="0">
-            <tabs:ErrorDetail />
+            <tabs:ErrorDetail x:Name="ErrorDetailLayoutGroup" DataContext="{x:Null}" />
         </StackPanel>
     </Grid>
 </UserControl>

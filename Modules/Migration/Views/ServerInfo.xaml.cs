@@ -6,20 +6,20 @@
 
 namespace Migration.Views
 {
+    using CDP4Dal;
     using Common.ViewModels;
     using System.Windows;
-    using System.Windows.Controls;
 
     /// <summary>
     /// Interaction logic for ServerInfo.xaml
     /// </summary>
-    public partial class ServerInfo : UserControl
+    public partial class ServerInfo
     {
         /// <summary>
-        /// <see cref="DependencyProperty"/> that can be set in XAML to indicate that the JsonIsAvailable is set
+        /// <see cref="DependencyProperty"/> that can be set in XAML to indicate that the DisplayErrorsTabs is set
         /// </summary>
-        public static readonly DependencyProperty ShowErrorsProperty = DependencyProperty.RegisterAttached(
-            "ShowErrors",
+        public static readonly DependencyProperty DisplayErrorsTabsProperty = DependencyProperty.RegisterAttached(
+            "DisplayErrorsTabs",
             typeof(bool),
             typeof(ServerInfo),
             new PropertyMetadata(true, PropertyChanged));
@@ -34,12 +34,21 @@ namespace Migration.Views
             new PropertyMetadata(false, PropertyChanged));
 
         /// <summary>
-        /// Gets or sets the <see cref="ShowErrorsProperty"/> dependency property.
+        /// <see cref="DependencyProperty"/> that can be set in XAML to indicate that the ServerSession is set
         /// </summary>
-        public bool ShowErrors
+        public static readonly DependencyProperty ServerSessionProperty = DependencyProperty.RegisterAttached(
+            "ServerSession",
+            typeof(ISession),
+            typeof(ServerInfo),
+            new PropertyMetadata(default(ISession), PropertyChanged));
+
+        /// <summary>
+        /// Gets or sets the <see cref="DisplayErrorsTabsProperty"/> dependency property.
+        /// </summary>
+        public bool DisplayErrorsTabs
         {
-            get => (bool)this.GetValue(ShowErrorsProperty);
-            set => this.SetValue(ShowErrorsProperty, value);
+            get => (bool)this.GetValue(DisplayErrorsTabsProperty);
+            set => this.SetValue(DisplayErrorsTabsProperty, value);
         }
 
         /// <summary>
@@ -50,6 +59,25 @@ namespace Migration.Views
             get => (bool)this.GetValue(LoginSuccessfullyProperty);
             set => this.SetValue(LoginSuccessfullyProperty, value);
         }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ServerSessionProperty"/> dependency property.
+        /// </summary>
+        public ISession ServerSession
+        {
+            get => (ISession)this.GetValue(ServerSessionProperty);
+            set => this.SetValue(ServerSessionProperty, value);
+        }
+
+        /// <summary>
+        /// Current server session <see cref="ISession"/>
+        /// </summary>
+        private ISession serverSession;
+
+        /// <summary>
+        /// New model <see cref="ErrorViewModel"/> instance for error tabs
+        /// </summary>
+        private ErrorViewModel errorViewModel;
 
         public ServerInfo()
         {
@@ -66,13 +94,17 @@ namespace Migration.Views
             if (!(d is ServerInfo))
                 return;
 
-            if (e.Property.Name == "ShowErrors")
+            switch(e.Property.Name)
             {
-                ((ServerInfo) d).ShowErrorsValueChanged(e);
-            }
-            else if (e.Property.Name == "LoginSuccessfully")
-            {
-                ((ServerInfo) d).LoginSuccessfullyValueChanged(e);
+                case "DisplayErrorsTabs":
+                    ((ServerInfo)d).ShowErrorsValueChanged(e);
+                    break;
+                case "LoginSuccessfully":
+                    ((ServerInfo)d).LoginSuccessfullyValueChanged(e);
+                    break;
+                case "ServerSession":
+                    ((ServerInfo)d).ServerSessionValueChanged(e);
+                    break;
             }
         }
 
@@ -94,16 +126,34 @@ namespace Migration.Views
         /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
         private void LoginSuccessfullyValueChanged(DependencyPropertyChangedEventArgs e)
         {
-            if (!(bool)e.NewValue) return;
+            if (!(bool) e.NewValue)
+            {
+                return;
+            }
 
-            if (this.PocoErrorsLayoutGroup.DataContext is ErrorViewModel pocoErrorsViewModel)
+            if (!this.DisplayErrorsTabs)
             {
-                pocoErrorsViewModel.ServerSession = (this.DataContext as LoginViewModel)?.ServerSession;
+                return;
             }
-            if (this.ModelErrorsLayoutGroup.DataContext is ErrorViewModel modelErrorsViewModel)
+
+            errorViewModel = new ErrorViewModel(this.serverSession);
+            this.PocoErrorsLayoutGroup.DataContext = errorViewModel;
+            this.ModelErrorsLayoutGroup.DataContext = errorViewModel;
+            this.ErrorDetailLayoutGroup.DataContext = errorViewModel;
+        }
+
+        /// <summary>
+        /// Instance handler which will handle any changes that occur to a particular instance.
+        /// </summary>
+        /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
+        private void ServerSessionValueChanged(DependencyPropertyChangedEventArgs e)
+        {
+            if (!(e.NewValue is ISession))
             {
-                modelErrorsViewModel.ServerSession = (this.DataContext as LoginViewModel)?.ServerSession;
+                return;
             }
+
+            this.serverSession = (ISession) e.NewValue;
         }
     }
 }

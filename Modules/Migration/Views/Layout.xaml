@@ -21,7 +21,7 @@
         <viewModels:MigrationViewModel />
     </dxlc:LayoutGroup.DataContext>
 
-    <GroupBox Header="Source" Height="300">
+    <GroupBox Header="Source" Height="320">
         <StackPanel Margin="0" HorizontalAlignment="Stretch">
             <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
@@ -53,7 +53,7 @@
                         <StackPanel Grid.Row="2"
                                     Grid.Column="0" Orientation="Horizontal">
                             <GroupBox Header="migration.json">
-                                <StackPanel Margin="0" Orientation="Horizontal">
+                                <StackPanel Margin="0 0 0 0" Orientation="Horizontal">
                                     <dxe:TextEdit
                                         Height="Auto"
                                         Margin="5"
@@ -83,13 +83,16 @@
                 <StackPanel Grid.Row="0" Grid.Column="1">
                     <views:ServerInfo
                         LoginSuccessfully="{Binding
-                          Path=LoginSuccessfully,
-                          UpdateSourceTrigger=PropertyChanged}"
+                        Path=LoginSuccessfully,
+                        UpdateSourceTrigger=PropertyChanged}"
+                        ServerSession="{Binding
+                        Path=ServerSession,
+                        UpdateSourceTrigger=PropertyChanged}"
                         Visibility="{Binding
                         Path=LoginSuccessfully,
                         Converter={dxmvvm:BooleanToVisibilityConverter},
                         UpdateSourceTrigger=PropertyChanged}"
-                        DataContext="{Binding SourceViewModel}" />
+                        DataContext="{Binding SourceViewModel}"/>
                 </StackPanel>
             </Grid>
         </StackPanel>
@@ -112,7 +115,13 @@
                 </StackPanel>
                 <StackPanel Grid.Row="0" Grid.Column="1">
                     <views:ServerInfo
-                        ShowErrors="False"
+                        DisplayErrorsTabs="False"
+                        LoginSuccessfully="{Binding
+                        Path=LoginSuccessfully,
+                        UpdateSourceTrigger=PropertyChanged}"
+                        ServerSession="{Binding
+                        Path=ServerSession,
+                        UpdateSourceTrigger=PropertyChanged}"
                         Visibility="{Binding
                         Path=LoginSuccessfully,
                         Converter={dxmvvm:BooleanToVisibilityConverter},
