@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ErrorDetail.xaml.cs">
+// <copyright file="ErrorDetailLayoutGroup.xaml.cs">
 //    Copyright (c) 2020
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -7,11 +7,14 @@
 namespace Common.Views.Tabs
 {
     /// <summary>
-    /// Interaction logic for ErrorDetail.xaml
+    /// Interaction logic for ErrorDetailLayoutGroup.xaml
     /// </summary>
-    public partial class ErrorDetail
+    public partial class ErrorDetailLayoutGroup
     {
-        public ErrorDetail()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ErrorDetailLayoutGroup"/> class.
+        /// </summary>
+        public ErrorDetailLayoutGroup()
         {
             InitializeComponent();
         }

@@ -28,7 +28,7 @@
             <tabs:ModelErrorLayoutGroup x:Name="ModelErrorsLayoutGroup" DataContext="{x:Null}" />
         </dxlc:LayoutGroup>
         <StackPanel Grid.Row="1" Grid.Column="0">
-            <tabs:ErrorDetail x:Name="ErrorDetailLayoutGroup" DataContext="{x:Null}" />
+            <tabs:ErrorDetailLayoutGroup x:Name="ErrorDetailLayoutGroup" DataContext="{x:Null}" />
         </StackPanel>
     </Grid>
 </UserControl>
