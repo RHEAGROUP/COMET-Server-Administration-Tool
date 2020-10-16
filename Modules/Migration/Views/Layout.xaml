@@ -17,6 +17,7 @@
     mc:Ignorable="d"
     VerticalAlignment="Stretch"
     HorizontalAlignment="Stretch">
+
     <dxlc:LayoutGroup.DataContext>
         <viewModels:MigrationViewModel />
     </dxlc:LayoutGroup.DataContext>

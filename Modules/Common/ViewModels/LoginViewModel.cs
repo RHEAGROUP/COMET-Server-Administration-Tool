@@ -24,6 +24,16 @@ namespace Common.ViewModels
     using PlainObjects;
 
     /// <summary>
+    /// Enum describing the possible server types
+    /// </summary>
+    public enum ServerType
+    {
+        CDP4,
+        WSP,
+        JSON
+    }
+
+    /// <summary>
     /// The view-model for the Login that allows users to connect to different data sources
     /// </summary>
     public class LoginViewModel : ReactiveObject
@@ -31,25 +41,26 @@ namespace Common.ViewModels
         /// <summary>
         /// Gets or sets data source server type
         /// </summary>
-        public static KeyValuePair<string, string>[] DataSourceList { get; } =
-        {
-            new KeyValuePair<string, string>("CDP", "CDP4 WebServices"),
-            new KeyValuePair<string, string>("OCDT", "OCDT WSP Server"),
-            new KeyValuePair<string, string>("JSON", "JSON")
-        };
+        public static Dictionary<ServerType, string> ServerTypes { get; } =
+            new Dictionary<ServerType, string>
+            {
+                { ServerType.CDP4, "CDP4 WebServices" },
+                { ServerType.WSP, "OCDT WSP Server" },
+                { ServerType.JSON, "JSON" }
+            };
 
         /// <summary>
         /// Backing field for the <see cref="ServerType"/> property
         /// </summary>
-        private KeyValuePair<string, string> serverType;
+        private ServerType selectedServerType;
 
         /// <summary>
         /// Gets or sets server serverType value
         /// </summary>
-        public KeyValuePair<string, string> ServerType
+        public ServerType SelectedServerType
         {
-            get => this.serverType;
-            set => this.RaiseAndSetIfChanged(ref this.serverType, value);
+            get => this.selectedServerType;
+            set => this.RaiseAndSetIfChanged(ref this.selectedServerType, value);
         }
 
         /// <summary>
@@ -260,12 +271,10 @@ namespace Common.ViewModels
         public LoginViewModel()
         {
             var canLogin = this.WhenAnyValue(
-                vm => vm.ServerType,
                 vm => vm.UserName,
                 vm => vm.Password,
                 vm => vm.Uri,
-                (serverType, username, password, uri) =>
-                    !string.IsNullOrEmpty(serverType.Value) &&
+                (username, password, uri) =>
                     !string.IsNullOrEmpty(username) &&
                     !string.IsNullOrEmpty(password) &&
                     !string.IsNullOrEmpty(uri));
@@ -274,19 +283,19 @@ namespace Common.ViewModels
             {
                 if (!loginFailed) return;
 
-                LogMessage($"Cannot login to {this.Uri}({this.ServerType.Value}) data-source");
+                LogMessage($"Cannot login to {this.Uri}({ServerTypes[SelectedServerType]}) data-source");
             });
 
             this.WhenAnyValue(vm => vm.LoginSuccessfully).Subscribe(loginSuccessfully =>
             {
                 if (!loginSuccessfully) return;
 
-                LogMessage($"Successfully logged to {this.Uri}({this.ServerType.Value}) data-source");
+                LogMessage($"Successfully logged to {this.Uri}({ServerTypes[SelectedServerType]}) data-source");
             });
 
-            this.WhenAnyValue(vm => vm.ServerType).Subscribe(_ =>
+            this.WhenAnyValue(vm => vm.SelectedServerType).Subscribe(_ =>
             {
-                this.JsonIsSelected = this.ServerType.Key != null && this.ServerType.Key.Equals("JSON");
+                this.JsonIsSelected = this.SelectedServerType == ServerType.JSON;
             });
 
             this.LoginCommand =
@@ -339,15 +348,15 @@ namespace Common.ViewModels
 
                 var credentials = new Credentials(this.UserName, this.Password, new Uri(this.Uri));
 
-                switch (this.ServerType.Key)
+                switch (this.SelectedServerType)
                 {
-                    case "CDP":
+                    case ServerType.CDP4:
                         this.dal = new CdpServicesDal();
                         break;
-                    case "OCDT":
+                    case ServerType.WSP:
                         this.dal = new WspDal();
                         break;
-                    case "JSON":
+                    case ServerType.JSON:
                         this.dal = new JsonFileDal(new Version("1.0.0"));
                         break;
                 }
@@ -442,7 +451,7 @@ namespace Common.ViewModels
         /// </summary>
         private void ExecuteLoadSourceFile()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog()
+            var openFileDialog = new OpenFileDialog()
             {
                 InitialDirectory = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\",
                 Filter = "Zip files (*.zip)|*.zip"
@@ -461,7 +470,7 @@ namespace Common.ViewModels
         /// </summary>
         private void ExecuteCheckUncheckModel()
         {
-            this.SelectAllModels = !(this.EngineeringModels.Where(em => !em.IsSelected).Count() > 0);
+            this.SelectAllModels = !(this.EngineeringModels.Any(em => !em.IsSelected));
         }
 
         /// <summary>
@@ -497,7 +506,9 @@ namespace Common.ViewModels
         /// <returns>The trimmed uri or the original if there is no slash.</returns>
         private static string TrimUri(string input)
         {
-            return input.EndsWith("/") ? input.Substring(0, input.Length - 1) : input;
+            return input.EndsWith("/")
+                ? input.Substring(0, input.Length - 1)
+                : input;
         }
     }
 }

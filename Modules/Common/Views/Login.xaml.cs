@@ -61,7 +61,7 @@ namespace Common.Views
         {
             if ((bool) e.NewValue) return;
 
-            this.ServerType.ItemsSource = LoginViewModel.DataSourceList.Where(item => item.Key != "JSON");
+            this.ServerType.ItemsSource = LoginViewModel.ServerTypes.Where(item => item.Key != ViewModels.ServerType.JSON);
             this.BrowseJson.Visibility = Visibility.Hidden;
         }
     }

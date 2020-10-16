@@ -46,8 +46,9 @@
                 Name="ServerType"
                 Margin="5"
                 Width="200"
-                SelectedItem="{Binding Path=ServerType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                ItemsSource="{Binding DataSourceList, Mode=OneTime}"
+                ItemsSource="{Binding ServerTypes, Mode=OneTime}"
+                SelectedValue="{Binding Path=SelectedServerType, Mode=TwoWay}"
+                IsSynchronizedWithCurrentItem="True"
                 SelectedValuePath="Key"
                 DisplayMemberPath="Value" />
             <Button
