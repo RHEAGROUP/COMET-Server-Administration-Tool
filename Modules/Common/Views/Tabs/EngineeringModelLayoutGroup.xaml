@@ -30,7 +30,7 @@
                 </dxg:TableView>
             </dxg:GridControl.View>
             <dxg:GridControl.Columns>
-                <dxg:GridColumn HorizontalHeaderContentAlignment="Center" AllowAutoFilter="False" Width="30">
+                <dxg:GridColumn AllowAutoFilter="False" Width="20">
                     <dxg:GridColumn.HeaderTemplate>
                         <DataTemplate>
                             <CheckBox Click="SelectAll_Clicked"
@@ -39,7 +39,7 @@
                     </dxg:GridColumn.HeaderTemplate>
                     <dxg:GridColumn.DisplayTemplate>
                         <ControlTemplate>
-                            <CheckBox Margin="4 0 0 0" HorizontalContentAlignment="Center"
+                            <CheckBox Margin="4 0 0 0"
                                       Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}, Path=DataContext.CheckUncheckModel}"
                                       IsChecked="{Binding RowData.Row.IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </ControlTemplate>
