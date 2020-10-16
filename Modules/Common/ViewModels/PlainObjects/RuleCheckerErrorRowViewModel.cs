@@ -8,6 +8,7 @@ using System;
 
 namespace Common.ViewModels.PlainObjects
 {
+    using CDP4Common.SiteDirectoryData;
     using CDP4Common.CommonData;
     using CDP4Rules.Common;
     using ReactiveUI;
@@ -18,14 +19,14 @@ namespace Common.ViewModels.PlainObjects
     public class RuleCheckerErrorRowViewModel : ReactiveObject
     {
         /// <summary>
-        /// Gets the <see cref="ClassKind"/> of the <see cref="Thing"/> that contains the error.
+        /// Gets or sets the <see cref="ClassKind"/> of the <see cref="Thing"/> that contains the error.
         /// </summary>
         public string ContainerThingClassKind { get; private set; }
 
         /// <summary>
         /// Gets or sets the identifier or code of the Rule that may have been broken
         /// </summary>
-        private string Id { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         /// Gets or sets the description of the Rule that may have been broken
@@ -36,6 +37,11 @@ namespace Common.ViewModels.PlainObjects
         /// Gets or sets the <see cref="SeverityKind"/>
         /// </summary>
         public SeverityKind Severity { get; private set; }
+
+        /// <summary>
+        /// Gets or sets top container name
+        /// </summary>
+        public string TopContainerName { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RuleCheckerErrorRowViewModel"/> class
@@ -58,6 +64,9 @@ namespace Common.ViewModels.PlainObjects
             this.Id = id;
             this.Description = description;
             this.Severity = severity;
+            this.TopContainerName = thing.TopContainer is SiteDirectory
+                ? "SiteDirectory"
+                : thing.TopContainer.UserFriendlyShortName;
         }
 
         /// <summary>
@@ -66,7 +75,8 @@ namespace Common.ViewModels.PlainObjects
         /// <returns>string object representation</returns>
         public override string ToString()
         {
-            return $"{this.ContainerThingClassKind} ({this.Id}){Environment.NewLine}Error: {this.Description}{Environment.NewLine}Severity: {this.Severity}";
+            return
+                $"{this.ContainerThingClassKind}({this.Id}) Top container: {this.TopContainerName}{Environment.NewLine}{this.Description}{Environment.NewLine}Severity: {this.Severity}";
         }
     }
 }

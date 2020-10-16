@@ -7,7 +7,6 @@
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                   xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                   xmlns:utils="clr-namespace:Common.Utils"
-                  xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
                   Header="Model Errors"
                   Orientation="Vertical"
                   mc:Ignorable="d"
@@ -43,7 +42,8 @@
                                        Command="{Binding ModelSelectRowCommand, UpdateSourceTrigger=PropertyChanged}"/>
             </dxmvvm:Interaction.Behaviors>
             <dxg:GridControl.Columns>
-                <dxg:GridColumn AllowColumnFiltering="False" FieldName="Id" Width="50" Header="ID" />
+                <dxg:GridColumn AllowColumnFiltering="False" FieldName="TopContainerName" Header="Top Container" />
+                <dxg:GridColumn AllowColumnFiltering="False" FieldName="Id" Width="70" Header="ID" />
                 <dxg:GridColumn FieldName="ContainerThingClassKind" Header="Class Kind" />
                 <dxg:GridColumn AllowColumnFiltering="False" FieldName="Description" Header="Content" />
                 <dxg:GridColumn AllowColumnFiltering="False" Width="60" Header="Severity" ToolTip="{Binding Severity}" FieldName="Severity">

@@ -41,6 +41,7 @@
                 </dxmvvm:EventToCommand>
             </dxmvvm:Interaction.Behaviors>
             <dxg:GridControl.Columns>
+                <dxg:GridColumn AllowColumnFiltering="False" FieldName="TopContainerName" Header="Top Container" />
                 <dxg:GridColumn AllowGrouping="True" FieldName="ContainerThingClassKind" Header="Class Kind" />
                 <dxg:GridColumn AllowColumnFiltering="False" FieldName="Error" Header="Content" />
                 <dxg:GridColumn AllowColumnFiltering="False" FieldName="Path" Header="Path" />

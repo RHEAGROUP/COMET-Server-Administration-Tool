@@ -6,6 +6,7 @@
 
 namespace Common.ViewModels.PlainObjects
 {
+    using CDP4Common.SiteDirectoryData;
     using CDP4Common.CommonData;
     using CDP4Common.Exceptions;
     using ReactiveUI;
@@ -27,14 +28,19 @@ namespace Common.ViewModels.PlainObjects
         public string ContainerThingClassKind { get; private set; }
 
         /// <summary>
-        /// Gets the human readable content of the Error.
+        /// Gets or sets the human readable content of the Error.
         /// </summary>
         public string Error { get; private set; }
 
         /// <summary>
-        /// Gets the human readable content of the Error.
+        /// Gets or sets the human readable content of the Error.
         /// </summary>
         public string Path { get; private set; }
+
+        /// <summary>
+        /// Gets or sets top container name
+        /// </summary>
+        public string TopContainerName { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PocoErrorRowViewModel"/> class
@@ -50,6 +56,9 @@ namespace Common.ViewModels.PlainObjects
             this.ContainerThingClassKind = thing.ClassKind.ToString();
             this.Error = error;
             this.Id = thing.Iid.ToString();
+            this.TopContainerName = thing.TopContainer is SiteDirectory
+                ? "SiteDirectory"
+                : thing.TopContainer.UserFriendlyShortName;
 
             try
             {
@@ -70,7 +79,8 @@ namespace Common.ViewModels.PlainObjects
         /// <returns>string object representation</returns>
         public override string ToString()
         {
-            return $"{this.ContainerThingClassKind} ({this.Id}){Environment.NewLine}Error: {this.Error}{Environment.NewLine}Path: {this.Path}";
+            return
+                $"{this.ContainerThingClassKind}({this.Id}) Top container: {this.TopContainerName}{Environment.NewLine}{this.Error}{Environment.NewLine}Path: {this.Path}";
         }
     }
 }
