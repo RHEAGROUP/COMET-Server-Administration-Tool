@@ -66,7 +66,7 @@ namespace Common.ViewModels.PlainObjects
         /// <returns>string object representation</returns>
         public override string ToString()
         {
-            return $"{this.ContainerThingClassKind}({this.Id}){Environment.NewLine}Error:{this.Description}";
+            return $"{this.ContainerThingClassKind} ({this.Id}){Environment.NewLine}Error: {this.Description}{Environment.NewLine}Severity: {this.Severity}";
         }
     }
 }

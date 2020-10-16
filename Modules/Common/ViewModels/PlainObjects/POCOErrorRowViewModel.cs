@@ -70,7 +70,7 @@ namespace Common.ViewModels.PlainObjects
         /// <returns>string object representation</returns>
         public override string ToString()
         {
-            return $"{this.ContainerThingClassKind}({this.Id}){Environment.NewLine}Error:{this.Error}";
+            return $"{this.ContainerThingClassKind} ({this.Id}){Environment.NewLine}Error: {this.Error}{Environment.NewLine}Path: {this.Path}";
         }
     }
 }
