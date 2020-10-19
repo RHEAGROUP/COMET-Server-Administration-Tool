@@ -26,7 +26,15 @@ namespace Migration.Utils
     /// <summary>
     /// Enumeration of the migration process steps
     /// </summary>
-    public enum MigrationStep { ImportStart, PackStart, PackEnd, ImportEnd, ExportStart, ExportEnd };
+    public enum MigrationStep
+    {
+        ImportStart,
+        PackStart,
+        PackEnd,
+        ImportEnd,
+        ExportStart,
+        ExportEnd
+    };
 
     /// <summary>
     /// The purpose of this class is to implement migration specif operations such as: import, export, pack
@@ -141,9 +149,9 @@ namespace Migration.Utils
                 if (!selectedModels.ToList().Any(em => em.Iid == modelSetup.Iid && em.IsSelected)) continue;
 
                 var model = new EngineeringModel(
-                        modelSetup.EngineeringModelIid,
-                        this.SourceSession.Assembler.Cache,
-                        this.SourceSession.Credentials.Uri)
+                    modelSetup.EngineeringModelIid,
+                    this.SourceSession.Assembler.Cache,
+                    this.SourceSession.Credentials.Uri)
                 {
                     EngineeringModelSetup = modelSetup
                 };
@@ -159,24 +167,26 @@ namespace Migration.Utils
                         this.SourceSession.Credentials.Uri);
 
                     model.Iteration.Add(iteration);
-                    tasks.Add(this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain).ContinueWith(t =>
-                    {
-                        var iterationDescription = $"'{modelSetup.Name}'.'{iterationSetup.IterationIid}'";
-
-                        string message;
-
-                        if (t.IsFaulted)
+                    tasks.Add(this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain)
+                        .ContinueWith(t =>
                         {
-                            message = $"Reading iteration {iterationDescription} failed. Exception: {t.Exception.Message}.";
-                            this.NotifyMessage(message);
-                            Logger.Warn(message);
-                            return;
-                        }
+                            var iterationDescription = $"'{modelSetup.Name}'.'{iterationSetup.IterationIid}'";
 
-                        message = $"Read iteration {iterationDescription} successfully.";
-                        this.NotifyMessage(message);
-                        Logger.Info(message);
-                    }));
+                            string message;
+
+                            if (t.IsFaulted && t.Exception != null)
+                            {
+                                message =
+                                    $"Reading iteration {iterationDescription} failed. Exception: {t.Exception.Message}.";
+                                this.NotifyMessage(message);
+                                Logger.Warn(message);
+                                return;
+                            }
+
+                            message = $"Read iteration {iterationDescription} successfully.";
+                            this.NotifyMessage(message);
+                            Logger.Info(message);
+                        }));
                 }
 
                 while (tasks.Count > 0)
@@ -207,8 +217,7 @@ namespace Migration.Utils
             }
 
             // TODO #34 Replace this in the near future, I cannot log into CDP WebService empty server
-            // var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
-            var targetUrl = $"http://localhost:5000/Data/Exchange";
+            var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
 
             Logger.Info($"Pushing data to {targetUrl}");
 
@@ -220,7 +229,7 @@ namespace Migration.Utils
                     {
                         using (var message = await httpClient.PostAsync(targetUrl, multipartContent))
                         {
-                            var input = await message.Content.ReadAsStringAsync();
+                            await message.Content.ReadAsStringAsync();
                             // TODO #35 add result interpretation
 
                             Logger.Info($"Finished pushing data");
@@ -255,7 +264,9 @@ namespace Migration.Utils
             var zipSession = new Session(this.dal, zipCredentials);
 
             var operationContainers = new List<OperationContainer>();
-            var openIterations = iterations != null ? this.SourceSession.OpenIterations.Select(i => i.Key).Where(oi => iterations.Any(i => i.Iid == oi.Iid)) : this.SourceSession.OpenIterations.Select(i => i.Key);
+            var openIterations = iterations != null
+                ? this.SourceSession.OpenIterations.Select(i => i.Key).Where(oi => iterations.Any(i => i.Iid == oi.Iid))
+                : this.SourceSession.OpenIterations.Select(i => i.Key);
 
             foreach (var iteration in openIterations)
             {
@@ -301,7 +312,8 @@ namespace Migration.Utils
 
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes($"{credentials.UserName}:{credentials.Password}")));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+                Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes($"{credentials.UserName}:{credentials.Password}")));
             client.DefaultRequestHeaders.Add("User-Agent", "SAT");
 
             return client;
