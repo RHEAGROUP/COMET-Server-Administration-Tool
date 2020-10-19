@@ -80,7 +80,9 @@ namespace Common.ViewModels.PlainObjects
         public override string ToString()
         {
             return
-                $"{this.ContainerThingClassKind}({this.Id}) Top container: {this.TopContainerName}{Environment.NewLine}{this.Error}{Environment.NewLine}Path: {this.Path}";
+                $"{this.ContainerThingClassKind}({this.Id}) " +
+                $"Top container: {this.TopContainerName}{Environment.NewLine}{this.Error}{Environment.NewLine}" +
+                $"Path: {this.Path}";
         }
     }
 }

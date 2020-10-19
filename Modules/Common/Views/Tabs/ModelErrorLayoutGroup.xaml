@@ -17,9 +17,7 @@
     </dxlc:LayoutGroup.Resources>
     <dxlc:LayoutItem>
         <dxg:GridControl
-            SelectedItem="{Binding CurrentModelError,
-            Mode=TwoWay,
-            UpdateSourceTrigger=PropertyChanged}"
+            SelectedItem="{Binding CurrentModelError, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             SelectionMode="Row"
             ItemsSource="{Binding RuleCheckerErrors, UpdateSourceTrigger=PropertyChanged}"
             AutoGenerateColumns="None">
@@ -39,18 +37,19 @@
             </dxg:GridControl.View>
             <dxmvvm:Interaction.Behaviors>
                 <dxmvvm:EventToCommand EventName="SelectionChanged"
-                                       Command="{Binding ModelSelectRowCommand, UpdateSourceTrigger=PropertyChanged}"/>
+                                       Command="{Binding ModelSelectRowCommand, UpdateSourceTrigger=PropertyChanged}" />
             </dxmvvm:Interaction.Behaviors>
             <dxg:GridControl.Columns>
                 <dxg:GridColumn AllowColumnFiltering="False" FieldName="TopContainerName" Header="Top Container" />
                 <dxg:GridColumn AllowColumnFiltering="False" FieldName="Id" Width="70" Header="ID" />
                 <dxg:GridColumn FieldName="ContainerThingClassKind" Header="Class Kind" />
                 <dxg:GridColumn AllowColumnFiltering="False" FieldName="Description" Header="Content" />
-                <dxg:GridColumn AllowColumnFiltering="False" Width="60" Header="Severity" ToolTip="{Binding Severity}" FieldName="Severity">
+                <dxg:GridColumn AllowColumnFiltering="False" Width="60" Header="Severity" ToolTip="{Binding Severity}"
+                                FieldName="Severity">
                     <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
                             <Image HorizontalAlignment="Center" VerticalAlignment="Center" Width="16" Height="16"
-                            Source="{Binding Path=Value, Converter={StaticResource SeverityToImageConverter}}">
+                                   Source="{Binding Path=Value, Converter={StaticResource SeverityToImageConverter}}">
                             </Image>
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>

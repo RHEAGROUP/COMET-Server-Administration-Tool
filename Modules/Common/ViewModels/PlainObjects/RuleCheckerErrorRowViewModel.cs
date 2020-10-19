@@ -4,7 +4,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System;
 
 namespace Common.ViewModels.PlainObjects
 {
@@ -12,6 +11,7 @@ namespace Common.ViewModels.PlainObjects
     using CDP4Common.CommonData;
     using CDP4Rules.Common;
     using ReactiveUI;
+    using System;
 
     /// <summary>
     /// Row class representing a <see cref="RuleCheckerErrorRowViewModel"/> as a plain object
@@ -76,7 +76,9 @@ namespace Common.ViewModels.PlainObjects
         public override string ToString()
         {
             return
-                $"{this.ContainerThingClassKind}({this.Id}) Top container: {this.TopContainerName}{Environment.NewLine}{this.Description}{Environment.NewLine}Severity: {this.Severity}";
+                $"{this.ContainerThingClassKind}({this.Id}) " +
+                $"Top container: {this.TopContainerName}{Environment.NewLine}{this.Description}{Environment.NewLine}" +
+                $"Severity: {this.Severity}";
         }
     }
 }

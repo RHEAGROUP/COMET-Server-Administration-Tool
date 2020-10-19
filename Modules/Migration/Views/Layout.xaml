@@ -43,7 +43,7 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <common:Login Grid.Row="0" Grid.Column="0"
-                            x:Name="LoginSource" />
+                                      x:Name="LoginSource" />
                         <CheckBox
                             Grid.Row="1"
                             Grid.Column="0"
@@ -92,7 +92,7 @@
                         Path=LoginSuccessfully,
                         Converter={dxmvvm:BooleanToVisibilityConverter},
                         UpdateSourceTrigger=PropertyChanged}"
-                        DataContext="{Binding SourceViewModel}"/>
+                        DataContext="{Binding SourceViewModel}" />
                 </StackPanel>
             </Grid>
         </StackPanel>
