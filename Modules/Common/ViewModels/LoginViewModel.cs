@@ -487,7 +487,8 @@ namespace Common.ViewModels
 
             return TrimUri(this.ServerSession.Credentials.Uri.ToString()).Equals(TrimUri(dataSourceUri)) &&
                    this.ServerSession.Credentials.UserName.Equals(dataSourceUsername) &&
-                   this.ServerSession.Credentials.Password.Equals(dataSourcePassword);
+                   this.ServerSession.Credentials.Password.Equals(dataSourcePassword) &&
+                   this.ServerSession.ActivePerson != null;
         }
 
         /// <summary>
