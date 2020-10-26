@@ -212,6 +212,7 @@
   <ItemGroup>
     <Compile Include="Utils\InverseBooleanConverter.cs" />
     <Compile Include="Utils\SeverityToImageConverter.cs" />
+    <Compile Include="ViewModels\EngineeringModelViewModel.cs" />
     <Compile Include="ViewModels\ErrorViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\PlainObjects\DefinedThingRowViewModel.cs" />
@@ -219,6 +220,7 @@
     <Compile Include="ViewModels\PlainObjects\POCOErrorRowViewModel.cs" />
     <Compile Include="ViewModels\PlainObjects\RuleCheckerErrorRowViewModel.cs" />
     <Compile Include="ViewModels\PlainObjects\SiteReferenceDataLibraryRowViewModel.cs" />
+    <Compile Include="ViewModels\SiteReferenceDataLibraryViewModel.cs" />
     <Compile Include="Views\Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
     </Compile>
