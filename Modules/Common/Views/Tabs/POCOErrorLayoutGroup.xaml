@@ -14,9 +14,7 @@
     <dxlc:LayoutItem>
         <dxg:GridControl
             AllowLiveDataShaping="False"
-            SelectedItem="{Binding CurrentPocoError,
-            Mode=TwoWay,
-            UpdateSourceTrigger=PropertyChanged}"
+            SelectedItem="{Binding CurrentPocoError, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             SelectionMode="Row"
             ItemsSource="{Binding PocoErrors, UpdateSourceTrigger=PropertyChanged}"
             AutoGenerateColumns="None">
