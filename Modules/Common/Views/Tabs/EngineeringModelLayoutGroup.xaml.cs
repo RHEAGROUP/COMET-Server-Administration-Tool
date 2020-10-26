@@ -6,9 +6,7 @@
 
 namespace Common.Views.Tabs
 {
-    using ViewModels.PlainObjects;
     using System.Windows;
-    using System.Windows.Controls;
 
     /// <summary>
     /// Interaction logic for EngineeringModelLayoutGroup.xaml
@@ -61,23 +59,6 @@ namespace Common.Views.Tabs
             if (!(bool)e.NewValue)
             {
                 this.EngineeringModelGridControl.Columns[0].Visible = false;
-            }
-        }
-
-        /// <summary>
-        /// Select all checkbox event
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void SelectAll_Clicked(object sender, RoutedEventArgs e)
-        {
-            foreach(var row in this.EngineeringModelGridControl.VisibleItems)
-            {
-                var isChecked = ((CheckBox)e.Source).IsChecked;
-                if (isChecked != null)
-                {
-                    ((EngineeringModelRowViewModel)row).IsSelected = (bool)isChecked;
-                }
             }
         }
     }

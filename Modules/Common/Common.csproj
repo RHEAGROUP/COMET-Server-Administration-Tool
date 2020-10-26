@@ -211,17 +211,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Utils\InverseBooleanConverter.cs" />
+    <Compile Include="Utils\SeverityToImageConverter.cs" />
+    <Compile Include="ViewModels\EngineeringModelViewModel.cs" />
+    <Compile Include="ViewModels\ErrorViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\PlainObjects\DefinedThingRowViewModel.cs" />
     <Compile Include="ViewModels\PlainObjects\EngineeringModelRowViewModel.cs" />
     <Compile Include="ViewModels\PlainObjects\POCOErrorRowViewModel.cs" />
     <Compile Include="ViewModels\PlainObjects\RuleCheckerErrorRowViewModel.cs" />
     <Compile Include="ViewModels\PlainObjects\SiteReferenceDataLibraryRowViewModel.cs" />
+    <Compile Include="ViewModels\SiteReferenceDataLibraryViewModel.cs" />
     <Compile Include="Views\Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Tabs\EngineeringModelLayoutGroup.xaml.cs">
       <DependentUpon>EngineeringModelLayoutGroup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Tabs\ErrorDetailLayoutGroup.xaml.cs">
+      <DependentUpon>ErrorDetailLayoutGroup.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Tabs\ModelErrorLayoutGroup.xaml.cs">
       <DependentUpon>ModelErrorLayoutGroup.xaml</DependentUpon>
@@ -241,6 +248,10 @@
     <Page Include="Views\Tabs\EngineeringModelLayoutGroup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Tabs\ErrorDetailLayoutGroup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Tabs\ModelErrorLayoutGroup.xaml">
       <Generator>MSBuild:Compile</Generator>
