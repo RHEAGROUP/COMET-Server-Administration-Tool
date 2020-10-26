@@ -72,21 +72,22 @@ namespace Common.ViewModels
         }
 
         /// <summary>
-        /// Delegate used for notifying current engineering list changes
+        /// Delegate used for notifying current engineering models selection changes
         /// </summary>
-        public delegate void EngineeringModelsListChangedDelegate(List<EngineeringModelRowViewModel> engineeringModels);
+        public delegate void EngineeringModelsListSelectionChangedDelegate(List<EngineeringModelRowViewModel> engineeringModels);
 
         /// <summary>
-        /// Associated event with the <see cref="EngineeringModelsListChangedDelegate"/>
+        /// Associated event with the <see cref="EngineeringModelsListSelectionChangedDelegate"/>
         /// </summary>
-        public event EngineeringModelsListChangedDelegate ModelListChangedEvent;
+        public event EngineeringModelsListSelectionChangedDelegate ModelListChangedEvent;
 
         /// <summary>
         /// Invoke ModelListChangedEvent
         /// </summary>
-        private void NotifyEngineeringModelsListChanges(List<EngineeringModelRowViewModel> engineeringModels)
+        /// <param name="models"></param>
+        private void NotifyEngineeringModelsListChanges(List<EngineeringModelRowViewModel> models)
         {
-            ModelListChangedEvent?.Invoke(engineeringModels);
+            ModelListChangedEvent?.Invoke(models);
         }
 
         /// <summary>

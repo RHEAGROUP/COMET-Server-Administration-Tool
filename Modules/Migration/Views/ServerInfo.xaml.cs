@@ -4,11 +4,15 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+using Common.ViewModels.PlainObjects;
+
 namespace Migration.Views
 {
     using CDP4Dal;
     using Common.ViewModels;
     using System.Windows;
+    using ReactiveUI;
 
     /// <summary>
     /// Interaction logic for ServerInfo.xaml
@@ -75,9 +79,19 @@ namespace Migration.Views
         private ISession serverSession;
 
         /// <summary>
-        /// New model <see cref="ErrorViewModel"/> instance for error tabs
+        /// New model instance for error tabs <see cref="ErrorViewModel"/>
         /// </summary>
         private ErrorViewModel errorViewModel;
+
+        /// <summary>
+        /// New model instance for engineering model tab <see cref="EngineeringModelViewModel"/>
+        /// </summary>
+        private EngineeringModelViewModel engineeringModelViewModel;
+
+        /// <summary>
+        /// New model instance for engineering model tab <see cref="SiteReferenceDataLibraryViewModel"/>
+        /// </summary>
+        private SiteReferenceDataLibraryViewModel siteReferenceDataLibraryViewModel;
 
         public ServerInfo()
         {
@@ -131,15 +145,31 @@ namespace Migration.Views
                 return;
             }
 
-            if (!this.DisplayErrorsTabs)
-            {
-                return;
-            }
+            this.engineeringModelViewModel = new EngineeringModelViewModel(this.serverSession);
+            this.engineeringModelViewModel.ModelListChangedEvent += EngineeringModelViewModelModelListChangedEvent;
+            this.EngineeringModelLayoutGroup.DataContext = this.engineeringModelViewModel;
 
-            errorViewModel = new ErrorViewModel(this.serverSession);
-            this.PocoErrorsLayoutGroup.DataContext = errorViewModel;
-            this.ModelErrorsLayoutGroup.DataContext = errorViewModel;
-            this.ErrorDetailLayoutGroup.DataContext = errorViewModel;
+            this.siteReferenceDataLibraryViewModel = new SiteReferenceDataLibraryViewModel(this.serverSession);
+            this.SiteRdlLayoutGroup.DataContext = this.siteReferenceDataLibraryViewModel;
+
+            this.errorViewModel = new ErrorViewModel(this.serverSession);
+            this.PocoErrorsLayoutGroup.DataContext = this.errorViewModel;
+            this.ModelErrorsLayoutGroup.DataContext = this.errorViewModel;
+            this.ErrorDetailLayoutGroup.DataContext = this.errorViewModel;
+        }
+
+        /// <summary>
+        /// Update engineering models list
+        /// </summary>
+        /// <param name="engineeringModelsList">
+        /// The models list that will be migrated <see cref="EngineeringModelRowViewModel" />
+        /// </param>
+        private void EngineeringModelViewModelModelListChangedEvent(List<EngineeringModelRowViewModel> engineeringModelsList)
+        {
+            if (this.DataContext is LoginViewModel viewModel)
+            {
+                viewModel.EngineeringModels = engineeringModelsList;
+            }
         }
 
         /// <summary>

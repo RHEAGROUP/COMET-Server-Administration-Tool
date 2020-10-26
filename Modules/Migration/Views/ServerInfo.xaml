@@ -20,10 +20,11 @@
             View="Tabs"
             Margin="0 0 0 0">
             <tabs:EngineeringModelLayoutGroup
+                x:Name="EngineeringModelLayoutGroup"
                 GridSelectionIsAvailable="{Binding
                             RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}},
                             Path=DisplayErrorsTabs}" />
-            <tabs:SiteRdlLayoutGroup />
+            <tabs:SiteRdlLayoutGroup x:Name="SiteRdlLayoutGroup" />
             <tabs:PocoErrorLayoutGroup x:Name="PocoErrorsLayoutGroup" DataContext="{x:Null}" />
             <tabs:ModelErrorLayoutGroup x:Name="ModelErrorsLayoutGroup" DataContext="{x:Null}" />
         </dxlc:LayoutGroup>
