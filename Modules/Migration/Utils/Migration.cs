@@ -123,7 +123,7 @@ namespace Migration.Utils
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task ImportData(ReactiveList<EngineeringModelRowViewModel> selectedModels)
+        public async Task ImportData(List<EngineeringModelRowViewModel> selectedModels)
         {
             if (this.SourceSession is null)
             {
@@ -138,7 +138,7 @@ namespace Migration.Utils
 
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
-                if (!selectedModels.ToList().Any(em => em.Iid == modelSetup.Iid && em.IsSelected)) continue;
+                if (!selectedModels.Any(em => em.Iid == modelSetup.Iid && em.IsSelected)) continue;
 
                 var model = new EngineeringModel(
                         modelSetup.EngineeringModelIid,
@@ -206,9 +206,7 @@ namespace Migration.Utils
                 return;
             }
 
-            // TODO #34 Replace this in the near future, I cannot log into CDP WebService empty server
-            // var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
-            var targetUrl = $"http://localhost:5000/Data/Exchange";
+            var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
 
             Logger.Info($"Pushing data to {targetUrl}");
 

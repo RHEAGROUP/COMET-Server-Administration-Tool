@@ -6,22 +6,19 @@
 
 namespace Common.ViewModels
 {
-    using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
     using CDP4Dal.DAL;
     using CDP4JsonFileDal;
-    using CDP4Rules;
     using CDP4ServicesDal;
     using CDP4WspDal;
     using Microsoft.Win32;
+    using PlainObjects;
     using ReactiveUI;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Linq;
     using System.Reactive;
     using System.Threading.Tasks;
-    using PlainObjects;
 
     /// <summary>
     /// Enum describing the possible server types
@@ -181,76 +178,6 @@ namespace Common.ViewModels
         }
 
         /// <summary>
-        /// Out property for the <see cref="SelectAllModels"/> property
-        /// </summary>
-        private bool selectAllModels;
-
-        /// <summary>
-        /// Gets a value indicating whether all models are selected
-        /// </summary>
-        private bool SelectAllModels
-        {
-            get => this.selectAllModels;
-            set => this.RaiseAndSetIfChanged(ref this.selectAllModels, value);
-        }
-
-        /// <summary>
-        /// Backing field for the <see cref="EngineeringModels"/> property
-        /// </summary>
-        private ReactiveList<EngineeringModelRowViewModel> engineeringModels;
-
-        /// <summary>
-        /// Gets or sets engineering models list
-        /// </summary>
-        public ReactiveList<EngineeringModelRowViewModel> EngineeringModels
-        {
-            get => this.engineeringModels;
-            private set => this.RaiseAndSetIfChanged(ref this.engineeringModels, value);
-        }
-
-        /// <summary>
-        /// Backing field for the <see cref="SiteReferenceDataLibraries"/> property
-        /// </summary>
-        private ReactiveList<SiteReferenceDataLibraryRowViewModel> siteReferenceDataLibraries;
-
-        /// <summary>
-        /// Gets or sets site reference data libraries
-        /// </summary>
-        public ReactiveList<SiteReferenceDataLibraryRowViewModel> SiteReferenceDataLibraries
-        {
-            get => this.siteReferenceDataLibraries;
-            private set => this.RaiseAndSetIfChanged(ref this.siteReferenceDataLibraries, value);
-        }
-
-        /// <summary>
-        /// Backing field for the <see cref="PocoErrors"/> property
-        /// </summary>
-        private ReactiveList<PocoErrorRowViewModel> pocoErrors;
-
-        /// <summary>
-        /// Gets or sets poco errors list
-        /// </summary>
-        public ReactiveList<PocoErrorRowViewModel> PocoErrors
-        {
-            get => this.pocoErrors;
-            private set => this.RaiseAndSetIfChanged(ref this.pocoErrors, value);
-        }
-
-        /// <summary>
-        /// Backing field for the <see cref="RuleCheckerErrors"/> property
-        /// </summary>
-        private ReactiveList<RuleCheckerErrorRowViewModel> ruleCheckerErrors;
-
-        /// <summary>
-        /// Gets or sets rule checker errors list
-        /// </summary>
-        public ReactiveList<RuleCheckerErrorRowViewModel> RuleCheckerErrors
-        {
-            get => this.ruleCheckerErrors;
-            private set => this.RaiseAndSetIfChanged(ref this.ruleCheckerErrors, value);
-        }
-
-        /// <summary>
         /// Gets the server login command
         /// </summary>
         public ReactiveCommand<Unit> LoginCommand { get; private set; }
@@ -261,9 +188,9 @@ namespace Common.ViewModels
         public ReactiveCommand<object> LoadSourceFile { get; private set; }
 
         /// <summary>
-        /// Gets the command to select/unselect all models for import
+        /// Gets or sets engineering models list
         /// </summary>
-        public ReactiveCommand<object> CheckUncheckModel { get; private set; }
+        public List<EngineeringModelRowViewModel> EngineeringModels { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginViewModel"/> class.
@@ -302,31 +229,9 @@ namespace Common.ViewModels
                 ReactiveCommand.CreateAsyncTask(canLogin, x => this.ExecuteLogin(), RxApp.MainThreadScheduler);
             this.LoadSourceFile = ReactiveCommand.Create();
             this.LoadSourceFile.Subscribe(_ => this.ExecuteLoadSourceFile());
-            this.CheckUncheckModel = ReactiveCommand.Create();
-            this.CheckUncheckModel.Subscribe(_ => this.ExecuteCheckUncheckModel());
 
             this.LoginSuccessfully = false;
             this.LoginFailed = false;
-
-            this.EngineeringModels = new ReactiveList<EngineeringModelRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
-
-            this.SiteReferenceDataLibraries = new ReactiveList<SiteReferenceDataLibraryRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
-
-            this.PocoErrors = new ReactiveList<PocoErrorRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
-
-            this.RuleCheckerErrors = new ReactiveList<RuleCheckerErrorRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
         }
 
         /// <summary>
@@ -366,83 +271,12 @@ namespace Common.ViewModels
                 await this.ServerSession.Open();
 
                 this.LoginSuccessfully = true;
-
-                var siteDirectory = this.ServerSession.RetrieveSiteDirectory();
-
-                this.BindEngineeringModels(siteDirectory);
-                this.BindSiteReferenceDataLibraries(siteDirectory);
-                this.BindPocoErrors();
-                this.BindEngineeringModelErrors();
             }
             catch (Exception ex)
             {
                 LogMessage(ex.Message);
 
                 this.LoginFailed = true;
-            }
-        }
-
-        /// <summary>
-        /// Bind engineering models to the reactive list
-        /// </summary>
-        /// <param name="siteDirectory">The <see cref="SiteDirectory"/> top container</param>
-        private void BindEngineeringModels(SiteDirectory siteDirectory)
-        {
-            this.EngineeringModels.Clear();
-
-            foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
-            {
-                this.EngineeringModels.Add(new EngineeringModelRowViewModel(modelSetup));
-            }
-
-            this.SelectAllModels = true;
-        }
-
-        /// <summary>
-        /// Bind site reference data libraries to the reactive list
-        /// </summary>
-        /// <param name="siteDirectory">The <see cref="SiteDirectory"/> top container</param>
-        private void BindSiteReferenceDataLibraries(SiteDirectory siteDirectory)
-        {
-            this.SiteReferenceDataLibraries.Clear();
-
-            foreach (var rdl in siteDirectory.SiteReferenceDataLibrary.OrderBy(m => m.Name))
-            {
-                this.SiteReferenceDataLibraries.Add(new SiteReferenceDataLibraryRowViewModel(rdl));
-            }
-        }
-
-        /// <summary>
-        /// Apply PocoCardinality & PocoProperties to the E10-25 data set and bind errors to the reactive list
-        /// </summary>
-        private void BindPocoErrors()
-        {
-            this.PocoErrors.Clear();
-
-            foreach (var thing in this.ServerSession.Assembler.Cache.Select(item => item.Value.Value)
-                .Where(t => t.ValidationErrors.Any()))
-            {
-                foreach (var error in thing.ValidationErrors)
-                {
-                    this.PocoErrors.Add(new PocoErrorRowViewModel(thing, error));
-                }
-            }
-        }
-
-        /// <summary>
-        /// Apply RuleCheckerEngine to the E10-25 data set and bind errors to the reactive list
-        /// </summary>
-        private void BindEngineeringModelErrors()
-        {
-            var ruleCheckerEngine = new RuleCheckerEngine();
-            var resultList = ruleCheckerEngine.Run(this.ServerSession.Assembler.Cache.Select(item => item.Value.Value));
-
-            this.RuleCheckerErrors.Clear();
-
-            foreach (var result in resultList)
-            {
-                this.RuleCheckerErrors.Add(new RuleCheckerErrorRowViewModel(result.Thing, result.Id, result.Description,
-                    result.Severity));
             }
         }
 
@@ -463,14 +297,6 @@ namespace Common.ViewModels
             {
                 this.Uri = openFileDialog.FileNames[0];
             }
-        }
-
-        /// <summary>
-        /// Select model for the migration procedure
-        /// </summary>
-        private void ExecuteCheckUncheckModel()
-        {
-            this.SelectAllModels = !(this.EngineeringModels.Any(em => !em.IsSelected));
         }
 
         /// <summary>
