@@ -4,15 +4,13 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.Collections.Generic;
-using Common.ViewModels.PlainObjects;
-
 namespace Migration.Views
 {
     using CDP4Dal;
     using Common.ViewModels;
+    using Common.ViewModels.PlainObjects;
+    using System.Collections.Generic;
     using System.Windows;
-    using ReactiveUI;
 
     /// <summary>
     /// Interaction logic for ServerInfo.xaml

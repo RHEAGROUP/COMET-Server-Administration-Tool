@@ -206,7 +206,6 @@ namespace Migration.Utils
                 return;
             }
 
-            // TODO #34 Replace this in the near future, I cannot log into CDP WebService empty server
             var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
 
             Logger.Info($"Pushing data to {targetUrl}");

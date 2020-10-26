@@ -4,17 +4,15 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
-
 namespace Common.ViewModels
 {
-    using PlainObjects;
     using CDP4Dal;
     using CDP4Dal.DAL;
     using CDP4JsonFileDal;
     using CDP4ServicesDal;
     using CDP4WspDal;
     using Microsoft.Win32;
+    using PlainObjects;
     using ReactiveUI;
     using System;
     using System.Collections.Generic;
@@ -181,10 +179,7 @@ namespace Common.ViewModels
         /// <summary>
         /// Gets or sets engineering models list
         /// </summary>
-        public List<EngineeringModelRowViewModel> EngineeringModels
-        {
-            get; set;
-        }
+        public List<EngineeringModelRowViewModel> EngineeringModels { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginViewModel"/> class.
