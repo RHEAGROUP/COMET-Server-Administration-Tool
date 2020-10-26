@@ -84,7 +84,7 @@ namespace Common.ViewModels
         /// <summary>
         /// Invoke ModelListChangedEvent
         /// </summary>
-        /// <param name="models"></param>
+        /// <param name="models">Currently selected engineering models</param>
         private void NotifyEngineeringModelsListChanges(List<EngineeringModelRowViewModel> models)
         {
             ModelListChangedEvent?.Invoke(models);
@@ -123,7 +123,7 @@ namespace Common.ViewModels
         }
 
         /// <summary>
-        ///
+        /// Select/unselect all models for the migration procedure
         /// </summary>
         private void ExecuteCheckUncheckAllModels()
         {
