@@ -83,16 +83,13 @@
                 </StackPanel>
                 <StackPanel Grid.Row="0" Grid.Column="1">
                     <views:ServerInfo
-                        LoginSuccessfully="{Binding
-                        Path=LoginSuccessfully,
-                        UpdateSourceTrigger=PropertyChanged}"
-                        ServerSession="{Binding
-                        Path=ServerSession,
-                        UpdateSourceTrigger=PropertyChanged}"
-                        Visibility="{Binding
-                        Path=LoginSuccessfully,
-                        Converter={dxmvvm:BooleanToVisibilityConverter},
-                        UpdateSourceTrigger=PropertyChanged}"
+                        LoginSuccessfully="{Binding Path=LoginSuccessfully,
+                                                    UpdateSourceTrigger=PropertyChanged}"
+                        ServerSession="{Binding Path=ServerSession,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                        Visibility="{Binding Path=LoginSuccessfully,
+                                             Converter={dxmvvm:BooleanToVisibilityConverter},
+                                             UpdateSourceTrigger=PropertyChanged}"
                         DataContext="{Binding SourceViewModel}" />
                 </StackPanel>
             </Grid>
@@ -117,16 +114,13 @@
                 <StackPanel Grid.Row="0" Grid.Column="1">
                     <views:ServerInfo
                         DisplayErrorsTabs="False"
-                        LoginSuccessfully="{Binding
-                        Path=LoginSuccessfully,
-                        UpdateSourceTrigger=PropertyChanged}"
-                        ServerSession="{Binding
-                        Path=ServerSession,
-                        UpdateSourceTrigger=PropertyChanged}"
-                        Visibility="{Binding
-                        Path=LoginSuccessfully,
-                        Converter={dxmvvm:BooleanToVisibilityConverter},
-                        UpdateSourceTrigger=PropertyChanged}"
+                        LoginSuccessfully="{Binding Path=LoginSuccessfully,
+                                                    UpdateSourceTrigger=PropertyChanged}"
+                        ServerSession="{Binding Path=ServerSession,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                        Visibility="{Binding Path=LoginSuccessfully,
+                                             Converter={dxmvvm:BooleanToVisibilityConverter},
+                                             UpdateSourceTrigger=PropertyChanged}"
                         DataContext="{Binding TargetViewModel}" />
                 </StackPanel>
             </Grid>

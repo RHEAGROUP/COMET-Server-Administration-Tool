@@ -210,14 +210,14 @@ namespace Common.ViewModels
             {
                 if (!loginFailed) return;
 
-                LogMessage($"Cannot login to {this.Uri}({ServerTypes[SelectedServerType]}) data-source");
+                LogMessage($"Cannot log in to {this.Uri} ({ServerTypes[SelectedServerType]}) data-source");
             });
 
             this.WhenAnyValue(vm => vm.LoginSuccessfully).Subscribe(loginSuccessfully =>
             {
                 if (!loginSuccessfully) return;
 
-                LogMessage($"Successfully logged to {this.Uri}({ServerTypes[SelectedServerType]}) data-source");
+                LogMessage($"Successfully logged in to {this.Uri} ({ServerTypes[SelectedServerType]}) data-source");
             });
 
             this.WhenAnyValue(vm => vm.SelectedServerType).Subscribe(_ =>
