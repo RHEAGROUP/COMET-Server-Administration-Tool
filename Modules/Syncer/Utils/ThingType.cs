@@ -9,7 +9,7 @@ namespace Syncer.Utils
     public enum ThingType
     {
         // EngineeringModel,
-        DomainOfExpertise,
-        SiteReferenceDataLibrary
+        SiteReferenceDataLibrary,
+        DomainOfExpertise
     }
 }

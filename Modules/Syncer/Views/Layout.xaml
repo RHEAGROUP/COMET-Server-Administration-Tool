@@ -9,6 +9,7 @@
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:views="clr-namespace:Common.Views;assembly=Common"
+    xmlns:tabs="clr-namespace:Common.Views.Tabs;assembly=Common"
     xmlns:viewModels="clr-namespace:Syncer.ViewModels"
     xmlns:behaviors="clr-namespace:Syncer.Behaviors"
     Header="Syncer"
@@ -22,7 +23,7 @@
         <viewModels:SyncerViewModel />
     </dxlc:LayoutGroup.DataContext>
 
-    <GroupBox Header="Source" Height="300">
+    <GroupBox Header="Source" Height="320">
         <StackPanel Margin="0" HorizontalAlignment="Stretch">
             <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
@@ -32,14 +33,11 @@
                 </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="0.4*" />
+                    <ColumnDefinition Width="0.6*" />
                 </Grid.ColumnDefinitions>
 
-                <views:Login
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    x:Name="LoginSource" />
-
+                <views:Login Grid.Row="0" Grid.Column="0" x:Name="LoginSource" />
                 <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
                     <dxlc:LayoutItemLabel
                         Margin="5"
@@ -57,6 +55,22 @@
                         DisplayMemberPath="Value"
                         />
                 </StackPanel>
+
+                <dxlc:LayoutGroup Grid.Row="0" Grid.Column="1"
+                    Orientation="Vertical"
+                    View="Tabs"
+                    Width="540"
+                    Margin="0 0 0 0"
+                    Visibility="{Binding Path=SourceViewModel.LoginSuccessfully,
+                                         Converter={dxmvvm:BooleanToVisibilityConverter},
+                                         UpdateSourceTrigger=PropertyChanged}">
+                    <tabs:SiteRdlLayoutGroup
+                        DataContext="{Binding Path=SiteReferenceDataLibraryViewModel,
+                                              UpdateSourceTrigger=PropertyChanged}" />
+                    <tabs:DomainOfExpertiseLayoutGroup
+                        DataContext="{Binding Path=DomainOfExpertiseViewModel,
+                                              UpdateSourceTrigger=PropertyChanged}" />
+                </dxlc:LayoutGroup>
             </Grid>
         </StackPanel>
     </GroupBox>
@@ -72,9 +86,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <views:Login
-                    Grid.Row="0"
-                    Grid.Column="0"
+                <views:Login Grid.Row="0" Grid.Column="0"
                     x:Name="LoginTarget"
                     JsonIsAvailable="False" />
             </Grid>

@@ -6,12 +6,14 @@
 
 namespace Syncer.ViewModels
 {
+    using CDP4Common.CommonData;
     using Common.ViewModels;
     using ReactiveUI;
     using Syncer.Utils;
     using Syncer.Utils.Sync;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reactive;
     using System.Threading.Tasks;
 
@@ -48,6 +50,22 @@ namespace Syncer.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.targetViewModel, value);
         }
 
+        private SiteReferenceDataLibraryViewModel siteReferenceDataLibraryViewModel;
+
+        public SiteReferenceDataLibraryViewModel SiteReferenceDataLibraryViewModel
+        {
+            get => this.siteReferenceDataLibraryViewModel;
+            set => this.RaiseAndSetIfChanged(ref this.siteReferenceDataLibraryViewModel, value);
+        }
+
+        private DomainOfExpertiseViewModel domainOfExpertiseViewModel;
+
+        public DomainOfExpertiseViewModel DomainOfExpertiseViewModel
+        {
+            get => this.domainOfExpertiseViewModel;
+            set => this.RaiseAndSetIfChanged(ref this.domainOfExpertiseViewModel, value);
+        }
+
         private readonly ObservableAsPropertyHelper<bool> canSync;
 
         public bool CanSync => this.canSync.Value;
@@ -62,7 +80,7 @@ namespace Syncer.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.output, value);
         }
 
-        private SyncerFactory syncerFactory = new SyncerFactory();
+        private readonly SyncerFactory syncerFactory = new SyncerFactory();
 
         public SyncerViewModel()
         {
@@ -83,6 +101,18 @@ namespace Syncer.ViewModels
         {
             this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(UpdateOutput);
             this.WhenAnyValue(vm => vm.TargetViewModel.Output).Subscribe(UpdateOutput);
+
+            this.WhenAnyValue(vm => vm.SourceViewModel.LoginSuccessfully).Subscribe(
+                (sourceLoggedIn) =>
+                {
+                    if (!sourceLoggedIn) return;
+
+                    this.SiteReferenceDataLibraryViewModel =
+                        new SiteReferenceDataLibraryViewModel(this.SourceViewModel.ServerSession);
+
+                    this.DomainOfExpertiseViewModel =
+                        new DomainOfExpertiseViewModel(this.SourceViewModel.ServerSession);
+                });
         }
 
         private void UpdateOutput(string message)
@@ -99,7 +129,31 @@ namespace Syncer.ViewModels
                 this.SourceViewModel.ServerSession,
                 this.TargetViewModel.ServerSession);
 
-            await syncer.Sync();
+            IEnumerable<Thing> selectedThings;
+            switch (this.SelectedThingType)
+            {
+                case ThingType.DomainOfExpertise:
+                    selectedThings = this.DomainOfExpertiseViewModel.DomainsOfExpertise
+                        .Where(r => r.IsSelected)
+                        .Select(r => r.Thing);
+                    break;
+                case ThingType.SiteReferenceDataLibrary:
+                    selectedThings = this.SiteReferenceDataLibraryViewModel.SiteReferenceDataLibraries
+                        .Where(r => r.IsSelected)
+                        .Select(r => r.Thing);
+                    break;
+                default:
+                    throw new ArgumentException("Invalid value", nameof(this.SelectedThingType));
+            }
+
+            try
+            {
+                await syncer.Sync(selectedThings);
+            }
+            catch (Exception e)
+            {
+                UpdateOutput(e.Message);
+            }
         }
     }
 }

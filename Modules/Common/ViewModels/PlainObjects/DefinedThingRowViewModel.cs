@@ -16,19 +16,23 @@ namespace Common.ViewModels.PlainObjects
     public abstract class DefinedThingRowViewModel<T> : ReactiveObject where T : DefinedThing
     {
         /// <summary>
+        /// Backing field for <see cref="Thing"/>
+        /// </summary>
+        private Thing thing;
+
+        /// <summary>
+        /// Gets or sets the thing
+        /// </summary>
+        public Thing Thing
+        {
+            get => this.thing;
+            private set => this.RaiseAndSetIfChanged(ref this.thing, value);
+        }
+
+        /// <summary>
         /// Backing field for <see cref="Iid"/>
         /// </summary>
         private Guid iid;
-
-        /// <summary>
-        /// Backing field for <see cref="Name"/>
-        /// </summary>
-        private string name;
-
-        /// <summary>
-        /// Backing field for <see cref="ShortName"/>
-        /// </summary>
-        private string shortName;
 
         /// <summary>
         /// Gets or sets the iid
@@ -40,6 +44,11 @@ namespace Common.ViewModels.PlainObjects
         }
 
         /// <summary>
+        /// Backing field for <see cref="Name"/>
+        /// </summary>
+        private string name;
+
+        /// <summary>
         /// Gets or sets the name
         /// </summary>
         public string Name
@@ -47,6 +56,11 @@ namespace Common.ViewModels.PlainObjects
             get => this.name;
             private set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
+
+        /// <summary>
+        /// Backing field for <see cref="ShortName"/>
+        /// </summary>
+        private string shortName;
 
         /// <summary>
         /// Gets or sets the shortName
@@ -65,6 +79,7 @@ namespace Common.ViewModels.PlainObjects
         /// </param>
         protected DefinedThingRowViewModel(T thing)
         {
+            this.Thing = thing;
             this.Iid = thing.Iid;
             this.Name = thing.Name;
             this.ShortName = thing.ShortName;
