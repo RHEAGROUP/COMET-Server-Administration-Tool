@@ -27,8 +27,6 @@ namespace App.Tests.Migration
         /// </summary>
         private void SetTargetAndSourceServers()
         {
-            // Migration will always fail when the target server does not contains models and in order to 'pass' the tests the target server it's the same with the source server
-
             this.migrationViewModel.Object.SourceViewModel = new LoginViewModel
             {
                 ServerType = new KeyValuePair<string, string>("CDP", "CDP4 WebServices"),
@@ -40,9 +38,9 @@ namespace App.Tests.Migration
             this.migrationViewModel.Object.TargetViewModel = new LoginViewModel
             {
                 ServerType = new KeyValuePair<string, string>("CDP", "CDP4 WebServices"),
-                UserName = SourceUsername, // TargetUsername
-                Password = SourcePassword, // TargetPassword
-                Uri = SourceServerUri      // TargetServerUri
+                UserName = SourceUsername,
+                Password = SourcePassword,
+                Uri = SourceServerUri
             };
         }
 

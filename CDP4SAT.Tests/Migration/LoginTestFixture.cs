@@ -4,7 +4,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace App.Tests.Migration
 {
     using global::Migration.ViewModels.Common;
