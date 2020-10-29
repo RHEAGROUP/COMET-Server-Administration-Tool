@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace App.Tests.Migration
+namespace Migration.Tests
 {
     using System.Reactive.Concurrency;
     using ReactiveUI;
@@ -70,11 +70,6 @@ namespace App.Tests.Migration
 
             Assert.DoesNotThrowAsync(async () =>
                 await this.migrationViewModel.Object.MigrateCommand.ExecuteAsyncTask());
-
-            Assert.DoesNotThrowAsync(async () =>
-                await this.migrationViewModel.Object.SourceViewModel.ServerSession.Close());
-            Assert.DoesNotThrowAsync(async () =>
-                await this.migrationViewModel.Object.TargetViewModel.ServerSession.Close());
         }
 
         [Test]

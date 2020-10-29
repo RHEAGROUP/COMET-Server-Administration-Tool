@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace App.Tests.Migration
+namespace Migration.Tests
 {
     using global::Migration.ViewModels.Common;
     using Moq;

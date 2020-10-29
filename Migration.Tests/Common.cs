@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace App.Tests.Migration
+namespace Migration.Tests
 {
     /// <summary>
     /// Common class that will be used by all suite tests
