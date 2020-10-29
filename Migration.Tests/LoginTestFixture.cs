@@ -6,12 +6,12 @@
 
 namespace Migration.Tests
 {
-    using global::Migration.ViewModels.Common;
     using Moq;
     using NUnit.Framework;
     using ReactiveUI;
-    using System.Reactive.Concurrency;
     using System.Collections.Generic;
+    using System.Reactive.Concurrency;
+    using ViewModels.Common;
 
     /// <summary>
     /// Suite of tests for the <see cref="Migration"/> <see cref="LoginViewModel"/>

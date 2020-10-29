@@ -14,8 +14,5 @@ namespace Migration.Tests
         protected const string SourceServerUri = "https://cdp4services-public.cdp4.org";
         protected const string SourceUsername = "admin";
         protected const string SourcePassword = "pass";
-        protected const string TargetServerUri = "http://localhost:5000";
-        protected const string TargetUsername = "admin";
-        protected const string TargetPassword = "pass";
     }
 }

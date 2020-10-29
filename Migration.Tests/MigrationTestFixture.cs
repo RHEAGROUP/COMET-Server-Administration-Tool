@@ -11,8 +11,8 @@ namespace Migration.Tests
     using Moq;
     using NUnit.Framework;
     using System.Collections.Generic;
-    using global::Migration.ViewModels;
-    using global::Migration.ViewModels.Common;
+    using ViewModels;
+    using ViewModels.Common;
 
     /// <summary>
     /// Suite of tests for the <see cref="Migration"/> <see cref="MigrationViewModel"/>
