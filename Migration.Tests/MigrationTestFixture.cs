@@ -18,9 +18,13 @@ namespace Migration.Tests
     /// Suite of tests for the <see cref="Migration"/> <see cref="MigrationViewModel"/>
     /// </summary>
     [TestFixture]
-    public class MigrationTestFixture : CommonTest
+    public class MigrationTestFixture
     {
         private Mock<MigrationViewModel> migrationViewModel;
+
+        private const string SourceServerUri = "https://cdp4services-public.cdp4.org";
+        private const string SourceUsername = "admin";
+        private const string SourcePassword = "pass";
 
         /// <summary>
         /// Set target and source servers required by the migration

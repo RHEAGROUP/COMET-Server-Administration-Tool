@@ -17,9 +17,13 @@ namespace Migration.Tests
     /// Suite of tests for the <see cref="Migration"/> <see cref="LoginViewModel"/>
     /// </summary>
     [TestFixture]
-    public class LoginTestFixture : CommonTest
+    public class LoginTestFixture
     {
         private Mock<LoginViewModel> loginViewModel;
+
+        private const string SourceServerUri = "https://cdp4services-public.cdp4.org";
+        private const string SourceUsername = "admin";
+        private const string SourcePassword = "pass";
 
         [SetUp]
         public void SetUp()
