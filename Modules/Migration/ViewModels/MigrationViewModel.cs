@@ -196,7 +196,7 @@ namespace Migration.ViewModels
         /// <returns>The <see cref="Task"/></returns>
         private async Task ExecuteMigration()
         {
-            await this.migration.ImportData(this.SourceViewModel.EngineeringModels);
+            await this.migration.ImportData(this.SourceViewModel.EngineeringModels, this.MigrationFile);
             await this.migration.ExportData();
             // TODO #33 add cleanup after migration
         }

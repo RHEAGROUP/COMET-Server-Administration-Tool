@@ -49,7 +49,12 @@ namespace Migration.Utils
         /// <summary>
         /// Annex C3 Zip archive file name
         /// </summary>
-        private static readonly string ArchiveName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\Annex-C3.zip";
+        private static readonly string ArchiveFileName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\Annex-C3.zip";
+
+        /// <summary>
+        /// Annex C3 Migration file name
+        /// </summary>
+        private static readonly string MigrationFileName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\migration.json";
 
         /// <summary>
         /// Data Access Layer used during migration process
@@ -128,10 +133,13 @@ namespace Migration.Utils
         /// <param name="selectedModels">
         /// Selected engineering models from the source server <see cref="EngineeringModelRowViewModel"/>
         /// </param>
+        /// <param name="migrationFile">
+        ///  Json migration file selected by the user
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task ImportData(ReactiveList<EngineeringModelRowViewModel> selectedModels)
+        public async Task ImportData(ReactiveList<EngineeringModelRowViewModel> selectedModels, string migrationFile)
         {
             if (this.SourceSession is null)
             {
@@ -143,6 +151,12 @@ namespace Migration.Utils
             this.NotifyStep(MigrationStep.ImportStart);
 
             var siteDirectory = this.SourceSession.RetrieveSiteDirectory();
+
+            if (siteDirectory == null)
+            {
+                await this.SourceSession.Open();
+                siteDirectory = this.SourceSession.RetrieveSiteDirectory();
+            }
 
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
@@ -196,7 +210,7 @@ namespace Migration.Utils
                 }
             }
 
-            await this.PackData();
+            await this.PackData(migrationFile);
 
             Logger.Info("Finished pulling data");
             this.NotifyStep(MigrationStep.ImportEnd);
@@ -251,22 +265,41 @@ namespace Migration.Utils
         /// <summary>
         /// Implement pack(zip) data operation
         /// </summary>
-        /// <returns></returns>
-        /// <param name="iterations">
-        /// Model iterations list <see cref="Iteration"/>
-        /// </param>
+        /// <param name="migrationFile">Migration file</param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task PackData(IEnumerable<Iteration> iterations = null)
+        private async Task PackData(string migrationFile)
         {
-            var zipCredentials = new Credentials("admin", "pass", new Uri(ArchiveName));
+            List<string> extensionFiles = null;
+            var zipCredentials = new Credentials("admin", "pass", new Uri(ArchiveFileName));
             var zipSession = new Session(this.dal, zipCredentials);
 
+            if (!string.IsNullOrEmpty(migrationFile))
+            {
+                if (!System.IO.File.Exists(migrationFile))
+                {
+                    this.NotifyMessage("Unable to find selected migration file");
+                    return;
+                }
+
+                try
+                {
+                    extensionFiles = new List<string> {MigrationFileName};
+                    System.IO.File.Copy(migrationFile, MigrationFileName);
+                }
+                catch (Exception ex)
+                {
+                    // TODO #37 add proper exception handling
+                    Logger.Error($"Could add migration.json file. Exception: {ex}");
+                    this.NotifyMessage("Could add migration.json file");
+                }
+            }
+
+            this.NotifyStep(MigrationStep.PackStart);
+
             var operationContainers = new List<OperationContainer>();
-            var openIterations = iterations != null
-                ? this.SourceSession.OpenIterations.Select(i => i.Key).Where(oi => iterations.Any(i => i.Iid == oi.Iid))
-                : this.SourceSession.OpenIterations.Select(i => i.Key);
+            var openIterations = this.SourceSession.OpenIterations.Select(i => i.Key);
 
             foreach (var iteration in openIterations)
             {
@@ -276,21 +309,30 @@ namespace Migration.Utils
                 var operation = new Operation(null, dto, OperationKind.Create);
                 operationContainer.AddOperation(operation);
                 operationContainers.Add(operationContainer);
-            }
 
-            try
-            {
-                // TODO #26 add result interpretation
-                await this.dal.Write(operationContainers);
-            }
-            catch (Exception ex)
-            {
-                // TODO #37 add proper exception handling
-                Logger.Error($"Could not pack data. Exception: {ex}");
-            }
-            finally
-            {
-                await this.SourceSession.Close();
+                try
+                {
+                    {
+                        // TODO #26 add result interpretation
+                        await this.dal.Write(operationContainers, extensionFiles);
+
+                        if (System.IO.File.Exists(MigrationFileName))
+                        {
+                            System.IO.File.Delete(MigrationFileName);
+                        }
+
+                        this.NotifyStep(MigrationStep.PackEnd);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // TODO #37 add proper exception handling
+                    Logger.Error($"Could not pack data. Exception: {ex}");
+                }
+                finally
+                {
+                    await this.SourceSession.Close();
+                }
             }
         }
 
@@ -313,7 +355,7 @@ namespace Migration.Utils
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes($"{credentials.UserName}:{credentials.Password}")));
+                Convert.ToBase64String(Encoding.ASCII.GetBytes($"{credentials.UserName}:{credentials.Password}")));
             client.DefaultRequestHeaders.Add("User-Agent", "SAT");
 
             return client;
@@ -327,10 +369,10 @@ namespace Migration.Utils
         /// </returns>
         private MultipartContent CreateMultipartContent()
         {
-            var fileName = Path.GetFileName(ArchiveName);
+            var fileName = Path.GetFileName(ArchiveFileName);
             var multipartContent = new MultipartFormDataContent();
 
-            using (var fileStream = System.IO.File.OpenRead(ArchiveName))
+            using (var fileStream = System.IO.File.OpenRead(ArchiveFileName))
             {
                 var contentStream = new MemoryStream();
                 fileStream.CopyTo(contentStream);
@@ -345,8 +387,9 @@ namespace Migration.Utils
                 streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
 
                 multipartContent.Add(streamContent, "file");
-                multipartContent.Add(new StringContent("pass", Encoding.UTF8), "password");
             }
+
+            multipartContent.Add(new StringContent("pass", Encoding.UTF8), "password");
 
             return multipartContent;
         }
