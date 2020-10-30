@@ -96,7 +96,6 @@ namespace Migration.Tests
             Assert.DoesNotThrowAsync(async () => await loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
             Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
             Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.CheckUncheckModel.ExecuteAsyncTask());
-            //Assert.DoesNotThrow(() => this.loginViewModel.Object.LoadSourceFile.Execute(null));
             Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.ServerSession.Close());
         }
     }
