@@ -30,7 +30,7 @@ namespace Migration.Utils
     using CDP4Dal.DAL;
     using CDP4Dal.Operations;
     using CDP4JsonFileDal;
-    using ReactiveUI;
+    using Common.ViewModels.PlainObjects;
     using NLog;
     using System;
     using System.Collections.Generic;
@@ -40,7 +40,6 @@ namespace Migration.Utils
     using System.Net.Http.Headers;
     using System.Text;
     using System.Threading.Tasks;
-    using Common.ViewModels.PlainObjects;
 
     /// <summary>
     /// Enumeration of the migration process steps
