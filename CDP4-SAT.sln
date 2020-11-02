@@ -4,7 +4,7 @@ VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App", "CDP4SAT\App.csproj", "{4E672AC5-A95E-4E5E-B35D-8A4B0E8B5340}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App.Tests", "CDP4SAT.Tests\App.Tests.csproj", "{64124677-EBB7-4484-9CC3-2E0A9A6482DA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Migration.Tests", "Migration.Tests\Migration.Tests.csproj", "{64124677-EBB7-4484-9CC3-2E0A9A6482DA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{53302909-5F6D-484F-BCD5-0760A3B92DD2}"
 EndProject
