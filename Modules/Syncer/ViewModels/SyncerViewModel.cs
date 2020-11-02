@@ -149,6 +149,7 @@ namespace Syncer.ViewModels
             try
             {
                 await syncer.Sync(selectedThings);
+                UpdateOutput("Sync successful");
             }
             catch (Exception e)
             {
