@@ -26,6 +26,7 @@
 namespace Syncer.Utils.Sync
 {
     using CDP4Common.CommonData;
+    using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
     using CDP4Dal.Operations;
     using System;
@@ -33,11 +34,32 @@ namespace Syncer.Utils.Sync
     using System.Linq;
     using System.Threading.Tasks;
 
+    /// <summary>
+    /// A helper class used for syncing <see cref="SiteReferenceDataLibrary"/>
+    /// </summary>
     internal class SiteReferenceDataLibrarySyncer : Syncer
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SiteReferenceDataLibrarySyncer"/> class
+        /// </summary>
+        /// <param name="sourceSession">
+        /// The <see cref="ISession"/> for the source server session
+        /// </param>
+        /// <param name="targetSession">
+        /// The <see cref="ISession"/> for the target server session
+        /// </param>
         public SiteReferenceDataLibrarySyncer(ISession sourceSession, ISession targetSession)
             : base(sourceSession, targetSession) { }
 
+        /// <summary>
+        /// Method syncing the given <paramref name="selectedThings"/> from the source server to the target server
+        /// </summary>
+        /// <param name="selectedThings">
+        /// A list of things to sync
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>
+        /// </returns>
         protected internal override async Task Sync(IEnumerable<Thing> selectedThings)
         {
             var selectedIids = new HashSet<Guid>(selectedThings.Select(thing => thing.Iid));
@@ -46,6 +68,7 @@ namespace Syncer.Utils.Sync
 
             var cloneTargetSiteDirectory = this.TargetSiteDirectory.Clone(false);
 
+            // sync SiteReferenceDataLibrary
             foreach (var sourceRdl in
                 this.SourceSiteDirectory.SiteReferenceDataLibrary
                     .Where(t => selectedIids.Contains(t.Iid))
@@ -85,6 +108,7 @@ namespace Syncer.Utils.Sync
                 }
             }
 
+            // update target SiteDirectory
             operationContainer.AddOperation(new Operation(
                 this.TargetSiteDirectory.ToDto(),
                 cloneTargetSiteDirectory.ToDto(),

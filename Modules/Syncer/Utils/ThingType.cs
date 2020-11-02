@@ -25,6 +25,9 @@
 
 namespace Syncer.Utils
 {
+    /// <summary>
+    /// Enum describing the possible ClassKinds to be synced
+    /// </summary>
     public enum ThingType
     {
         // EngineeringModel,

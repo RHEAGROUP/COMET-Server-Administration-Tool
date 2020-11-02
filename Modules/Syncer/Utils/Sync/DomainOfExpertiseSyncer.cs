@@ -26,6 +26,7 @@
 namespace Syncer.Utils.Sync
 {
     using CDP4Common.CommonData;
+    using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
     using CDP4Dal.Operations;
     using System;
@@ -33,11 +34,33 @@ namespace Syncer.Utils.Sync
     using System.Linq;
     using System.Threading.Tasks;
 
+    /// <summary>
+    /// A helper class used for syncing things of type
+    /// <see cref="DomainOfExpertise"/> and <see cref="DomainOfExpertiseGroup"/>
+    /// </summary>
     internal class DomainOfExpertiseSyncer : Syncer
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DomainOfExpertiseSyncer"/> class
+        /// </summary>
+        /// <param name="sourceSession">
+        /// The <see cref="ISession"/> for the source server session
+        /// </param>
+        /// <param name="targetSession">
+        /// The <see cref="ISession"/> for the target server session
+        /// </param>
         public DomainOfExpertiseSyncer(ISession sourceSession, ISession targetSession)
             : base(sourceSession, targetSession) { }
 
+        /// <summary>
+        /// Method syncing the given <paramref name="selectedThings"/> from the source server to the target server
+        /// </summary>
+        /// <param name="selectedThings">
+        /// A list of things to sync
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>
+        /// </returns>
         protected internal override async Task Sync(IEnumerable<Thing> selectedThings)
         {
             var selectedIids = new HashSet<Guid>(selectedThings.Select(thing => thing.Iid));
@@ -49,6 +72,7 @@ namespace Syncer.Utils.Sync
             var allTargetThings = this.TargetSiteDirectory.QueryContainedThingsDeep()
                 .ToDictionary(thing => thing.Iid, thing => thing);
 
+            // sync DomainOfExpertise
             foreach (var domain in this.SourceSiteDirectory.Domain
                 .Where(t => selectedIids.Contains((t.Iid))))
             {
@@ -72,6 +96,7 @@ namespace Syncer.Utils.Sync
                 }
             }
 
+            // sync DomainOfExpertiseGroup
             foreach (var domainGroup in this.SourceSiteDirectory.DomainGroup
                 .Where(t => selectedIids.Contains((t.Iid))))
             {
@@ -95,6 +120,7 @@ namespace Syncer.Utils.Sync
                 }
             }
 
+            // update target SiteDirectory
             operationContainer.AddOperation(new Operation(
                 this.TargetSiteDirectory.ToDto(),
                 cloneTargetSiteDirectory.ToDto(),
