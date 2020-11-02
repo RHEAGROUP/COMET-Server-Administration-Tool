@@ -39,8 +39,6 @@ namespace Common.Utils
                     return new DXImageExtension { Image = new DXImageConverter().ConvertFrom("Warning_16x16.png") as DXImageInfo }.ProvideValue(null);
                 case "Error":
                     return new DXImageExtension { Image = new DXImageConverter().ConvertFrom("Error_16x16.png") as DXImageInfo }.ProvideValue(null);
-                default:
-                    throw new ArgumentException("Invalid value", nameof(value));
             }
 
             return null;
