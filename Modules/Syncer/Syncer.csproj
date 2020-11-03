@@ -110,6 +110,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Behaviors\SyncerBehavior.cs" />
+    <Compile Include="Utils\Sync\SyncerFactory.cs" />
     <Compile Include="Utils\ThingType.cs" />
     <Compile Include="Utils\Sync\DomainOfExpertiseSyncer.cs" />
     <Compile Include="Utils\Sync\SiteReferenceDataLibrarySyncer.cs" />

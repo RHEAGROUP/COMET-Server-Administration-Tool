@@ -35,58 +35,6 @@ namespace Syncer.Utils.Sync
     using System.Threading.Tasks;
 
     /// <summary>
-    /// A factory class used to build the helper <see cref="Syncer"/> classes
-    /// </summary>
-    internal class SyncerFactory
-    {
-        /// <summary>
-        /// The singleton class instance
-        /// </summary>
-        private static readonly SyncerFactory Instance = new SyncerFactory();
-
-        /// <summary>
-        /// Gets the singleton class instance
-        /// </summary>
-        /// <returns>
-        /// The singleton class instance
-        /// </returns>
-        internal static SyncerFactory GetInstance() => Instance;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SyncerFactory"/> class
-        /// </summary>
-        private SyncerFactory() { }
-
-        /// <summary>
-        /// Creates a new <see cref="Syncer"/> helper class
-        /// </summary>
-        /// <param name="type">
-        /// The <see cref="ThingType"/> describing the ClassKind to be synced
-        /// </param>
-        /// <param name="sourceSession">
-        /// The <see cref="ISession"/> for the source server session
-        /// </param>
-        /// <param name="targetSession">
-        /// The <see cref="ISession"/> for the target server session
-        /// </param>
-        /// <returns>
-        /// The newly created helper <see cref="Syncer"/> class
-        /// </returns>
-        internal Syncer CreateSyncer(ThingType type, ISession sourceSession, ISession targetSession)
-        {
-            switch (type)
-            {
-                case ThingType.DomainOfExpertise:
-                    return new DomainOfExpertiseSyncer(sourceSession, targetSession);
-                case ThingType.SiteReferenceDataLibrary:
-                    return new SiteReferenceDataLibrarySyncer(sourceSession, targetSession);
-                default:
-                    throw new ArgumentException("Invalid value", nameof(type));
-            }
-        }
-    }
-
-    /// <summary>
     /// A helper class used for syncing <see cref="Thing"/>s of certain kinds
     /// </summary>
     internal abstract class Syncer
