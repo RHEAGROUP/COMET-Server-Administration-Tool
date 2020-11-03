@@ -80,7 +80,7 @@ namespace Common.Views
         {
             if ((bool) e.NewValue) return;
 
-            this.ServerType.ItemsSource = LoginViewModel.ServerTypes.Where(item => item.Key != ViewModels.ServerType.JSON);
+            this.ServerType.ItemsSource = LoginViewModel.ServerTypes.Where(item => item.Key != ViewModels.DataSource.JSON);
             this.BrowseJson.Visibility = Visibility.Hidden;
         }
     }

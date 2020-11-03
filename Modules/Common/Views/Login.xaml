@@ -47,7 +47,7 @@
                 Margin="5"
                 Width="200"
                 ItemsSource="{Binding ServerTypes, Mode=OneTime}"
-                SelectedValue="{Binding Path=SelectedServerType, Mode=TwoWay}"
+                SelectedValue="{Binding Path=SelectedDataSource, Mode=TwoWay}"
                 IsSynchronizedWithCurrentItem="True"
                 SelectedValuePath="Key"
                 DisplayMemberPath="Value" />

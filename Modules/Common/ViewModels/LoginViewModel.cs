@@ -42,7 +42,7 @@ namespace Common.ViewModels
     /// <summary>
     /// Enum describing the possible server types
     /// </summary>
-    public enum ServerType
+    public enum DataSource
     {
         CDP4,
         WSP,
@@ -57,26 +57,26 @@ namespace Common.ViewModels
         /// <summary>
         /// Gets or sets data source server type
         /// </summary>
-        public static Dictionary<ServerType, string> ServerTypes { get; } =
-            new Dictionary<ServerType, string>
+        public static Dictionary<DataSource, string> ServerTypes { get; } =
+            new Dictionary<DataSource, string>
             {
-                { ServerType.CDP4, "CDP4 WebServices" },
-                { ServerType.WSP, "OCDT WSP Server" },
-                { ServerType.JSON, "JSON" }
+                { DataSource.CDP4, "CDP4 WebServices" },
+                { DataSource.WSP, "OCDT WSP Server" },
+                { DataSource.JSON, "JSON" }
             };
 
         /// <summary>
-        /// Backing field for the <see cref="ServerType"/> property
+        /// Backing field for the <see cref="DataSource"/> property
         /// </summary>
-        private ServerType selectedServerType;
+        private DataSource selectedDataSource;
 
         /// <summary>
         /// Gets or sets server serverType value
         /// </summary>
-        public ServerType SelectedServerType
+        public DataSource SelectedDataSource
         {
-            get => this.selectedServerType;
-            set => this.RaiseAndSetIfChanged(ref this.selectedServerType, value);
+            get => this.selectedDataSource;
+            set => this.RaiseAndSetIfChanged(ref this.selectedDataSource, value);
         }
 
         /// <summary>
@@ -229,19 +229,19 @@ namespace Common.ViewModels
             {
                 if (!loginFailed) return;
 
-                LogMessage($"Cannot log in to {this.Uri} ({ServerTypes[SelectedServerType]}) data-source");
+                LogMessage($"Cannot log in to {this.Uri} ({ServerTypes[SelectedDataSource]}) data-source");
             });
 
             this.WhenAnyValue(vm => vm.LoginSuccessfully).Subscribe(loginSuccessfully =>
             {
                 if (!loginSuccessfully) return;
 
-                LogMessage($"Successfully logged in to {this.Uri} ({ServerTypes[SelectedServerType]}) data-source");
+                LogMessage($"Successfully logged in to {this.Uri} ({ServerTypes[SelectedDataSource]}) data-source");
             });
 
-            this.WhenAnyValue(vm => vm.SelectedServerType).Subscribe(_ =>
+            this.WhenAnyValue(vm => vm.SelectedDataSource).Subscribe(_ =>
             {
-                this.JsonIsSelected = this.SelectedServerType == ServerType.JSON;
+                this.JsonIsSelected = this.SelectedDataSource == DataSource.JSON;
             });
 
             this.LoginCommand =
@@ -272,15 +272,15 @@ namespace Common.ViewModels
 
                 var credentials = new Credentials(this.UserName, this.Password, new Uri(this.Uri));
 
-                switch (this.SelectedServerType)
+                switch (this.SelectedDataSource)
                 {
-                    case ServerType.CDP4:
+                    case DataSource.CDP4:
                         this.dal = new CdpServicesDal();
                         break;
-                    case ServerType.WSP:
+                    case DataSource.WSP:
                         this.dal = new WspDal();
                         break;
-                    case ServerType.JSON:
+                    case DataSource.JSON:
                         this.dal = new JsonFileDal(new Version("1.0.0"));
                         break;
                 }
