@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MigrationViewModel.cs" company="RHEA System S.A.">
+// <copyright file="SyncerViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -28,8 +28,8 @@ namespace Syncer.ViewModels
     using CDP4Common.CommonData;
     using Common.ViewModels;
     using ReactiveUI;
-    using Syncer.Utils;
-    using Syncer.Utils.Sync;
+    using Utils;
+    using Utils.Sync;
     using System;
     using System.Collections.Generic;
     using System.Linq;
