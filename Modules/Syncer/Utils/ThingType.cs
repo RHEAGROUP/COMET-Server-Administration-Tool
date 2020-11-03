@@ -30,7 +30,7 @@ namespace Syncer.Utils
     /// </summary>
     public enum ThingType
     {
-        // EngineeringModel,
+        // TODO #68 Check if the first Syncer implementation allows model synchronization
         SiteReferenceDataLibrary,
         DomainOfExpertise
     }
