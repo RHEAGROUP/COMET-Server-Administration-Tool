@@ -215,8 +215,29 @@ namespace Migration.ViewModels
         /// <returns>The <see cref="Task"/></returns>
         private async Task ExecuteMigration()
         {
-            await this.migration.ImportData(this.SourceViewModel.EngineeringModels, this.MigrationFile);
-            await this.migration.ExportData();
+            var result = await this.migration.ImportData(this.SourceViewModel.EngineeringModels);
+
+            if (!result)
+            {
+                this.UpdateOutput("Import operation failed. Migration will not continue.");
+                return;
+            }
+
+            result = await this.migration.PackData(this.MigrationFile);
+
+            if (!result)
+            {
+                this.UpdateOutput("Build AnnexC3 archive failed. Migration will not continue.");
+                return;
+            }
+
+            result = await this.migration.ExportData();
+
+            if (!result)
+            {
+                this.UpdateOutput("Pushing archive failed. Migration will not continue.");
+            }
+
             // TODO #33 add cleanup after migration
         }
 
@@ -235,6 +256,12 @@ namespace Migration.ViewModels
                     break;
                 case MigrationStep.ImportEnd:
                     this.UpdateOutput("Import operation end");
+                    break;
+                case MigrationStep.PackStart:
+                    this.UpdateOutput("Pack operation start");
+                    break;
+                case MigrationStep.PackEnd:
+                    this.UpdateOutput("Pack operation end");
                     break;
                 case MigrationStep.ExportStart:
                     this.UpdateOutput("Export operation start");

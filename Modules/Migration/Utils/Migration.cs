@@ -6,13 +6,6 @@
 
 namespace Migration.Utils
 {
-    using CDP4Common.EngineeringModelData;
-    using CDP4Dal;
-    using CDP4Dal.DAL;
-    using CDP4Dal.Operations;
-    using CDP4JsonFileDal;
-    using ReactiveUI;
-    using NLog;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -21,7 +14,14 @@ namespace Migration.Utils
     using System.Net.Http.Headers;
     using System.Text;
     using System.Threading.Tasks;
+
+    using CDP4Common.EngineeringModelData;
+    using CDP4Dal;
+    using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
+    using CDP4JsonFileDal;
     using Common.ViewModels.PlainObjects;
+    using NLog;
 
     /// <summary>
     /// Enumeration of the migration process steps
@@ -133,18 +133,21 @@ namespace Migration.Utils
         /// <param name="selectedModels">
         /// Selected engineering models from the source server <see cref="EngineeringModelRowViewModel"/>
         /// </param>
-        /// <param name="migrationFile">
-        ///  Json migration file selected by the user
-        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task ImportData(ReactiveList<EngineeringModelRowViewModel> selectedModels, string migrationFile)
+        public async Task<bool> ImportData(List<EngineeringModelRowViewModel> selectedModels)
         {
             if (this.SourceSession is null)
             {
                 this.NotifyMessage("Please select source session");
-                return;
+                return false;
+            }
+
+            if (selectedModels is null)
+            {
+                this.NotifyMessage("Please select model(s) to migrate");
+                return false;
             }
 
             Logger.Info($"Retrieving SiteDirectory from {this.SourceSession.DataSourceUri}...");
@@ -210,10 +213,10 @@ namespace Migration.Utils
                 }
             }
 
-            await this.PackData(migrationFile);
-
             Logger.Info("Finished pulling data");
             this.NotifyStep(MigrationStep.ImportEnd);
+
+            return true;
         }
 
         /// <summary>
@@ -222,12 +225,15 @@ namespace Migration.Utils
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task ExportData()
+        public async Task<bool> ExportData()
         {
+            var success = true;
+
             if (this.TargetSession is null)
             {
                 this.NotifyMessage("Please select the target session");
-                return;
+
+                return false;
             }
 
             // TODO #34 Replace this in the near future, I cannot log into CDP WebService empty server
@@ -241,25 +247,42 @@ namespace Migration.Utils
                 {
                     using (var multipartContent = this.CreateMultipartContent())
                     {
-                        using (var message = await httpClient.PostAsync(targetUrl, multipartContent))
+                        await httpClient.PostAsync(targetUrl, multipartContent).ContinueWith( (t) =>
                         {
-                            await message.Content.ReadAsStringAsync();
                             // TODO #35 add result interpretation
+                            if (t.IsFaulted)
+                            {
+                                if (t.Exception?.InnerException != null)
+                                {
+                                    throw t.Exception?.InnerException;
+                                }
 
-                            Logger.Info($"Finished pushing data");
-                        }
+                                throw new Exception("Unknown inner exception");
+                            }
+
+                            Logger.Info($"Server status response {t.Result.StatusCode}");
+                            success = t.Result.IsSuccessStatusCode;
+
+                            if (success)
+                            {
+                                Logger.Info("Finished pushing data");
+                            }
+                        });
                     }
                 }
             }
             catch (Exception ex)
             {
                 Logger.Error($"Could not push data. Exception: {ex}");
+                success = false;
                 // TODO #36 add proper exception handling
             }
             finally
             {
                 await this.TargetSession.Close();
             }
+
+            return success;
         }
 
         /// <summary>
@@ -269,18 +292,20 @@ namespace Migration.Utils
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task PackData(string migrationFile)
+        public async Task<bool> PackData(string migrationFile)
         {
             List<string> extensionFiles = null;
             var zipCredentials = new Credentials("admin", "pass", new Uri(ArchiveFileName));
             var zipSession = new Session(this.dal, zipCredentials);
+            var success = true;
 
             if (!string.IsNullOrEmpty(migrationFile))
             {
                 if (!System.IO.File.Exists(migrationFile))
                 {
                     this.NotifyMessage("Unable to find selected migration file");
-                    return;
+
+                    return false;
                 }
 
                 try
@@ -293,6 +318,8 @@ namespace Migration.Utils
                     // TODO #37 add proper exception handling
                     Logger.Error($"Could add migration.json file. Exception: {ex}");
                     this.NotifyMessage("Could add migration.json file");
+
+                    return false;
                 }
             }
 
@@ -328,12 +355,15 @@ namespace Migration.Utils
                 {
                     // TODO #37 add proper exception handling
                     Logger.Error($"Could not pack data. Exception: {ex}");
+                    success = false;
                 }
                 finally
                 {
                     await this.SourceSession.Close();
                 }
             }
+
+            return success;
         }
 
         /// <summary>
@@ -349,8 +379,9 @@ namespace Migration.Utils
         {
             var client = new HttpClient
             {
-                BaseAddress = credentials.Uri
-            };
+                BaseAddress = credentials.Uri,
+                Timeout = TimeSpan.FromMinutes(30)
+        };
 
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
