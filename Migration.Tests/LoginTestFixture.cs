@@ -6,15 +6,14 @@
 
 namespace Migration.Tests
 {
+    using Common.ViewModels;
     using Moq;
     using NUnit.Framework;
     using ReactiveUI;
-    using System.Collections.Generic;
     using System.Reactive.Concurrency;
-    using ViewModels.Common;
 
     /// <summary>
-    /// Suite of tests for the <see cref="Migration"/> <see cref="LoginViewModel"/>
+    /// Suite of tests for the <see cref="LoginViewModel"/>
     /// </summary>
     [TestFixture]
     public class LoginTestFixture
@@ -34,7 +33,7 @@ namespace Migration.Tests
             {
                 Object =
                 {
-                    ServerType = new KeyValuePair<string, string>("CDP", "CDP4 WebServices"),
+                    SelectedDataSource = DataSource.CDP4,
                     UserName = SourceUsername,
                     Password = SourcePassword,
                     Uri = SourceServerUri
@@ -45,8 +44,8 @@ namespace Migration.Tests
         [Test]
         public void VerifyGetterSetters()
         {
-            Assert.AreEqual(this.loginViewModel.Object.ServerType,
-                new KeyValuePair<string, string>("CDP", "CDP4 WebServices"));
+            Assert.AreEqual(this.loginViewModel.Object.SelectedDataSource,
+                DataSource.CDP4);
             Assert.AreEqual("admin", this.loginViewModel.Object.UserName);
             Assert.AreEqual("pass", this.loginViewModel.Object.Password);
             Assert.AreEqual("https://cdp4services-public.cdp4.org", this.loginViewModel.Object.Uri);
@@ -55,6 +54,7 @@ namespace Migration.Tests
         [Test]
         public void VerifyIfLoginSucceeded()
         {
+            //loginViewModel.SetupProperty(vm => vm.LoginSuccessfully, true);
             Assert.DoesNotThrowAsync(async () => await loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
             Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
             Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.ServerSession.Close());
@@ -66,8 +66,8 @@ namespace Migration.Tests
             this.loginViewModel.Object.UserName = "admin1";
             this.loginViewModel.Object.Password = "pass1";
             this.loginViewModel.Object.Uri = "https://cdp4services-public1.cdp4.org";
-            Assert.AreEqual(this.loginViewModel.Object.ServerType,
-                new KeyValuePair<string, string>("CDP", "CDP4 WebServices"));
+            Assert.AreEqual(this.loginViewModel.Object.SelectedDataSource,
+                DataSource.CDP4);
             Assert.AreEqual("admin1", this.loginViewModel.Object.UserName);
             Assert.AreEqual("pass1", this.loginViewModel.Object.Password);
             Assert.AreEqual("https://cdp4services-public1.cdp4.org", this.loginViewModel.Object.Uri);
@@ -77,29 +77,10 @@ namespace Migration.Tests
         }
 
         [Test]
-        public void VerifyIfEngineeringModelsAreLoaded()
-        {
-            Assert.DoesNotThrowAsync(async () => await loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
-            Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
-            Assert.NotZero(this.loginViewModel.Object.EngineeringModels.Count);
-            Assert.DoesNotThrowAsync(async () => await loginViewModel.Object.ServerSession.Close());
-        }
-
-        [Test]
-        public void VerifyIfReferenceDataLibrariesAreLoaded()
-        {
-            Assert.DoesNotThrowAsync(async () => await loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
-            Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
-            Assert.NotZero(this.loginViewModel.Object.SiteReferenceDataLibraries.Count);
-            Assert.DoesNotThrowAsync(async () => await loginViewModel.Object.ServerSession.Close());
-        }
-
-        [Test]
         public void VerifyIfExecuteCommandsWorks()
         {
             Assert.DoesNotThrowAsync(async () => await loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
             Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
-            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.CheckUncheckModel.ExecuteAsyncTask());
             Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.ServerSession.Close());
         }
     }
