@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainApp.xaml.cs" company="RHEA System S.A.">
+// <copyright file="ErrorDetailLayoutGroup.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -23,14 +23,19 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace App
+namespace Common.Views.Tabs
 {
-    using System.Windows;
-
     /// <summary>
-    /// Interaction logic for App.xaml
+    /// Interaction logic for ErrorDetailLayoutGroup.xaml
     /// </summary>
-    public partial class MainApp : Application
+    public partial class ErrorDetailLayoutGroup
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ErrorDetailLayoutGroup"/> class.
+        /// </summary>
+        public ErrorDetailLayoutGroup()
+        {
+            InitializeComponent();
+        }
     }
 }

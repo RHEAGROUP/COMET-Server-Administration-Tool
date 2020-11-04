@@ -5,18 +5,26 @@
                   xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
                   xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                  xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                  xmlns:utils="clr-namespace:Common.Utils"
                   Header="Model Errors"
                   Orientation="Vertical"
                   mc:Ignorable="d"
                   VerticalAlignment="Stretch"
                   HorizontalAlignment="Stretch">
+    <dxlc:LayoutGroup.Resources>
+        <utils:SeverityToImageConverter x:Key="SeverityToImageConverter" />
+    </dxlc:LayoutGroup.Resources>
     <dxlc:LayoutItem>
-        <dxg:GridControl EnableSmartColumnsGeneration="True"
-                         ItemsSource="{Binding RuleCheckerErrors, UpdateSourceTrigger=PropertyChanged}"
-                         AutoGenerateColumns="None">
+        <dxg:GridControl
+            SelectedItem="{Binding CurrentModelError, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            SelectionMode="Row"
+            ItemsSource="{Binding RuleCheckerErrors, UpdateSourceTrigger=PropertyChanged}"
+            AutoGenerateColumns="None">
             <dxg:GridControl.View>
                 <dxg:TableView
                     Height="140"
+                    ShowIndicator="False"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     AllowColumnMoving="False"
@@ -27,10 +35,39 @@
                     VerticalScrollbarVisibility="Auto">
                 </dxg:TableView>
             </dxg:GridControl.View>
+            <dxmvvm:Interaction.Behaviors>
+                <dxmvvm:EventToCommand EventName="SelectionChanged"
+                                       Command="{Binding ModelSelectRowCommand, UpdateSourceTrigger=PropertyChanged}" />
+            </dxmvvm:Interaction.Behaviors>
             <dxg:GridControl.Columns>
-                <dxg:GridColumn AllowGrouping="True" Binding="{Binding ContainerThingClassKind}" Header="Class Kind" />
-                <dxg:GridColumn Binding="{Binding Description}" Header="Content" />
-                <dxg:GridColumn Binding="{Binding Severity}" Header="Severity" />
+                <dxg:GridColumn AllowColumnFiltering="False"
+                                FieldName="TopContainerName"
+                                Header="Top Container" />
+                <dxg:GridColumn AllowColumnFiltering="False"
+                                FieldName="Id"
+                                Width="70"
+                                Header="ID" />
+                <dxg:GridColumn FieldName="ContainerThingClassKind"
+                                Header="Class Kind" />
+                <dxg:GridColumn AllowColumnFiltering="False"
+                                FieldName="Description"
+                                Header="Content" />
+                <dxg:GridColumn AllowColumnFiltering="False"
+                                Width="60"
+                                Header="Severity"
+                                ToolTip="{Binding Severity}"
+                                FieldName="Severity">
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Width="16"
+                                   Height="16"
+                                   Source="{Binding Path=Value, Converter={StaticResource SeverityToImageConverter}}">
+                            </Image>
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
             </dxg:GridControl.Columns>
         </dxg:GridControl>
     </dxlc:LayoutItem>
