@@ -23,6 +23,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Threading;
+
 namespace Migration.Utils
 {
     using System;
@@ -255,6 +257,8 @@ namespace Migration.Utils
                 return false;
             }
 
+            this.NotifyStep(MigrationStep.ExportStart);
+
             // TODO #34 Replace this in the near future, I cannot log into CDP WebService empty server
             var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
 
@@ -300,6 +304,8 @@ namespace Migration.Utils
             {
                 await this.TargetSession.Close();
             }
+
+            this.NotifyStep(MigrationStep.ExportEnd);
 
             return success;
         }
@@ -399,8 +405,9 @@ namespace Migration.Utils
             var client = new HttpClient
             {
                 BaseAddress = credentials.Uri,
-                Timeout = TimeSpan.FromMinutes(30)
-        };
+                // TODO #70 Add user manual for the migration process
+                Timeout = Timeout.InfiniteTimeSpan
+            };
 
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

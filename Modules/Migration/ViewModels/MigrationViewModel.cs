@@ -219,7 +219,6 @@ namespace Migration.ViewModels
 
             if (!result)
             {
-                this.UpdateOutput("Import operation failed. Migration will not continue.");
                 return;
             }
 
@@ -227,16 +226,10 @@ namespace Migration.ViewModels
 
             if (!result)
             {
-                this.UpdateOutput("Build AnnexC3 archive failed. Migration will not continue.");
                 return;
             }
 
-            result = await this.migration.ExportData();
-
-            if (!result)
-            {
-                this.UpdateOutput("Pushing archive failed. Migration will not continue.");
-            }
+            await this.migration.ExportData();
 
             // TODO #33 add cleanup after migration
         }
