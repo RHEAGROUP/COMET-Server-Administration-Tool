@@ -165,7 +165,7 @@ namespace Migration.Views
             this.engineeringModelViewModel = new EngineeringModelViewModel(this.serverSession);
             this.engineeringModelViewModel.ModelListChangedEvent += EngineeringModelViewModelModelListChangedEvent;
             this.EngineeringModelLayoutGroup.DataContext = this.engineeringModelViewModel;
-
+            this.engineeringModelViewModel.CheckUncheckAllModels.Execute(null);
             this.siteReferenceDataLibraryViewModel = new SiteReferenceDataLibraryViewModel(this.serverSession);
             this.SiteRdlLayoutGroup.DataContext = this.siteReferenceDataLibraryViewModel;
 

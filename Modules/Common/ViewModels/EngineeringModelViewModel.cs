@@ -167,7 +167,6 @@ namespace Common.ViewModels
             }
 
             this.SelectAllModels = true;
-            NotifyEngineeringModelsListChanges(this.EngineeringModels.Where(em => em.IsSelected).ToList());
         }
     }
 }
