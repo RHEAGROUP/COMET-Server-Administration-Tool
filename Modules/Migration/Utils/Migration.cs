@@ -23,8 +23,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.Threading;
-
 namespace Migration.Utils
 {
     using System;
@@ -34,6 +32,7 @@ namespace Migration.Utils
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using CDP4Common.EngineeringModelData;
