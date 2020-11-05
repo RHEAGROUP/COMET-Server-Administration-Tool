@@ -25,13 +25,13 @@
 
 namespace Migration.ViewModels
 {
-    using Utils;
-    using Microsoft.Win32;
-    using ReactiveUI;
     using System;
     using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using Microsoft.Win32;
+    using Utils;
+    using ReactiveUI;
     using Common.ViewModels;
 
     /// <summary>
@@ -129,8 +129,14 @@ namespace Migration.ViewModels
         /// </summary>
         public void AddSubscriptions()
         {
-            this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(UpdateOutput);
-            this.WhenAnyValue(vm => vm.TargetViewModel.Output).Subscribe(UpdateOutput);
+            this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(message =>
+            {
+                OperationMessageHandler(message);
+            });
+            this.WhenAnyValue(vm => vm.TargetViewModel.Output).Subscribe(message =>
+            {
+                OperationMessageHandler(message);
+            });
 
             this.WhenAnyValue(
                 vm => vm.SourceViewModel.LoginSuccessfully,
@@ -180,8 +186,8 @@ namespace Migration.ViewModels
             this.FileIsChecked = false;
 
             this.migration = new Migration();
-            this.migration.OperationMessageEvent += this.UpdateOutput;
-            this.migration.OperationStepEvent += this.UpdateUi;
+            this.migration.OperationMessageEvent += this.OperationMessageHandler;
+            this.migration.OperationStepEvent += this.OperationStepHandler;
 
             this.LoadMigrationFile = ReactiveCommand.Create();
             this.LoadMigrationFile.Subscribe(_ => this.ExecuteLoadMigrationFile());
@@ -240,27 +246,27 @@ namespace Migration.ViewModels
         /// <param name="step">
         /// Migration operation step <see cref="MigrationStep"/>
         /// </param>
-        private void UpdateUi(MigrationStep step)
+        private void OperationStepHandler(MigrationStep step)
         {
             switch (step)
             {
                 case MigrationStep.ImportStart:
-                    this.UpdateOutput("Import operation start");
+                    this.OperationMessageHandler("Import operation start");
                     break;
                 case MigrationStep.ImportEnd:
-                    this.UpdateOutput("Import operation end");
+                    this.OperationMessageHandler("Import operation end");
                     break;
                 case MigrationStep.PackStart:
-                    this.UpdateOutput("Pack operation start");
+                    this.OperationMessageHandler("Pack operation start");
                     break;
                 case MigrationStep.PackEnd:
-                    this.UpdateOutput("Pack operation end");
+                    this.OperationMessageHandler("Pack operation end");
                     break;
                 case MigrationStep.ExportStart:
-                    this.UpdateOutput("Export operation start");
+                    this.OperationMessageHandler("Export operation start");
                     break;
                 case MigrationStep.ExportEnd:
-                    this.UpdateOutput("Export operation end");
+                    this.OperationMessageHandler("Export operation end");
                     break;
             }
         }
@@ -269,7 +275,7 @@ namespace Migration.ViewModels
         /// Add text message to the output panel
         /// </summary>
         /// <param name="message">The text message</param>
-        private void UpdateOutput(string message)
+        private void OperationMessageHandler(string message)
         {
             if (string.IsNullOrEmpty(message)) return;
 

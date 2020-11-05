@@ -113,12 +113,44 @@ namespace Migration.Utils
         public event MigrationStepDelegate OperationStepEvent;
 
         /// <summary>
-        /// Invoke OperationMessageEvent
+        /// Log verbosity
+        /// </summary>
+        private enum LogVerbosity
+        {
+            Info,
+            Warn,
+            Debug,
+            Error
+        };
+
+        /// <summary>
+        /// Invoke OperationMessageEvent and optionally log
         /// </summary>
         /// <param name="message">progress message</param>
-        private void NotifyMessage(string message)
+        /// <param name="logLevel">Log verbosity level(optional) <see cref="LogVerbosity"/></param>
+        /// <param name="ex">Exception(optional) <see cref="Exception"/></param>
+        private void NotifyMessage(string message, LogVerbosity? logLevel = null, Exception ex = null)
         {
             OperationMessageEvent?.Invoke(message);
+
+            switch (logLevel)
+            {
+                case LogVerbosity.Info:
+                    Logger.Info(message);
+                    break;
+                case LogVerbosity.Warn:
+                    Logger.Warn(message);
+                    break;
+                case LogVerbosity.Debug:
+                    Logger.Debug(message);
+                    break;
+                case LogVerbosity.Error:
+                    Logger.Error(ex?.Message != null ? message + ex.Message : message);
+                    break;
+                default:
+                    Logger.Trace(message);
+                    break;
+            }
         }
 
         /// <summary>
@@ -164,14 +196,15 @@ namespace Migration.Utils
                 return false;
             }
 
-            if (selectedModels is null)
+            if (selectedModels is null || selectedModels.Count == 0)
             {
                 this.NotifyMessage("Please select model(s) to migrate");
                 return false;
             }
 
-            Logger.Info($"Retrieving SiteDirectory from {this.SourceSession.DataSourceUri}...");
             this.NotifyStep(MigrationStep.ImportStart);
+
+            this.NotifyMessage($"Retrieving SiteDirectory from {this.SourceSession.DataSourceUri}...");
 
             var siteDirectory = this.SourceSession.RetrieveSiteDirectory();
 
@@ -209,20 +242,13 @@ namespace Migration.Utils
                         {
                             var iterationDescription = $"'{modelSetup.Name}'.'{iterationSetup.IterationIid}'";
 
-                            string message;
-
                             if (t.IsFaulted && t.Exception != null)
                             {
-                                message =
-                                    $"Reading iteration {iterationDescription} failed. Exception: {t.Exception.Message}.";
-                                this.NotifyMessage(message);
-                                Logger.Warn(message);
+                                this.NotifyMessage($"Reading iteration {iterationDescription} failed. Exception: {t.Exception.Message}.", LogVerbosity.Warn);
                                 return;
                             }
 
-                            message = $"Read iteration {iterationDescription} successfully.";
-                            this.NotifyMessage(message);
-                            Logger.Info(message);
+                            this.NotifyMessage($"Read iteration {iterationDescription} successfully.", LogVerbosity.Info);
                         }));
                 }
 
@@ -233,7 +259,6 @@ namespace Migration.Utils
                 }
             }
 
-            Logger.Info("Finished pulling data");
             this.NotifyStep(MigrationStep.ImportEnd);
 
             return true;
@@ -261,7 +286,7 @@ namespace Migration.Utils
             // TODO #34 Replace this in the near future, I cannot log into CDP WebService empty server
             var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
 
-            Logger.Info($"Pushing data to {targetUrl}");
+            this.NotifyMessage($"Pushing data to {targetUrl}", LogVerbosity.Info);
 
             try
             {
@@ -295,7 +320,7 @@ namespace Migration.Utils
             }
             catch (Exception ex)
             {
-                Logger.Error($"Could not push data. Exception: {ex}");
+                this.NotifyMessage($"Could not push data.", LogVerbosity.Error, ex);
                 success = false;
                 // TODO #36 add proper exception handling
             }
@@ -327,7 +352,7 @@ namespace Migration.Utils
             {
                 if (!System.IO.File.Exists(migrationFile))
                 {
-                    this.NotifyMessage("Unable to find selected migration file");
+                    this.NotifyMessage("Unable to find selected migration file", LogVerbosity.Warn);
 
                     return false;
                 }
@@ -340,8 +365,7 @@ namespace Migration.Utils
                 catch (Exception ex)
                 {
                     // TODO #37 add proper exception handling
-                    Logger.Error($"Could add migration.json file. Exception: {ex}");
-                    this.NotifyMessage("Could add migration.json file");
+                    this.NotifyMessage("Could not add migration.json file", LogVerbosity.Error, ex);
 
                     return false;
                 }
@@ -371,14 +395,12 @@ namespace Migration.Utils
                         {
                             System.IO.File.Delete(MigrationFileName);
                         }
-
-                        this.NotifyStep(MigrationStep.PackEnd);
                     }
                 }
                 catch (Exception ex)
                 {
                     // TODO #37 add proper exception handling
-                    Logger.Error($"Could not pack data. Exception: {ex}");
+                    this.NotifyMessage("Could not pack data", LogVerbosity.Error, ex);
                     success = false;
                 }
                 finally
@@ -386,6 +408,8 @@ namespace Migration.Utils
                     await this.SourceSession.Close();
                 }
             }
+
+            this.NotifyStep(MigrationStep.PackEnd);
 
             return success;
         }
