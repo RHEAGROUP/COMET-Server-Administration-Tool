@@ -25,11 +25,11 @@
 
 namespace Migration.Views
 {
+    using System.Collections.Generic;
+    using System.Windows;
     using CDP4Dal;
     using Common.ViewModels;
     using Common.ViewModels.PlainObjects;
-    using System.Collections.Generic;
-    using System.Windows;
 
     /// <summary>
     /// Interaction logic for ServerInfo.xaml

@@ -25,6 +25,11 @@
 
 namespace Common.ViewModels
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Reactive;
+    using System.Threading.Tasks;
     using CDP4Dal;
     using CDP4Dal.DAL;
     using CDP4JsonFileDal;
@@ -33,11 +38,6 @@ namespace Common.ViewModels
     using Microsoft.Win32;
     using PlainObjects;
     using ReactiveUI;
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Reactive;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// The view-model for the Login that allows users to connect to different data sources
@@ -334,7 +334,6 @@ namespace Common.ViewModels
                    this.ServerSession.Credentials.UserName.Equals(dataSourceUsername) &&
                    this.ServerSession.Credentials.Password.Equals(dataSourcePassword) &&
                    this.ServerSession.ActivePerson != null;
-            ;
         }
 
         /// <summary>
