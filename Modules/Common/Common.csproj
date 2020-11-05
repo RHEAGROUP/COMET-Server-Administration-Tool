@@ -212,10 +212,12 @@
   <ItemGroup>
     <Compile Include="Utils\InverseBooleanConverter.cs" />
     <Compile Include="Utils\SeverityToImageConverter.cs" />
+    <Compile Include="ViewModels\DomainOfExpertiseViewModel.cs" />
     <Compile Include="ViewModels\EngineeringModelViewModel.cs" />
     <Compile Include="ViewModels\ErrorViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\PlainObjects\DefinedThingRowViewModel.cs" />
+    <Compile Include="ViewModels\PlainObjects\DomainOfExpertiseRowViewModel.cs" />
     <Compile Include="ViewModels\PlainObjects\EngineeringModelRowViewModel.cs" />
     <Compile Include="ViewModels\PlainObjects\POCOErrorRowViewModel.cs" />
     <Compile Include="ViewModels\PlainObjects\RuleCheckerErrorRowViewModel.cs" />
@@ -223,6 +225,9 @@
     <Compile Include="ViewModels\SiteReferenceDataLibraryViewModel.cs" />
     <Compile Include="Views\Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Tabs\DomainOfExpertiseLayoutGroup.xaml.cs">
+      <DependentUpon>DomainOfExpertiseLayoutGroup.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Tabs\EngineeringModelLayoutGroup.xaml.cs">
       <DependentUpon>EngineeringModelLayoutGroup.xaml</DependentUpon>
@@ -244,6 +249,10 @@
     <Page Include="Views\Login.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Tabs\DomainOfExpertiseLayoutGroup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Tabs\EngineeringModelLayoutGroup.xaml">
       <Generator>MSBuild:Compile</Generator>

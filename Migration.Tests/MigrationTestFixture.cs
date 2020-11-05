@@ -6,16 +6,15 @@
 
 namespace Migration.Tests
 {
-    using System.Reactive.Concurrency;
-    using ReactiveUI;
+    using Common.ViewModels;
     using Moq;
     using NUnit.Framework;
-    using System.Collections.Generic;
+    using ReactiveUI;
+    using System.Reactive.Concurrency;
     using ViewModels;
-    using ViewModels.Common;
 
     /// <summary>
-    /// Suite of tests for the <see cref="Migration"/> <see cref="MigrationViewModel"/>
+    /// Suite of tests for the <see cref="MigrationViewModel"/>
     /// </summary>
     [TestFixture]
     public class MigrationTestFixture
@@ -33,7 +32,7 @@ namespace Migration.Tests
         {
             this.migrationViewModel.Object.SourceViewModel = new LoginViewModel
             {
-                ServerType = new KeyValuePair<string, string>("CDP", "CDP4 WebServices"),
+                SelectedDataSource = DataSource.CDP4,
                 UserName = SourceUsername,
                 Password = SourcePassword,
                 Uri = SourceServerUri
@@ -41,7 +40,7 @@ namespace Migration.Tests
 
             this.migrationViewModel.Object.TargetViewModel = new LoginViewModel
             {
-                ServerType = new KeyValuePair<string, string>("CDP", "CDP4 WebServices"),
+                SelectedDataSource = DataSource.CDP4,
                 UserName = SourceUsername,
                 Password = SourcePassword,
                 Uri = SourceServerUri

@@ -137,6 +137,10 @@
       <Project>{4e672ac5-a95e-4e5e-b35d-8a4b0e8b5340}</Project>
       <Name>App</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Modules\Common\Common.csproj">
+      <Project>{8C7936C7-8FE8-4DC2-A20C-388B55C08FA5}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Modules\Migration\Migration.csproj">
       <Project>{72b5cde8-c1b4-423e-b717-7a472957e55c}</Project>
       <Name>Migration</Name>
