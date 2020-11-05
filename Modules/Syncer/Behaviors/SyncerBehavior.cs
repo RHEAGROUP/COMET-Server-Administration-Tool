@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SiteReferenceDataLibraryRowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="SyncerBehavior.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -23,39 +23,48 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Common.ViewModels.PlainObjects
+namespace Syncer.Behaviors
 {
-    using CDP4Common.SiteDirectoryData;
-    using ReactiveUI;
+    using Common.ViewModels;
+    using ViewModels;
+    using Views;
+    using DevExpress.Mvvm.UI.Interactivity;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
-    /// Row class representing a <see cref="SiteReferenceDataLibrary"/> as a plain object
+    /// The purpose of this class is to implement a behavior that allows the login and source sections
+    /// to share the same view model
     /// </summary>
-    public class SiteReferenceDataLibraryRowViewModel : DefinedThingRowViewModel<SiteReferenceDataLibrary>
+    public class SyncerBehavior : Behavior<Layout>
     {
         /// <summary>
-        /// Backing field for <see cref="IsSelected"/>
+        /// The on attached event handler
         /// </summary>
-        private bool isSelected;
-
-        /// <summary>
-        /// Gets or sets the if object is selected
-        /// </summary>
-        public bool IsSelected
+        [ExcludeFromCodeCoverage]
+        protected override void OnAttached()
         {
-            get => this.isSelected;
-            set => this.RaiseAndSetIfChanged(ref this.isSelected, value);
+            base.OnAttached();
+
+            if (!(AssociatedObject.DataContext is SyncerViewModel currentDataContext)) return;
+
+            currentDataContext.SourceViewModel = AssociatedObject.LoginSource.DataContext as LoginViewModel;
+            currentDataContext.TargetViewModel = AssociatedObject.LoginTarget.DataContext as LoginViewModel;
+            currentDataContext.AddSubscriptions();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SiteReferenceDataLibraryRowViewModel"/> class
+        /// The on detached event handler
         /// </summary>
-        /// <param name="siteReferenceDataLibrary">
-        /// The <see cref="SiteReferenceDataLibrary"/> associated with this row
-        /// </param>
-        public SiteReferenceDataLibraryRowViewModel(SiteReferenceDataLibrary siteReferenceDataLibrary)
-            : base(siteReferenceDataLibrary)
+        [ExcludeFromCodeCoverage]
+        protected override void OnDetaching()
         {
+            if (AssociatedObject.DataContext is SyncerViewModel currentDataContext)
+            {
+                currentDataContext.SourceViewModel = null;
+                currentDataContext.TargetViewModel = null;
+            }
+
+            base.OnDetaching();
         }
     }
 }

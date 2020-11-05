@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DefinedThingRowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="DomainOfExpertiseRowViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -26,82 +26,53 @@
 namespace Common.ViewModels.PlainObjects
 {
     using CDP4Common.CommonData;
+    using CDP4Common.SiteDirectoryData;
     using ReactiveUI;
-    using System;
 
     /// <summary>
-    /// Row class representing a <see cref="DefinedThing"/> as a plain object
+    /// Row class representing a <see cref="DomainOfExpertise"/> or <see cref="DomainOfExpertiseGroup"/>
+    /// as a plain object
     /// </summary>
-    public abstract class DefinedThingRowViewModel<T> : ReactiveObject where T : DefinedThing
+    public class DomainOfExpertiseRowViewModel : DefinedThingRowViewModel<DefinedThing>
     {
         /// <summary>
-        /// Backing field for <see cref="Thing"/>
+        /// Backing field for <see cref="IsSelected"/>
         /// </summary>
-        private Thing thing;
+        private bool isSelected;
 
         /// <summary>
-        /// Gets or sets the thing
+        /// Gets or sets the if object is selected
         /// </summary>
-        public Thing Thing
+        public bool IsSelected
         {
-            get => this.thing;
-            private set => this.RaiseAndSetIfChanged(ref this.thing, value);
+            get => this.isSelected;
+            set => this.RaiseAndSetIfChanged(ref this.isSelected, value);
         }
 
         /// <summary>
-        /// Backing field for <see cref="Iid"/>
+        /// Backing field for <see cref="ClassKind"/>
         /// </summary>
-        private Guid iid;
+        private ClassKind classKind;
 
         /// <summary>
-        /// Gets or sets the iid
+        /// Gets or sets the ClassKind
         /// </summary>
-        public Guid Iid
+        public ClassKind ClassKind
         {
-            get => this.iid;
-            private set => this.RaiseAndSetIfChanged(ref this.iid, value);
+            get => this.classKind;
+            private set => this.RaiseAndSetIfChanged(ref this.classKind, value);
         }
 
         /// <summary>
-        /// Backing field for <see cref="Name"/>
+        /// Initializes a new instance of the <see cref="DomainOfExpertiseRowViewModel"/> class
         /// </summary>
-        private string name;
-
-        /// <summary>
-        /// Gets or sets the name
-        /// </summary>
-        public string Name
-        {
-            get => this.name;
-            private set => this.RaiseAndSetIfChanged(ref this.name, value);
-        }
-
-        /// <summary>
-        /// Backing field for <see cref="ShortName"/>
-        /// </summary>
-        private string shortName;
-
-        /// <summary>
-        /// Gets or sets the shortName
-        /// </summary>
-        public string ShortName
-        {
-            get => this.shortName;
-            private set => this.RaiseAndSetIfChanged(ref this.shortName, value);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DefinedThingRowViewModel{T}"/> class
-        /// </summary>
-        /// <param name="thing">
+        /// <param name="definedThing">
         /// The <see cref="DefinedThing"/> associated with this row
         /// </param>
-        protected DefinedThingRowViewModel(T thing)
+        public DomainOfExpertiseRowViewModel(DefinedThing definedThing)
+            : base(definedThing)
         {
-            this.Thing = thing;
-            this.Iid = thing.Iid;
-            this.Name = thing.Name;
-            this.ShortName = thing.ShortName;
+            this.ClassKind = definedThing.ClassKind;
         }
     }
 }

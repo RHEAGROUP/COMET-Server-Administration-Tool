@@ -17,6 +17,7 @@
     mc:Ignorable="d"
     VerticalAlignment="Stretch"
     HorizontalAlignment="Stretch">
+
     <dxlc:LayoutGroup.DataContext>
         <viewModels:MigrationViewModel />
     </dxlc:LayoutGroup.DataContext>
@@ -32,6 +33,7 @@
                     <ColumnDefinition Width="0.4*" />
                     <ColumnDefinition Width="0.6*" />
                 </Grid.ColumnDefinitions>
+
                 <StackPanel Grid.Row="0" Grid.Column="0">
                     <Grid HorizontalAlignment="Stretch">
                         <Grid.RowDefinitions>
@@ -42,16 +44,12 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <common:Login Grid.Row="0" Grid.Column="0"
-                                      x:Name="LoginSource" />
-                        <CheckBox
-                            Grid.Row="1"
-                            Grid.Column="0"
+                        <common:Login Grid.Row="0" Grid.Column="0" x:Name="LoginSource" />
+                        <CheckBox Grid.Row="1" Grid.Column="0"
                             IsChecked="{Binding Path=FileIsChecked}"
                             Margin="5"
                             Content="File" />
-                        <StackPanel Grid.Row="2"
-                                    Grid.Column="0" Orientation="Horizontal">
+                        <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
                             <GroupBox Header="migration.json">
                                 <StackPanel Margin="0 0 0 0" Orientation="Horizontal">
                                     <dxe:TextEdit
@@ -80,18 +78,16 @@
                         </StackPanel>
                     </Grid>
                 </StackPanel>
-                <StackPanel Grid.Row="0" Grid.Column="1">
+
+                <StackPanel Grid.Row="0" Grid.Column="1" Width="540">
                     <views:ServerInfo
-                        LoginSuccessfully="{Binding
-                        Path=LoginSuccessfully,
-                        UpdateSourceTrigger=PropertyChanged}"
-                        ServerSession="{Binding
-                        Path=ServerSession,
-                        UpdateSourceTrigger=PropertyChanged}"
-                        Visibility="{Binding
-                        Path=LoginSuccessfully,
-                        Converter={dxmvvm:BooleanToVisibilityConverter},
-                        UpdateSourceTrigger=PropertyChanged}"
+                        LoginSuccessfully="{Binding Path=LoginSuccessfully,
+                                                    UpdateSourceTrigger=PropertyChanged}"
+                        ServerSession="{Binding Path=ServerSession,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                        Visibility="{Binding Path=LoginSuccessfully,
+                                             Converter={dxmvvm:BooleanToVisibilityConverter},
+                                             UpdateSourceTrigger=PropertyChanged}"
                         DataContext="{Binding SourceViewModel}" />
                 </StackPanel>
             </Grid>
@@ -108,24 +104,20 @@
                     <ColumnDefinition Width="0.4*" />
                     <ColumnDefinition Width="0.6*" />
                 </Grid.ColumnDefinitions>
+
                 <StackPanel Grid.Row="0" Grid.Column="0">
-                    <common:Login
-                        x:Name="LoginTarget"
-                        JsonIsAvailable="False" />
+                    <common:Login x:Name="LoginTarget" JsonIsAvailable="False" />
                 </StackPanel>
                 <StackPanel Grid.Row="0" Grid.Column="1">
                     <views:ServerInfo
                         DisplayErrorsTabs="False"
-                        LoginSuccessfully="{Binding
-                        Path=LoginSuccessfully,
-                        UpdateSourceTrigger=PropertyChanged}"
-                        ServerSession="{Binding
-                        Path=ServerSession,
-                        UpdateSourceTrigger=PropertyChanged}"
-                        Visibility="{Binding
-                        Path=LoginSuccessfully,
-                        Converter={dxmvvm:BooleanToVisibilityConverter},
-                        UpdateSourceTrigger=PropertyChanged}"
+                        LoginSuccessfully="{Binding Path=LoginSuccessfully,
+                                                    UpdateSourceTrigger=PropertyChanged}"
+                        ServerSession="{Binding Path=ServerSession,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                        Visibility="{Binding Path=LoginSuccessfully,
+                                             Converter={dxmvvm:BooleanToVisibilityConverter},
+                                             UpdateSourceTrigger=PropertyChanged}"
                         DataContext="{Binding TargetViewModel}" />
                 </StackPanel>
             </Grid>

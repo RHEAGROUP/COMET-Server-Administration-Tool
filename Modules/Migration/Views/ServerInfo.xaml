@@ -25,7 +25,6 @@
                 GridSelectionIsAvailable="{Binding
                             RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}},
                             Path=DisplayErrorsTabs}" />
-            <tabs:SiteRdlLayoutGroup x:Name="SiteRdlLayoutGroup" DataContext="{x:Null}" />
             <tabs:PocoErrorLayoutGroup x:Name="PocoErrorsLayoutGroup" DataContext="{x:Null}" />
             <tabs:ModelErrorLayoutGroup x:Name="ModelErrorsLayoutGroup" DataContext="{x:Null}" />
         </dxlc:LayoutGroup>

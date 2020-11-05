@@ -105,11 +105,6 @@ namespace Migration.Views
         /// </summary>
         private EngineeringModelViewModel engineeringModelViewModel;
 
-        /// <summary>
-        /// New model instance for engineering model tab <see cref="SiteReferenceDataLibraryViewModel"/>
-        /// </summary>
-        private SiteReferenceDataLibraryViewModel siteReferenceDataLibraryViewModel;
-
         public ServerInfo()
         {
             InitializeComponent();
@@ -157,7 +152,7 @@ namespace Migration.Views
         /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
         private void LoginSuccessfullyValueChanged(DependencyPropertyChangedEventArgs e)
         {
-            if (!(bool) e.NewValue)
+            if (!(bool)e.NewValue)
             {
                 return;
             }
@@ -166,6 +161,7 @@ namespace Migration.Views
             this.engineeringModelViewModel.ModelListChangedEvent += EngineeringModelViewModelModelListChangedEvent;
             this.EngineeringModelLayoutGroup.DataContext = this.engineeringModelViewModel;
             this.engineeringModelViewModel.CheckUncheckAllModels.Execute(null);
+          
             this.siteReferenceDataLibraryViewModel = new SiteReferenceDataLibraryViewModel(this.serverSession);
             this.SiteRdlLayoutGroup.DataContext = this.siteReferenceDataLibraryViewModel;
 
@@ -200,7 +196,7 @@ namespace Migration.Views
                 return;
             }
 
-            this.serverSession = (ISession) e.NewValue;
+            this.serverSession = (ISession)e.NewValue;
         }
     }
 }

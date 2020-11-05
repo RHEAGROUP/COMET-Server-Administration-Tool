@@ -40,6 +40,16 @@ namespace Common.ViewModels
     using ReactiveUI;
 
     /// <summary>
+    /// Enum describing the possible server types
+    /// </summary>
+    public enum DataSource
+    {
+        CDP4,
+        WSP,
+        JSON
+    }
+
+    /// <summary>
     /// The view-model for the Login that allows users to connect to different data sources
     /// </summary>
     public class LoginViewModel : ReactiveObject
@@ -47,25 +57,26 @@ namespace Common.ViewModels
         /// <summary>
         /// Gets or sets data source server type
         /// </summary>
-        public static KeyValuePair<string, string>[] DataSourceList { get; } =
-        {
-            new KeyValuePair<string, string>("CDP", "CDP4 WebServices"),
-            new KeyValuePair<string, string>("OCDT", "OCDT WSP Server"),
-            new KeyValuePair<string, string>("JSON", "JSON")
-        };
+        public static Dictionary<DataSource, string> ServerTypes { get; } =
+            new Dictionary<DataSource, string>
+            {
+                { DataSource.CDP4, "CDP4 WebServices" },
+                { DataSource.WSP, "OCDT WSP Server" },
+                { DataSource.JSON, "JSON" }
+            };
 
         /// <summary>
-        /// Backing field for the <see cref="ServerType"/> property
+        /// Backing field for the <see cref="DataSource"/> property
         /// </summary>
-        private KeyValuePair<string, string> serverType;
+        private DataSource selectedDataSource;
 
         /// <summary>
         /// Gets or sets server serverType value
         /// </summary>
-        public KeyValuePair<string, string> ServerType
+        public DataSource SelectedDataSource
         {
-            get => this.serverType;
-            set => this.RaiseAndSetIfChanged(ref this.serverType, value);
+            get => this.selectedDataSource;
+            set => this.RaiseAndSetIfChanged(ref this.selectedDataSource, value);
         }
 
         /// <summary>
@@ -206,12 +217,10 @@ namespace Common.ViewModels
         public LoginViewModel()
         {
             var canLogin = this.WhenAnyValue(
-                vm => vm.ServerType,
                 vm => vm.UserName,
                 vm => vm.Password,
                 vm => vm.Uri,
-                (serverType, username, password, uri) =>
-                    !string.IsNullOrEmpty(serverType.Value) &&
+                (username, password, uri) =>
                     !string.IsNullOrEmpty(username) &&
                     !string.IsNullOrEmpty(password) &&
                     !string.IsNullOrEmpty(uri));
@@ -220,19 +229,19 @@ namespace Common.ViewModels
             {
                 if (!loginFailed) return;
 
-                LogMessage($"Cannot login to {this.Uri}({this.ServerType.Value}) data-source");
+                LogMessage($"Cannot log in to {this.Uri} ({ServerTypes[SelectedDataSource]}) data-source");
             });
 
             this.WhenAnyValue(vm => vm.LoginSuccessfully).Subscribe(loginSuccessfully =>
             {
                 if (!loginSuccessfully) return;
 
-                LogMessage($"Successfully logged to {this.Uri}({this.ServerType.Value}) data-source");
+                LogMessage($"Successfully logged in to {this.Uri} ({ServerTypes[SelectedDataSource]}) data-source");
             });
 
-            this.WhenAnyValue(vm => vm.ServerType).Subscribe(_ =>
+            this.WhenAnyValue(vm => vm.SelectedDataSource).Subscribe(_ =>
             {
-                this.JsonIsSelected = this.ServerType.Key != null && this.ServerType.Key.Equals("JSON");
+                this.JsonIsSelected = this.SelectedDataSource == DataSource.JSON;
             });
 
             this.LoginCommand =
@@ -263,15 +272,15 @@ namespace Common.ViewModels
 
                 var credentials = new Credentials(this.UserName, this.Password, new Uri(this.Uri));
 
-                switch (this.ServerType.Key)
+                switch (this.SelectedDataSource)
                 {
-                    case "CDP":
+                    case DataSource.CDP4:
                         this.dal = new CdpServicesDal();
                         break;
-                    case "OCDT":
+                    case DataSource.WSP:
                         this.dal = new WspDal();
                         break;
-                    case "JSON":
+                    case DataSource.JSON:
                         this.dal = new JsonFileDal(new Version("1.0.0"));
                         break;
                 }
@@ -295,7 +304,7 @@ namespace Common.ViewModels
         /// </summary>
         private void ExecuteLoadSourceFile()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog()
+            var openFileDialog = new OpenFileDialog()
             {
                 InitialDirectory = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\",
                 Filter = "Zip files (*.zip)|*.zip"
@@ -343,7 +352,9 @@ namespace Common.ViewModels
         /// <returns>The trimmed uri or the original if there is no slash.</returns>
         private static string TrimUri(string input)
         {
-            return input.EndsWith("/") ? input.Substring(0, input.Length - 1) : input;
+            return input.EndsWith("/")
+                ? input.Substring(0, input.Length - 1)
+                : input;
         }
     }
 }

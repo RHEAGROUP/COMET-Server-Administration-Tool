@@ -34,7 +34,6 @@ namespace Migration.Utils
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-
     using CDP4Common.EngineeringModelData;
     using CDP4Dal;
     using CDP4Dal.DAL;
@@ -42,7 +41,7 @@ namespace Migration.Utils
     using CDP4JsonFileDal;
     using Common.ViewModels.PlainObjects;
     using NLog;
-
+  
     /// <summary>
     /// Enumeration of the migration process steps
     /// </summary>

@@ -64,7 +64,7 @@ namespace Migration.ViewModels
         private LoginViewModel loginSourceViewModel;
 
         /// <summary>
-        /// Gets or sets the logging source view model
+        /// Gets or sets the source view model
         /// </summary>
         public LoginViewModel SourceViewModel
         {
@@ -78,7 +78,7 @@ namespace Migration.ViewModels
         private LoginViewModel loginTargetViewModel;
 
         /// <summary>
-        /// Gets or sets the target source view model
+        /// Gets or sets the target view model
         /// </summary>
         public LoginViewModel TargetViewModel
         {

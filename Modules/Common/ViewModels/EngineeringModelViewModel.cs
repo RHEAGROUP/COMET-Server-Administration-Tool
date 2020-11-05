@@ -137,7 +137,7 @@ namespace Common.ViewModels
         /// </summary>
         private void ExecuteCheckUncheckModel()
         {
-            this.SelectAllModels = !(this.EngineeringModels.Where(em => !em.IsSelected).Count() > 0);
+            this.SelectAllModels = !(this.EngineeringModels.Any(em => !em.IsSelected));
             NotifyEngineeringModelsListChanges(this.EngineeringModels.Where(em => em.IsSelected).ToList());
         }
 

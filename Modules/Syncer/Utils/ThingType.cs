@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SiteReferenceDataLibraryRowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="ThingType.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -23,39 +23,15 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Common.ViewModels.PlainObjects
+namespace Syncer.Utils
 {
-    using CDP4Common.SiteDirectoryData;
-    using ReactiveUI;
-
     /// <summary>
-    /// Row class representing a <see cref="SiteReferenceDataLibrary"/> as a plain object
+    /// Enum describing the possible ClassKinds to be synced
     /// </summary>
-    public class SiteReferenceDataLibraryRowViewModel : DefinedThingRowViewModel<SiteReferenceDataLibrary>
+    public enum ThingType
     {
-        /// <summary>
-        /// Backing field for <see cref="IsSelected"/>
-        /// </summary>
-        private bool isSelected;
-
-        /// <summary>
-        /// Gets or sets the if object is selected
-        /// </summary>
-        public bool IsSelected
-        {
-            get => this.isSelected;
-            set => this.RaiseAndSetIfChanged(ref this.isSelected, value);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SiteReferenceDataLibraryRowViewModel"/> class
-        /// </summary>
-        /// <param name="siteReferenceDataLibrary">
-        /// The <see cref="SiteReferenceDataLibrary"/> associated with this row
-        /// </param>
-        public SiteReferenceDataLibraryRowViewModel(SiteReferenceDataLibrary siteReferenceDataLibrary)
-            : base(siteReferenceDataLibrary)
-        {
-        }
+        // TODO #68 Check if the first Syncer implementation allows model synchronization
+        SiteReferenceDataLibrary,
+        DomainOfExpertise
     }
 }

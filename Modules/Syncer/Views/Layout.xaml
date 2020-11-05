@@ -7,7 +7,11 @@
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     xmlns:views="clr-namespace:Common.Views;assembly=Common"
+    xmlns:tabs="clr-namespace:Common.Views.Tabs;assembly=Common"
+    xmlns:viewModels="clr-namespace:Syncer.ViewModels"
+    xmlns:behaviors="clr-namespace:Syncer.Behaviors"
     Header="Syncer"
     Orientation="Vertical"
     mc:Ignorable="d"
@@ -15,7 +19,11 @@
     HorizontalAlignment="Stretch"
     >
 
-    <GroupBox Header="Source" Height="300">
+    <dxlc:LayoutGroup.DataContext>
+        <viewModels:SyncerViewModel />
+    </dxlc:LayoutGroup.DataContext>
+
+    <GroupBox Header="Source" Height="320">
         <StackPanel Margin="0" HorizontalAlignment="Stretch">
             <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
@@ -25,29 +33,44 @@
                 </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="0.4*" />
+                    <ColumnDefinition Width="0.6*" />
                 </Grid.ColumnDefinitions>
 
-                <views:Login
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    x:Name="LoginSource" />
-
+                <views:Login Grid.Row="0" Grid.Column="0" x:Name="LoginSource" />
                 <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
                     <dxlc:LayoutItemLabel
                         Margin="5"
                         Content="ClassKind" />
                 </StackPanel>
                 <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
-                    <!-- TODO #9 ComboBox: SelectedItem, ItemsSource -->
                     <ComboBox
                         FontSize="12"
                         Name="ThingType"
                         Margin="5"
                         Width="350"
+                        ItemsSource="{Binding ThingTypes, Mode=OneTime}"
+                        SelectedValue="{Binding Path=SelectedThingType, Mode=TwoWay}"
                         SelectedValuePath="Key"
-                        DisplayMemberPath="Value" />
+                        DisplayMemberPath="Value"
+                        />
                 </StackPanel>
+
+                <dxlc:LayoutGroup Grid.Row="0" Grid.Column="1"
+                    Orientation="Vertical"
+                    View="Tabs"
+                    Width="540"
+                    Margin="0 0 0 0"
+                    Visibility="{Binding Path=SourceViewModel.LoginSuccessfully,
+                                         Converter={dxmvvm:BooleanToVisibilityConverter},
+                                         UpdateSourceTrigger=PropertyChanged}">
+                    <tabs:SiteRdlLayoutGroup
+                        DataContext="{Binding Path=SiteReferenceDataLibraryViewModel,
+                                              UpdateSourceTrigger=PropertyChanged}" />
+                    <tabs:DomainOfExpertiseLayoutGroup
+                        DataContext="{Binding Path=DomainOfExpertiseViewModel,
+                                              UpdateSourceTrigger=PropertyChanged}" />
+                </dxlc:LayoutGroup>
             </Grid>
         </StackPanel>
     </GroupBox>
@@ -63,9 +86,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <views:Login
-                    Grid.Row="0"
-                    Grid.Column="0"
+                <views:Login Grid.Row="0" Grid.Column="0"
                     x:Name="LoginTarget"
                     JsonIsAvailable="False" />
             </Grid>
@@ -73,13 +94,15 @@
     </GroupBox>
 
     <StackPanel Margin="0" HorizontalAlignment="Left" MaxHeight="30">
-        <!-- TODO #9 Button: IsEnabled, Command -->
         <Button
             MinWidth="100"
             Height="Auto"
             MaxWidth="100"
             Margin="0 5 0 5"
-            FontSize="12">
+            FontSize="12"
+            IsEnabled="{Binding Path=CanSync}"
+            Command="{Binding Path=SyncCommand}"
+            >
             <StackPanel Orientation="Horizontal">
                 <Image Source="{dx:DXImage Image=Export_16x16.png}" Stretch="Uniform" />
                 <TextBlock Text="Sync" VerticalAlignment="Center" Margin="5 0 0 0" />
@@ -88,7 +111,6 @@
     </StackPanel>
 
     <GroupBox Header="Output" HorizontalAlignment="Stretch">
-        <!-- TODO #9 TextEdit: Text="Binding Path... -->
         <dxe:TextEdit
             Height="Auto"
             FontSize="12"
@@ -97,9 +119,12 @@
             VerticalContentAlignment="Top"
             VerticalScrollBarVisibility="Visible"
             IsReadOnly="True"
+            Text="{Binding Path=Output, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             />
     </GroupBox>
 
-    <!-- TODO #9 interaction behavior -->
+    <dxmvvm:Interaction.Behaviors>
+        <behaviors:SyncerBehavior />
+    </dxmvvm:Interaction.Behaviors>
 
 </dxlc:LayoutGroup>

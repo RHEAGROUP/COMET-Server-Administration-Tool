@@ -19,7 +19,9 @@
         <dxlc:LayoutControl
             Margin="5"
             Orientation="Vertical"
-            ScrollBars="None" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            ScrollBars="None"
+            VerticalAlignment="Stretch"
+            HorizontalAlignment="Stretch">
             <dxlc:LayoutGroup
                 Orientation="Vertical"
                 View="Tabs"

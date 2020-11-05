@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SiteReferenceDataLibraryViewModel.cs" company="RHEA System S.A.">
+// <copyright file="DomainOfExpertiseViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -33,9 +33,9 @@ namespace Common.ViewModels
     using System.Linq;
 
     /// <summary>
-    /// The view-model for the Source and target server that is responsible for getting referenced data libraries
+    /// The viewmodel that is responsible for domains of expertise
     /// </summary>
-    public class SiteReferenceDataLibraryViewModel : ReactiveObject
+    public class DomainOfExpertiseViewModel : ReactiveObject
     {
         /// <summary>
         /// Backing field for the <see cref="ISession"/> property
@@ -52,17 +52,17 @@ namespace Common.ViewModels
         }
 
         /// <summary>
-        /// Backing field for the <see cref="SiteReferenceDataLibraries"/> property
+        /// Backing field for the <see cref="DomainsOfExpertise"/> property
         /// </summary>
-        private ReactiveList<SiteReferenceDataLibraryRowViewModel> siteReferenceDataLibraries;
+        private ReactiveList<DomainOfExpertiseRowViewModel> domainsOfExpertise;
 
         /// <summary>
-        /// Gets or sets site reference data libraries
+        /// Gets or sets domains of expertise
         /// </summary>
-        public ReactiveList<SiteReferenceDataLibraryRowViewModel> SiteReferenceDataLibraries
+        public ReactiveList<DomainOfExpertiseRowViewModel> DomainsOfExpertise
         {
-            get => this.siteReferenceDataLibraries;
-            private set => this.RaiseAndSetIfChanged(ref this.siteReferenceDataLibraries, value);
+            get => this.domainsOfExpertise;
+            private set => this.RaiseAndSetIfChanged(ref this.domainsOfExpertise, value);
         }
 
         /// <summary>
@@ -90,28 +90,33 @@ namespace Common.ViewModels
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SiteReferenceDataLibraryViewModel"/> class.
+        /// Initializes a new instance of the <see cref="DomainOfExpertiseViewModel"/> class
         /// </summary>
-        public SiteReferenceDataLibraryViewModel(ISession serverSession)
+        public DomainOfExpertiseViewModel(ISession serverSession)
         {
             this.serverSession = serverSession;
 
             this.CheckUncheckThing = ReactiveCommand.Create();
             this.CheckUncheckThing.Subscribe(_ =>
-                this.SelectAllThings = !(this.SiteReferenceDataLibraries.Any(d => !d.IsSelected)));
+                this.SelectAllThings = !(this.DomainsOfExpertise.Any(d => !d.IsSelected)));
 
             this.CheckUncheckAllThings = ReactiveCommand.Create();
             this.CheckUncheckAllThings.Subscribe(_ =>
-                this.SiteReferenceDataLibraries.ForEach(d => d.IsSelected = this.SelectAllThings));
+                this.DomainsOfExpertise.ForEach(d => d.IsSelected = this.SelectAllThings));
 
-            this.SiteReferenceDataLibraries = new ReactiveList<SiteReferenceDataLibraryRowViewModel>
+            this.DomainsOfExpertise = new ReactiveList<DomainOfExpertiseRowViewModel>
             {
                 ChangeTrackingEnabled = true
             };
 
-            foreach (var rdl in this.ServerSession.RetrieveSiteDirectory().SiteReferenceDataLibrary.OrderBy(m => m.Name))
+            foreach (var domain in this.serverSession.RetrieveSiteDirectory().Domain)
             {
-                this.SiteReferenceDataLibraries.Add(new SiteReferenceDataLibraryRowViewModel(rdl));
+                this.DomainsOfExpertise.Add(new DomainOfExpertiseRowViewModel(domain));
+            }
+
+            foreach (var domainGroup in this.serverSession.RetrieveSiteDirectory().DomainGroup)
+            {
+                this.DomainsOfExpertise.Add(new DomainOfExpertiseRowViewModel(domainGroup));
             }
         }
     }
