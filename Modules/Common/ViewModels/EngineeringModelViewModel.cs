@@ -25,13 +25,13 @@
 
 namespace Common.ViewModels
 {
-    using CDP4Common.SiteDirectoryData;
-    using CDP4Dal;
     using System;
     using System.Linq;
+    using System.Collections.Generic;
+    using CDP4Common.SiteDirectoryData;
+    using CDP4Dal;
     using PlainObjects;
     using ReactiveUI;
-    using System.Collections.Generic;
 
     /// <summary>
     /// The view-model for the Source and target server that is responsible for getting engineering models
@@ -167,7 +167,6 @@ namespace Common.ViewModels
             }
 
             this.SelectAllModels = true;
-            NotifyEngineeringModelsListChanges(this.EngineeringModels.Where(em => em.IsSelected).ToList());
         }
     }
 }

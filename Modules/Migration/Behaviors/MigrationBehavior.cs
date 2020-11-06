@@ -25,11 +25,11 @@
 
 namespace Migration.Behaviors
 {
+    using System.Diagnostics.CodeAnalysis;
     using Common.ViewModels;
     using ViewModels;
     using Views;
     using DevExpress.Mvvm.UI.Interactivity;
-    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// The purpose of this class is to implement a behavior that is specific to migration flow and allows

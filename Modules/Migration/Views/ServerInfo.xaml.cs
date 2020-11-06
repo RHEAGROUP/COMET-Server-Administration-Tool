@@ -25,11 +25,11 @@
 
 namespace Migration.Views
 {
+    using System.Collections.Generic;
+    using System.Windows;
     using CDP4Dal;
     using Common.ViewModels;
     using Common.ViewModels.PlainObjects;
-    using System.Collections.Generic;
-    using System.Windows;
 
     /// <summary>
     /// Interaction logic for ServerInfo.xaml
@@ -160,6 +160,7 @@ namespace Migration.Views
             this.engineeringModelViewModel = new EngineeringModelViewModel(this.serverSession);
             this.engineeringModelViewModel.ModelListChangedEvent += EngineeringModelViewModelModelListChangedEvent;
             this.EngineeringModelLayoutGroup.DataContext = this.engineeringModelViewModel;
+            this.engineeringModelViewModel.CheckUncheckAllModels.Execute(null);
 
             this.errorViewModel = new ErrorViewModel(this.serverSession);
             this.PocoErrorsLayoutGroup.DataContext = this.errorViewModel;

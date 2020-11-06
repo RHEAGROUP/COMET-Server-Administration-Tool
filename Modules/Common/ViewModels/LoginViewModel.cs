@@ -25,6 +25,11 @@
 
 namespace Common.ViewModels
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Reactive;
+    using System.Threading.Tasks;
     using CDP4Dal;
     using CDP4Dal.DAL;
     using CDP4JsonFileDal;
@@ -33,11 +38,6 @@ namespace Common.ViewModels
     using Microsoft.Win32;
     using PlainObjects;
     using ReactiveUI;
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Reactive;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// Enum describing the possible server types
@@ -270,8 +270,6 @@ namespace Common.ViewModels
                     await this.ServerSession.Close();
                 }
 
-                var credentials = new Credentials(this.UserName, this.Password, new Uri(this.Uri));
-
                 switch (this.SelectedDataSource)
                 {
                     case DataSource.CDP4:
@@ -284,6 +282,16 @@ namespace Common.ViewModels
                         this.dal = new JsonFileDal(new Version("1.0.0"));
                         break;
                 }
+
+                // when no trailing slash is provided it can lead to loss of nested paths
+                // see https://stackoverflow.com/questions/22543723/create-new-uri-from-base-uri-and-relative-path-slash-makes-a-difference
+                // for consistency, all uri's are now appended, cannot rely on user getting it right.
+                if (this.SelectedDataSource != DataSource.JSON && !this.Uri.EndsWith("/"))
+                {
+                    this.Uri += "/";
+                }
+
+                var credentials = new Credentials(this.UserName, this.Password, new Uri(this.Uri));
 
                 this.ServerSession = new Session(this.dal, credentials);
 
@@ -341,7 +349,8 @@ namespace Common.ViewModels
 
             return TrimUri(this.ServerSession.Credentials.Uri.ToString()).Equals(TrimUri(dataSourceUri)) &&
                    this.ServerSession.Credentials.UserName.Equals(dataSourceUsername) &&
-                   this.ServerSession.Credentials.Password.Equals(dataSourcePassword);
+                   this.ServerSession.Credentials.Password.Equals(dataSourcePassword) &&
+                   this.ServerSession.ActivePerson != null;
         }
 
         /// <summary>

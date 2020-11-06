@@ -1,107 +1,75 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{984BD61A-3256-4ACA-8953-7751FC454790}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>Syncer</RootNamespace>
-    <AssemblyName>Syncer</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFramework>net452</TargetFramework>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
+    <PackageReference Include="CDP4Common-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4Dal-CE" Version="6.3.0" />
+    <PackageReference Include="DevExpress.CodeParser" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Data" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Data.Desktop" Version="20.1.7" />
+    <PackageReference Include="DevExpress.DataAccess" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Images" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Mvvm" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Office.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Pdf.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Printing.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Layout" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Navigation" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Office" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Printing" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Themes.Office2019Colorful" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Xpo" Version="20.1.7" />
+    <PackageReference Include="Microsoft.Bcl" Version="1.1.10" />
+    <PackageReference Include="Microsoft.Bcl.Build" Version="1.0.21" />
+    <PackageReference Include="NLog" Version="4.6.8" />
+    <PackageReference Include="reactiveui-core.Net40" Version="6.5.0" />
+    <PackageReference Include="Rx-Core" Version="2.2.5" />
+    <PackageReference Include="Rx-Interfaces" Version="2.2.5" />
+    <PackageReference Include="Rx-Linq" Version="2.2.5" />
+    <PackageReference Include="Rx-Main" Version="2.2.5" />
+    <PackageReference Include="Rx-PlatformServices" Version="2.2.5" />
+    <PackageReference Include="Rx-XAML" Version="2.2.5" />
+    <PackageReference Include="Splat.Net40" Version="1.6.2" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Common\Common.csproj">
-      <Project>{8c7936c7-8fe8-4dc2-a20c-388b55c08fa5}</Project>
-      <Name>Common</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="CDP4Common, Version=6.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CDP4Common-CE.6.2.1-2020.10.22.3-pre-release\lib\net452\CDP4Common.dll</HintPath>
-    </Reference>
-    <Reference Include="CDP4Dal, Version=6.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CDP4Dal-CE.6.2.0-2020.10.22.3-pre-release\lib\net452\CDP4Dal.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Data.Desktop.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.Data.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.Mvvm.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.Xpf.Core.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Wpf.Core.20.1.7\lib\net452\DevExpress.Xpf.Core.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.LayoutControl.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NLog.4.6.8\lib\net45\NLog.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="ReactiveUI, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\reactiveui-core.Net40.6.5.0\lib\net40\ReactiveUI.dll</HintPath>
-    </Reference>
-    <Reference Include="Splat, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Splat.Net40.1.6.2\lib\net40\Splat.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Configuration" />
-    <Reference Include="System.Data" />
     <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Interfaces, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Interfaces.2.2.5\lib\net45\System.Reactive.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Linq, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Linq.2.2.5\lib\net45\System.Reactive.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.PlatformServices, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-PlatformServices.2.2.5\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Windows.Threading, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-XAML.2.2.5\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Page Include="Views\Layout.xaml">
       <SubType>Designer</SubType>
@@ -109,16 +77,8 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Behaviors\SyncerBehavior.cs" />
-    <Compile Include="Utils\Sync\SyncerFactory.cs" />
-    <Compile Include="Utils\ThingType.cs" />
-    <Compile Include="Utils\Sync\DomainOfExpertiseSyncer.cs" />
-    <Compile Include="Utils\Sync\SiteReferenceDataLibrarySyncer.cs" />
-    <Compile Include="Utils\Sync\Syncer.cs" />
-    <Compile Include="ViewModels\SyncerViewModel.cs" />
-    <Compile Include="Views\Layout.xaml.cs">
+    <Compile Update="Views\Layout.xaml.cs">
       <DependentUpon>Layout.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace App.ViewModels
+namespace CDP4SAT.ViewModels
 {
     using DevExpress.Mvvm;
 

@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace App.Views
+namespace CDP4SAT.Views
 {
     using System.Windows.Controls;
 

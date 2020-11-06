@@ -25,13 +25,6 @@
 
 namespace Migration.Utils
 {
-    using CDP4Common.EngineeringModelData;
-    using CDP4Dal;
-    using CDP4Dal.DAL;
-    using CDP4Dal.Operations;
-    using CDP4JsonFileDal;
-    using Common.ViewModels.PlainObjects;
-    using NLog;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -39,12 +32,28 @@ namespace Migration.Utils
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
+    using CDP4Common.EngineeringModelData;
+    using CDP4Dal;
+    using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
+    using CDP4JsonFileDal;
+    using Common.ViewModels.PlainObjects;
+    using NLog;
 
     /// <summary>
     /// Enumeration of the migration process steps
     /// </summary>
-    public enum MigrationStep { ImportStart, PackStart, PackEnd, ImportEnd, ExportStart, ExportEnd };
+    public enum MigrationStep
+    {
+        ImportStart,
+        PackStart,
+        PackEnd,
+        ImportEnd,
+        ExportStart,
+        ExportEnd
+    };
 
     /// <summary>
     /// The purpose of this class is to implement migration specif operations such as: import, export, pack
@@ -59,7 +68,12 @@ namespace Migration.Utils
         /// <summary>
         /// Annex C3 Zip archive file name
         /// </summary>
-        private static readonly string ArchiveName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\Annex-C3.zip";
+        private static readonly string ArchiveFileName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\Annex-C3.zip";
+
+        /// <summary>
+        /// Annex C3 Migration file name
+        /// </summary>
+        private static readonly string MigrationFileName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\migration.json";
 
         /// <summary>
         /// Data Access Layer used during migration process
@@ -98,12 +112,44 @@ namespace Migration.Utils
         public event MigrationStepDelegate OperationStepEvent;
 
         /// <summary>
-        /// Invoke OperationMessageEvent
+        /// Log verbosity
+        /// </summary>
+        private enum LogVerbosity
+        {
+            Info,
+            Warn,
+            Debug,
+            Error
+        };
+
+        /// <summary>
+        /// Invoke OperationMessageEvent and optionally log
         /// </summary>
         /// <param name="message">progress message</param>
-        private void NotifyMessage(string message)
+        /// <param name="logLevel">Log verbosity level(optional) <see cref="LogVerbosity"/></param>
+        /// <param name="ex">Exception(optional) <see cref="Exception"/></param>
+        private void NotifyMessage(string message, LogVerbosity? logLevel = null, Exception ex = null)
         {
             OperationMessageEvent?.Invoke(message);
+
+            switch (logLevel)
+            {
+                case LogVerbosity.Info:
+                    Logger.Info(message);
+                    break;
+                case LogVerbosity.Warn:
+                    Logger.Warn(message);
+                    break;
+                case LogVerbosity.Debug:
+                    Logger.Debug(message);
+                    break;
+                case LogVerbosity.Error:
+                    Logger.Error(ex?.Message != null ? message + ex.Message : message);
+                    break;
+                default:
+                    Logger.Trace(message);
+                    break;
+            }
         }
 
         /// <summary>
@@ -141,27 +187,40 @@ namespace Migration.Utils
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task ImportData(List<EngineeringModelRowViewModel> selectedModels)
+        public async Task<bool> ImportData(List<EngineeringModelRowViewModel> selectedModels)
         {
             if (this.SourceSession is null)
             {
                 this.NotifyMessage("Please select source session");
-                return;
+                return false;
             }
 
-            Logger.Info($"Retrieving SiteDirectory from {this.SourceSession.DataSourceUri}...");
+            if (selectedModels is null || selectedModels.Count == 0)
+            {
+                this.NotifyMessage("Please select model(s) to migrate");
+                return false;
+            }
+
             this.NotifyStep(MigrationStep.ImportStart);
+
+            this.NotifyMessage($"Retrieving SiteDirectory from {this.SourceSession.DataSourceUri}...");
 
             var siteDirectory = this.SourceSession.RetrieveSiteDirectory();
 
+            if (siteDirectory == null)
+            {
+                await this.SourceSession.Open();
+                siteDirectory = this.SourceSession.RetrieveSiteDirectory();
+            }
+
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
-                if (!selectedModels.Any(em => em.Iid == modelSetup.Iid && em.IsSelected)) continue;
+                if (!selectedModels.ToList().Any(em => em.Iid == modelSetup.Iid && em.IsSelected)) continue;
 
                 var model = new EngineeringModel(
-                        modelSetup.EngineeringModelIid,
-                        this.SourceSession.Assembler.Cache,
-                        this.SourceSession.Credentials.Uri)
+                    modelSetup.EngineeringModelIid,
+                    this.SourceSession.Assembler.Cache,
+                    this.SourceSession.Credentials.Uri)
                 {
                     EngineeringModelSetup = modelSetup
                 };
@@ -177,24 +236,19 @@ namespace Migration.Utils
                         this.SourceSession.Credentials.Uri);
 
                     model.Iteration.Add(iteration);
-                    tasks.Add(this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain).ContinueWith(t =>
-                    {
-                        var iterationDescription = $"'{modelSetup.Name}'.'{iterationSetup.IterationIid}'";
-
-                        string message;
-
-                        if (t.IsFaulted)
+                    tasks.Add(this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain)
+                        .ContinueWith(t =>
                         {
-                            message = $"Reading iteration {iterationDescription} failed. Exception: {t.Exception.Message}.";
-                            this.NotifyMessage(message);
-                            Logger.Warn(message);
-                            return;
-                        }
+                            var iterationDescription = $"'{modelSetup.Name}'.'{iterationSetup.IterationIid}'";
 
-                        message = $"Read iteration {iterationDescription} successfully.";
-                        this.NotifyMessage(message);
-                        Logger.Info(message);
-                    }));
+                            if (t.IsFaulted && t.Exception != null)
+                            {
+                                this.NotifyMessage($"Reading iteration {iterationDescription} failed. Exception: {t.Exception.Message}.", LogVerbosity.Warn);
+                                return;
+                            }
+
+                            this.NotifyMessage($"Read iteration {iterationDescription} successfully.", LogVerbosity.Info);
+                        }));
                 }
 
                 while (tasks.Count > 0)
@@ -204,10 +258,9 @@ namespace Migration.Utils
                 }
             }
 
-            await this.PackData();
-
-            Logger.Info("Finished pulling data");
             this.NotifyStep(MigrationStep.ImportEnd);
+
+            return true;
         }
 
         /// <summary>
@@ -216,17 +269,22 @@ namespace Migration.Utils
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task ExportData()
+        public async Task<bool> ExportData()
         {
+            var success = true;
+
             if (this.TargetSession is null)
             {
                 this.NotifyMessage("Please select the target session");
-                return;
+
+                return false;
             }
+
+            this.NotifyStep(MigrationStep.ExportStart);
 
             var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
 
-            Logger.Info($"Pushing data to {targetUrl}");
+            this.NotifyMessage($"Pushing data to {targetUrl}", LogVerbosity.Info);
 
             try
             {
@@ -234,44 +292,88 @@ namespace Migration.Utils
                 {
                     using (var multipartContent = this.CreateMultipartContent())
                     {
-                        using (var message = await httpClient.PostAsync(targetUrl, multipartContent))
+                        await httpClient.PostAsync(targetUrl, multipartContent).ContinueWith( (t) =>
                         {
-                            var input = await message.Content.ReadAsStringAsync();
-                            // TODO #35 add result interpretation
+                            if (t.IsFaulted)
+                            {
+                                if (t.Exception?.InnerException != null)
+                                {
+                                    throw t.Exception?.InnerException;
+                                }
 
-                            Logger.Info($"Finished pushing data");
-                        }
+                                throw new Exception("Unknown inner exception");
+                            }
+
+                            Logger.Info($"Server status response {t.Result.StatusCode}");
+                            success = t.Result.IsSuccessStatusCode;
+
+                            if (success)
+                            {
+                                Logger.Info("Finished pushing data");
+                            }
+                            else
+                            {
+                                Logger.Error("Unable to push data. Server returned error. Please check server logs.");
+                            }
+                        });
                     }
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error($"Could not push data. Exception: {ex}");
-                // TODO #36 add proper exception handling
+                this.NotifyMessage($"Could not push data.", LogVerbosity.Error, ex);
+                success = false;
             }
             finally
             {
                 await this.TargetSession.Close();
             }
+
+            this.NotifyStep(MigrationStep.ExportEnd);
+
+            return success;
         }
 
         /// <summary>
         /// Implement pack(zip) data operation
         /// </summary>
-        /// <returns></returns>
-        /// <param name="iterations">
-        /// Model iterations list <see cref="Iteration"/>
-        /// </param>
+        /// <param name="migrationFile">Migration file</param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task PackData(IEnumerable<Iteration> iterations = null)
+        public async Task<bool> PackData(string migrationFile)
         {
-            var zipCredentials = new Credentials("admin", "pass", new Uri(ArchiveName));
+            List<string> extensionFiles = null;
+            var zipCredentials = new Credentials("admin", "pass", new Uri(ArchiveFileName));
             var zipSession = new Session(this.dal, zipCredentials);
+            var success = true;
+
+            if (!string.IsNullOrEmpty(migrationFile))
+            {
+                if (!System.IO.File.Exists(migrationFile))
+                {
+                    this.NotifyMessage("Unable to find selected migration file", LogVerbosity.Warn);
+
+                    return false;
+                }
+
+                try
+                {
+                    extensionFiles = new List<string> {MigrationFileName};
+                    System.IO.File.Copy(migrationFile, MigrationFileName);
+                }
+                catch (Exception ex)
+                {
+                    this.NotifyMessage("Could not add migration.json file", LogVerbosity.Error, ex);
+
+                    return false;
+                }
+            }
+
+            this.NotifyStep(MigrationStep.PackStart);
 
             var operationContainers = new List<OperationContainer>();
-            var openIterations = iterations != null ? this.SourceSession.OpenIterations.Select(i => i.Key).Where(oi => iterations.Any(i => i.Iid == oi.Iid)) : this.SourceSession.OpenIterations.Select(i => i.Key);
+            var openIterations = this.SourceSession.OpenIterations.Select(i => i.Key);
 
             foreach (var iteration in openIterations)
             {
@@ -281,22 +383,30 @@ namespace Migration.Utils
                 var operation = new Operation(null, dto, OperationKind.Create);
                 operationContainer.AddOperation(operation);
                 operationContainers.Add(operationContainer);
+
+                try
+                {
+                    await this.dal.Write(operationContainers, extensionFiles);
+
+                    if (System.IO.File.Exists(MigrationFileName))
+                    {
+                        System.IO.File.Delete(MigrationFileName);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    this.NotifyMessage("Could not pack data", LogVerbosity.Error, ex);
+                    success = false;
+                }
+                finally
+                {
+                    await this.SourceSession.Close();
+                }
             }
 
-            try
-            {
-                // TODO #26 add result interpretation
-                await this.dal.Write(operationContainers);
-            }
-            catch (Exception ex)
-            {
-                // TODO #37 add proper exception handling
-                Logger.Error($"Could not pack data. Exception: {ex}");
-            }
-            finally
-            {
-                await this.SourceSession.Close();
-            }
+            this.NotifyStep(MigrationStep.PackEnd);
+
+            return success;
         }
 
         /// <summary>
@@ -312,12 +422,15 @@ namespace Migration.Utils
         {
             var client = new HttpClient
             {
-                BaseAddress = credentials.Uri
+                BaseAddress = credentials.Uri,
+                // TODO #70 Add user manual for the migration process
+                Timeout = Timeout.InfiniteTimeSpan
             };
 
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes($"{credentials.UserName}:{credentials.Password}")));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+                Convert.ToBase64String(Encoding.ASCII.GetBytes($"{credentials.UserName}:{credentials.Password}")));
             client.DefaultRequestHeaders.Add("User-Agent", "SAT");
 
             return client;
@@ -331,10 +444,10 @@ namespace Migration.Utils
         /// </returns>
         private MultipartContent CreateMultipartContent()
         {
-            var fileName = Path.GetFileName(ArchiveName);
+            var fileName = Path.GetFileName(ArchiveFileName);
             var multipartContent = new MultipartFormDataContent();
 
-            using (var fileStream = System.IO.File.OpenRead(ArchiveName))
+            using (var fileStream = System.IO.File.OpenRead(ArchiveFileName))
             {
                 var contentStream = new MemoryStream();
                 fileStream.CopyTo(contentStream);
@@ -349,8 +462,9 @@ namespace Migration.Utils
                 streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
 
                 multipartContent.Add(streamContent, "file");
-                multipartContent.Add(new StringContent("pass", Encoding.UTF8), "password");
             }
+
+            multipartContent.Add(new StringContent("pass", Encoding.UTF8), "password");
 
             return multipartContent;
         }

@@ -1,247 +1,101 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8C7936C7-8FE8-4DC2-A20C-388B55C08FA5}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>Common</RootNamespace>
-    <AssemblyName>Common</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFramework>net452</TargetFramework>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
+    <PackageReference Include="CDP4Common-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4Dal-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4JsonFileDal-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4Rules-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4ServicesDal-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4WspDal-CE" Version="6.3.0" />
+    <PackageReference Include="DevExpress.CodeParser" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Data" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Data.Desktop" Version="20.1.7" />
+    <PackageReference Include="DevExpress.DataAccess" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Images" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Mvvm" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Office.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Pdf.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Printing.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Layout" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Navigation" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Office" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Printing" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Themes.Office2019Colorful" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Xpo" Version="20.1.7" />
+    <PackageReference Include="DotNetZip" Version="1.13.8" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+    <PackageReference Include="Microsoft.Bcl" Version="1.1.10" />
+    <PackageReference Include="Microsoft.Bcl.Build" Version="1.0.21" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="NLog" Version="4.6.8" />
+    <PackageReference Include="reactiveui-core.Net40" Version="6.5.0" />
+    <PackageReference Include="Rx-Core" Version="2.2.5" />
+    <PackageReference Include="Rx-Interfaces" Version="2.2.5" />
+    <PackageReference Include="Rx-Linq" Version="2.2.5" />
+    <PackageReference Include="Rx-Main" Version="2.2.5" />
+    <PackageReference Include="Rx-PlatformServices" Version="2.2.5" />
+    <PackageReference Include="Rx-XAML" Version="2.2.5" />
+    <PackageReference Include="Splat.Net40" Version="1.6.2" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="CDP4Common, Version=6.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CDP4Common-CE.6.2.0\lib\net452\CDP4Common.dll</HintPath>
-    </Reference>
-    <Reference Include="CDP4Dal, Version=6.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CDP4Dal-CE.6.2.0\lib\net452\CDP4Dal.dll</HintPath>
-    </Reference>
-    <Reference Include="CDP4JsonFileDal, Version=6.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CDP4JsonFileDal-CE.6.2.0\lib\net452\CDP4JsonFileDal.dll</HintPath>
-    </Reference>
-    <Reference Include="CDP4JsonSerializer, Version=6.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CDP4JsonSerializer-CE.6.2.0\lib\net452\CDP4JsonSerializer.dll</HintPath>
-    </Reference>
-    <Reference Include="CDP4Rules, Version=6.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CDP4Rules-CE.6.2.0\lib\net452\CDP4Rules.dll</HintPath>
-    </Reference>
-    <Reference Include="CDP4ServicesDal, Version=6.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CDP4ServicesDal-CE.6.2.0\lib\net452\CDP4ServicesDal.dll</HintPath>
-    </Reference>
-    <Reference Include="CDP4WspDal, Version=6.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CDP4WspDal-CE.6.2.0\lib\net452\CDP4WspDal.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.CodeParser.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.CodeParser.20.1.7\lib\net452\DevExpress.CodeParser.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Data.Desktop.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Data.Desktop.20.1.7\lib\net452\DevExpress.Data.Desktop.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Data.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Data.20.1.7\lib\net452\DevExpress.Data.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.DataAccess.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.DataAccess.20.1.7\lib\net452\DevExpress.DataAccess.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Images.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Images.20.1.7\lib\net452\DevExpress.Images.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Mvvm.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Mvvm.20.1.7\lib\net452\DevExpress.Mvvm.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Office.v20.1.Core, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Office.Core.20.1.7\lib\net452\DevExpress.Office.v20.1.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Pdf.v20.1.Core, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Pdf.Core.20.1.7\lib\net452\DevExpress.Pdf.v20.1.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Pdf.v20.1.Drawing, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Pdf.Drawing.20.1.7\lib\net452\DevExpress.Pdf.v20.1.Drawing.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Printing.v20.1.Core, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Printing.Core.20.1.7\lib\net452\DevExpress.Printing.v20.1.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.RichEdit.v20.1.Core, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.RichEdit.Core.20.1.7\lib\net452\DevExpress.RichEdit.v20.1.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.RichEdit.v20.1.Export, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.RichEdit.Export.20.1.7\lib\net452\DevExpress.RichEdit.v20.1.Export.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Accordion.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Wpf.Navigation.20.1.7\lib\net452\DevExpress.Xpf.Accordion.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Controls.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Wpf.Navigation.20.1.7\lib\net452\DevExpress.Xpf.Controls.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Core.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Wpf.Core.20.1.7\lib\net452\DevExpress.Xpf.Core.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Core.v20.1.Extensions, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Wpf.Core.20.1.7\lib\net452\DevExpress.Xpf.Core.v20.1.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Docking.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Wpf.Navigation.20.1.7\lib\net452\DevExpress.Xpf.Docking.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.DocumentViewer.v20.1.Core, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Wpf.DocumentViewer.Core.20.1.7\lib\net452\DevExpress.Xpf.DocumentViewer.v20.1.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.ExpressionEditor.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Wpf.ExpressionEditor.20.1.7\lib\net452\DevExpress.Xpf.ExpressionEditor.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Grid.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Wpf.Grid.Core.20.1.7\lib\net452\DevExpress.Xpf.Grid.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Grid.v20.1.Core, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Wpf.Grid.Core.20.1.7\lib\net452\DevExpress.Xpf.Grid.v20.1.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Grid.v20.1.Extensions, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Wpf.Grid.Core.20.1.7\lib\net452\DevExpress.Xpf.Grid.v20.1.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Layout.v20.1.Core, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Wpf.Navigation.20.1.7\lib\net452\DevExpress.Xpf.Layout.v20.1.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.LayoutControl.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Wpf.Layout.20.1.7\lib\net452\DevExpress.Xpf.LayoutControl.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.NavBar.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Wpf.Navigation.20.1.7\lib\net452\DevExpress.Xpf.NavBar.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Office.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Wpf.Office.20.1.7\lib\net452\DevExpress.Xpf.Office.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Printing.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Wpf.Printing.20.1.7\lib\net452\DevExpress.Xpf.Printing.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Ribbon.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Wpf.Navigation.20.1.7\lib\net452\DevExpress.Xpf.Ribbon.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.RichEdit.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Wpf.RichEdit.20.1.7\lib\net452\DevExpress.Xpf.RichEdit.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.Themes.Office2019Colorful.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Wpf.Themes.Office2019Colorful.20.1.7\lib\net452\DevExpress.Xpf.Themes.Office2019Colorful.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpo.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DevExpress.Xpo.20.1.7\lib\net452\DevExpress.Xpo.v20.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DotNetZip, Version=1.13.8.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\DotNetZip.1.13.8\lib\net40\DotNetZip.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NLog.4.6.8\lib\net45\NLog.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="ReactiveUI, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\reactiveui-core.Net40.6.5.0\lib\net40\ReactiveUI.dll</HintPath>
-    </Reference>
-    <Reference Include="Splat, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Splat.Net40.1.6.2\lib\net40\Splat.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Configuration" />
-    <Reference Include="System.Data" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Net" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Net.Http.Formatting, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Client.5.2.7\lib\net45\System.Net.Http.Formatting.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Interfaces, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Interfaces.2.2.5\lib\net45\System.Reactive.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Linq, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-Linq.2.2.5\lib\net45\System.Reactive.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.PlatformServices, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-PlatformServices.2.2.5\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Windows.Threading, Version=2.2.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Rx-XAML.2.2.5\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Utils\InverseBooleanConverter.cs" />
-    <Compile Include="Utils\SeverityToImageConverter.cs" />
-    <Compile Include="ViewModels\DomainOfExpertiseViewModel.cs" />
-    <Compile Include="ViewModels\EngineeringModelViewModel.cs" />
-    <Compile Include="ViewModels\ErrorViewModel.cs" />
-    <Compile Include="ViewModels\LoginViewModel.cs" />
-    <Compile Include="ViewModels\PlainObjects\DefinedThingRowViewModel.cs" />
-    <Compile Include="ViewModels\PlainObjects\DomainOfExpertiseRowViewModel.cs" />
-    <Compile Include="ViewModels\PlainObjects\EngineeringModelRowViewModel.cs" />
-    <Compile Include="ViewModels\PlainObjects\POCOErrorRowViewModel.cs" />
-    <Compile Include="ViewModels\PlainObjects\RuleCheckerErrorRowViewModel.cs" />
-    <Compile Include="ViewModels\PlainObjects\SiteReferenceDataLibraryRowViewModel.cs" />
-    <Compile Include="ViewModels\SiteReferenceDataLibraryViewModel.cs" />
-    <Compile Include="Views\Login.xaml.cs">
+    <Compile Update="Views\Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Tabs\DomainOfExpertiseLayoutGroup.xaml.cs">
+    <Compile Update="Views\Tabs\DomainOfExpertiseLayoutGroup.xaml.cs">
       <DependentUpon>DomainOfExpertiseLayoutGroup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Tabs\EngineeringModelLayoutGroup.xaml.cs">
+    <Compile Update="Views\Tabs\EngineeringModelLayoutGroup.xaml.cs">
       <DependentUpon>EngineeringModelLayoutGroup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Tabs\ErrorDetailLayoutGroup.xaml.cs">
+    <Compile Update="Views\Tabs\ErrorDetailLayoutGroup.xaml.cs">
       <DependentUpon>ErrorDetailLayoutGroup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Tabs\ModelErrorLayoutGroup.xaml.cs">
+    <Compile Update="Views\Tabs\ModelErrorLayoutGroup.xaml.cs">
       <DependentUpon>ModelErrorLayoutGroup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Tabs\POCOErrorLayoutGroup.xaml.cs">
+    <Compile Update="Views\Tabs\POCOErrorLayoutGroup.xaml.cs">
       <DependentUpon>POCOErrorLayoutGroup.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Tabs\SiteRdlLayoutGroup.xaml.cs">
+    <Compile Update="Views\Tabs\SiteRdlLayoutGroup.xaml.cs">
       <DependentUpon>SiteRdlLayoutGroup.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -275,12 +129,4 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
-  </Target>
 </Project>
