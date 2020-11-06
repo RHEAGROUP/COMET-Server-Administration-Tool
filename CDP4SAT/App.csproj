@@ -38,26 +38,26 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CDP4Common, Version=6.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Common-CE.6.2.0\lib\net452\CDP4Common.dll</HintPath>
+    <Reference Include="CDP4Common, Version=6.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Common-CE.6.3.0\lib\net452\CDP4Common.dll</HintPath>
     </Reference>
-    <Reference Include="CDP4Dal, Version=6.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Dal-CE.6.2.0\lib\net452\CDP4Dal.dll</HintPath>
+    <Reference Include="CDP4Dal, Version=6.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Dal-CE.6.3.0\lib\net452\CDP4Dal.dll</HintPath>
     </Reference>
-    <Reference Include="CDP4JsonFileDal, Version=6.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4JsonFileDal-CE.6.2.0\lib\net452\CDP4JsonFileDal.dll</HintPath>
+    <Reference Include="CDP4JsonFileDal, Version=6.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4JsonFileDal-CE.6.3.0\lib\net452\CDP4JsonFileDal.dll</HintPath>
     </Reference>
-    <Reference Include="CDP4JsonSerializer, Version=6.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4JsonSerializer-CE.6.2.0\lib\net452\CDP4JsonSerializer.dll</HintPath>
+    <Reference Include="CDP4JsonSerializer, Version=6.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4JsonSerializer-CE.6.3.0\lib\net452\CDP4JsonSerializer.dll</HintPath>
     </Reference>
-    <Reference Include="CDP4Rules, Version=6.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4Rules-CE.6.2.0\lib\net452\CDP4Rules.dll</HintPath>
+    <Reference Include="CDP4Rules, Version=6.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4Rules-CE.6.3.0\lib\net452\CDP4Rules.dll</HintPath>
     </Reference>
-    <Reference Include="CDP4ServicesDal, Version=6.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4ServicesDal-CE.6.2.0\lib\net452\CDP4ServicesDal.dll</HintPath>
+    <Reference Include="CDP4ServicesDal, Version=6.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4ServicesDal-CE.6.3.0\lib\net452\CDP4ServicesDal.dll</HintPath>
     </Reference>
-    <Reference Include="CDP4WspDal, Version=6.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\CDP4WspDal-CE.6.2.0\lib\net452\CDP4WspDal.dll</HintPath>
+    <Reference Include="CDP4WspDal, Version=6.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\CDP4WspDal-CE.6.3.0\lib\net452\CDP4WspDal.dll</HintPath>
     </Reference>
     <Reference Include="DevExpress.CodeParser.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <HintPath>..\packages\DevExpress.CodeParser.20.1.7\lib\net452\DevExpress.CodeParser.v20.1.dll</HintPath>

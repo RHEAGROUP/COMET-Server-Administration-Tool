@@ -46,11 +46,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="CDP4Common, Version=6.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CDP4Common-CE.6.2.1-2020.10.22.3-pre-release\lib\net452\CDP4Common.dll</HintPath>
+    <Reference Include="CDP4Common, Version=6.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\CDP4Common-CE.6.3.0\lib\net452\CDP4Common.dll</HintPath>
     </Reference>
-    <Reference Include="CDP4Dal, Version=6.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CDP4Dal-CE.6.2.0-2020.10.22.3-pre-release\lib\net452\CDP4Dal.dll</HintPath>
+    <Reference Include="CDP4Dal, Version=6.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\CDP4Dal-CE.6.3.0\lib\net452\CDP4Dal.dll</HintPath>
     </Reference>
     <Reference Include="DevExpress.Data.Desktop.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.Data.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
