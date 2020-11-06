@@ -270,8 +270,6 @@ namespace Common.ViewModels
                     await this.ServerSession.Close();
                 }
 
-                var credentials = new Credentials(this.UserName, this.Password, new Uri(this.Uri));
-
                 switch (this.SelectedDataSource)
                 {
                     case DataSource.CDP4:
@@ -284,6 +282,16 @@ namespace Common.ViewModels
                         this.dal = new JsonFileDal(new Version("1.0.0"));
                         break;
                 }
+
+                // when no trailing slash is provided it can lead to loss of nested paths
+                // see https://stackoverflow.com/questions/22543723/create-new-uri-from-base-uri-and-relative-path-slash-makes-a-difference
+                // for consistency, all uri's are now appended, cannot rely on user getting it right.
+                if (this.SelectedDataSource != DataSource.JSON && !this.Uri.EndsWith("/"))
+                {
+                    this.Uri += "/";
+                }
+
+                var credentials = new Credentials(this.UserName, this.Password, new Uri(this.Uri));
 
                 this.ServerSession = new Session(this.dal, credentials);
 
