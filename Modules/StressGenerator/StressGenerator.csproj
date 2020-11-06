@@ -1,43 +1,18 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E65B83A1-1CF0-45BE-A1FE-6D60C2F844CD}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>StressGenerator</RootNamespace>
-    <AssemblyName>StressGenerator</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFramework>net452</TargetFramework>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
   <ItemGroup>
     <Page Include="Views\Layout.xaml">
       <SubType>Designer</SubType>
@@ -45,18 +20,63 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Views\Layout.xaml.cs">
+    <Compile Update="Views\Layout.xaml.cs">
       <DependentUpon>Layout.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="DevExpress.Xpf.Core.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
-    <Reference Include="DevExpress.Xpf.LayoutControl.v20.1, Version=20.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <PackageReference Include="CDP4Common-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4Dal-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4JsonFileDal-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4Rules-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4ServicesDal-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4WspDal-CE" Version="6.3.0" />
+    <PackageReference Include="DevExpress.CodeParser" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Data" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Data.Desktop" Version="20.1.7" />
+    <PackageReference Include="DevExpress.DataAccess" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Images" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Mvvm" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Office.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Pdf.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Printing.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Layout" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Navigation" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Office" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Printing" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Wpf.Themes.Office2019Colorful" Version="20.1.7" />
+    <PackageReference Include="DevExpress.Xpo" Version="20.1.7" />
+    <PackageReference Include="DotNetZip" Version="1.13.8" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+    <PackageReference Include="Microsoft.Bcl" Version="1.1.10" />
+    <PackageReference Include="Microsoft.Bcl.Build" Version="1.0.21" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="NLog" Version="4.6.8" />
+    <PackageReference Include="reactiveui-core.Net40" Version="6.5.0" />
+    <PackageReference Include="Rx-Core" Version="2.2.5" />
+    <PackageReference Include="Rx-Interfaces" Version="2.2.5" />
+    <PackageReference Include="Rx-Linq" Version="2.2.5" />
+    <PackageReference Include="Rx-Main" Version="2.2.5" />
+    <PackageReference Include="Rx-PlatformServices" Version="2.2.5" />
+    <PackageReference Include="Rx-XAML" Version="2.2.5" />
+    <PackageReference Include="Splat.Net40" Version="1.6.2" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

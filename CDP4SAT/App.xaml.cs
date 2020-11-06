@@ -23,14 +23,14 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace App
+namespace CDP4SAT
 {
     using System.Windows;
 
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class MainApp : Application
+    public partial class App : Application
     {
     }
 }

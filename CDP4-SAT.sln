@@ -2,19 +2,24 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App", "CDP4SAT\App.csproj", "{4E672AC5-A95E-4E5E-B35D-8A4B0E8B5340}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "App", "CDP4SAT\App.csproj", "{4E672AC5-A95E-4E5E-B35D-8A4B0E8B5340}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Migration.Tests", "Migration.Tests\Migration.Tests.csproj", "{64124677-EBB7-4484-9CC3-2E0A9A6482DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Migration.Tests", "Migration.Tests\Migration.Tests.csproj", "{64124677-EBB7-4484-9CC3-2E0A9A6482DA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{53302909-5F6D-484F-BCD5-0760A3B92DD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Modules\Common\Common.csproj", "{8C7936C7-8FE8-4DC2-A20C-388B55C08FA5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Modules\Common\Common.csproj", "{8C7936C7-8FE8-4DC2-A20C-388B55C08FA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Migration", "Modules\Migration\Migration.csproj", "{72B5CDE8-C1B4-423E-B717-7A472957E55C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Migration", "Modules\Migration\Migration.csproj", "{72B5CDE8-C1B4-423E-B717-7A472957E55C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Syncer", "Modules\Syncer\Syncer.csproj", "{984BD61A-3256-4ACA-8953-7751FC454790}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Syncer", "Modules\Syncer\Syncer.csproj", "{984BD61A-3256-4ACA-8953-7751FC454790}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StressGenerator", "Modules\StressGenerator\StressGenerator.csproj", "{E65B83A1-1CF0-45BE-A1FE-6D60C2F844CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StressGenerator", "Modules\StressGenerator\StressGenerator.csproj", "{E65B83A1-1CF0-45BE-A1FE-6D60C2F844CD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A8979830-7424-4B10-8B3F-E1FB55BE369E}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
