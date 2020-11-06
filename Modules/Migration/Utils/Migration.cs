@@ -41,7 +41,7 @@ namespace Migration.Utils
     using CDP4JsonFileDal;
     using Common.ViewModels.PlainObjects;
     using NLog;
-  
+
     /// <summary>
     /// Enumeration of the migration process steps
     /// </summary>
@@ -282,7 +282,6 @@ namespace Migration.Utils
 
             this.NotifyStep(MigrationStep.ExportStart);
 
-            // TODO #34 Replace this in the near future, I cannot log into CDP WebService empty server
             var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
 
             this.NotifyMessage($"Pushing data to {targetUrl}", LogVerbosity.Info);
@@ -295,7 +294,6 @@ namespace Migration.Utils
                     {
                         await httpClient.PostAsync(targetUrl, multipartContent).ContinueWith( (t) =>
                         {
-                            // TODO #35 add result interpretation
                             if (t.IsFaulted)
                             {
                                 if (t.Exception?.InnerException != null)
@@ -313,6 +311,10 @@ namespace Migration.Utils
                             {
                                 Logger.Info("Finished pushing data");
                             }
+                            else
+                            {
+                                Logger.Error("Unable to push data. Server returned error. Please check server logs.");
+                            }
                         });
                     }
                 }
@@ -321,7 +323,6 @@ namespace Migration.Utils
             {
                 this.NotifyMessage($"Could not push data.", LogVerbosity.Error, ex);
                 success = false;
-                // TODO #36 add proper exception handling
             }
             finally
             {
@@ -363,7 +364,6 @@ namespace Migration.Utils
                 }
                 catch (Exception ex)
                 {
-                    // TODO #37 add proper exception handling
                     this.NotifyMessage("Could not add migration.json file", LogVerbosity.Error, ex);
 
                     return false;
@@ -386,19 +386,15 @@ namespace Migration.Utils
 
                 try
                 {
-                    {
-                        // TODO #26 add result interpretation
-                        await this.dal.Write(operationContainers, extensionFiles);
+                    await this.dal.Write(operationContainers, extensionFiles);
 
-                        if (System.IO.File.Exists(MigrationFileName))
-                        {
-                            System.IO.File.Delete(MigrationFileName);
-                        }
+                    if (System.IO.File.Exists(MigrationFileName))
+                    {
+                        System.IO.File.Delete(MigrationFileName);
                     }
                 }
                 catch (Exception ex)
                 {
-                    // TODO #37 add proper exception handling
                     this.NotifyMessage("Could not pack data", LogVerbosity.Error, ex);
                     success = false;
                 }
