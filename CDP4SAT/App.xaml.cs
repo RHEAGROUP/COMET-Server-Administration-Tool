@@ -25,12 +25,64 @@
 
 namespace CDP4SAT
 {
+    using System;
     using System.Windows;
+    using ExceptionReporting;
+    using NLog;
 
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
+        /// <summary>
+        /// A NLog logger
+        /// </summary>
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
+        /// Called when the applications starts. Makes a distinction between debug and release mode
+        /// </summary>
+        /// <param name="e">
+        /// the event argument
+        /// </param>
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            AppDomain.CurrentDomain.UnhandledException += AppDomainUnhandledException;
+
+            Application.Current.MainWindow = new MainWindow();
+            Application.Current.MainWindow.Show();
+        }
+
+        /// <summary>
+        /// Event handler
+        /// </summary>
+        /// <param name="sender">T the sender of the exception</param>
+        /// <param name="e">An instance of <see cref="UnhandledExceptionEventArgs"/> that carries the <see cref="Exception"/></param>
+        private static void AppDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            HandleException(e.ExceptionObject as Exception);
+        }
+
+        /// <summary>
+        /// Handles the provided exception by showing it to the end-user
+        /// </summary>
+        /// <param name="ex">The exception that is being handled</param>
+        private static void HandleException(Exception ex)
+        {
+            if (ex == null)
+            {
+                return;
+            }
+
+            logger.Error(ex);
+
+            var exceptionReporter = new ExceptionReporter();
+            exceptionReporter.Show(ex);
+
+            Environment.Exit(1);
+        }
     }
 }
