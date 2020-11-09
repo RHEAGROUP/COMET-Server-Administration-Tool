@@ -66,25 +66,6 @@ namespace Common.ViewModels
             };
 
         /// <summary>
-        /// Gets data source server type (migration target)
-        /// </summary>
-        public static Dictionary<DataSource, string> MigrationTargetServerTypes { get; } =
-            new Dictionary<DataSource, string>
-            {
-                { DataSource.CDP4, "CDP4 WebServices" }
-            };
-
-        /// <summary>
-        /// Gets data source server type (syncer target)
-        /// </summary>
-        public static Dictionary<DataSource, string> SyncerTargetServerTypes { get; } =
-            new Dictionary<DataSource, string>
-            {
-                { DataSource.CDP4, "CDP4 WebServices" },
-                { DataSource.WSP, "OCDT WSP Server" }
-            };
-
-        /// <summary>
         /// Backing field for the <see cref="DataSource"/> property
         /// </summary>
         private DataSource selectedDataSource;

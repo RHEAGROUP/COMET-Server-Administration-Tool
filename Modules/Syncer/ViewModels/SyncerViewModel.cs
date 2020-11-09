@@ -42,6 +42,16 @@ namespace Syncer.ViewModels
     public class SyncerViewModel : ReactiveObject
     {
         /// <summary>
+        /// Gets data source server type
+        /// </summary>
+        public static Dictionary<DataSource, string> SyncerTargetServerTypes { get; } =
+            new Dictionary<DataSource, string>
+            {
+                { DataSource.CDP4, "CDP4 WebServices" },
+                { DataSource.WSP, "OCDT WSP Server" }
+            };
+
+        /// <summary>
         /// Property describing the possible ClassKinds to be synced
         /// </summary>
         public static Dictionary<ThingType, string> ThingTypes { get; } =

@@ -106,7 +106,8 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Row="0" Grid.Column="0">
-                    <common:Login x:Name="LoginTarget" JsonIsAvailable="False" ServerTypes="{Binding Path=MigrationTargetServerTypes}" />
+                    <common:Login x:Name="LoginTarget" ServerTypes="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dxlc:LayoutGroup}},
+                                                        Path=DataContext.MigrationTargetServerTypes}" />
                 </StackPanel>
                 <StackPanel Grid.Row="0" Grid.Column="1">
                     <views:ServerInfo

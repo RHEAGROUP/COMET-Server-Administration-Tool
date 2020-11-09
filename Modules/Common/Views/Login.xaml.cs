@@ -36,15 +36,6 @@ namespace Common.Views
     public partial class Login : UserControl
     {
         /// <summary>
-        /// <see cref="DependencyProperty"/> that can be set in XAML to indicate that the JsonIsAvailable is available
-        /// </summary>
-        public static readonly DependencyProperty JsonIsAvailableProperty = DependencyProperty.RegisterAttached(
-            "JsonIsAvailable",
-            typeof(bool),
-            typeof(Login),
-            new PropertyMetadata(true, new PropertyChangedCallback(OnJsonIsAvailableChanged)));
-
-        /// <summary>
         /// <see cref="DependencyProperty"/> that can be set in XAML to specify different ServerTypes options
         /// </summary>
         public static readonly DependencyProperty ServerTypesProperty = DependencyProperty.RegisterAttached(
@@ -52,16 +43,6 @@ namespace Common.Views
             typeof(Dictionary<DataSource, string>),
             typeof(Login),
             new PropertyMetadata(new Dictionary<DataSource, string>(), new PropertyChangedCallback(OnServerTypesChanged)));
-
-        /// <summary>
-        /// Gets or sets the <see cref="JsonIsAvailableProperty"/> dependency property.
-        /// </summary>
-        public bool JsonIsAvailable
-        {
-            get => (bool)this.GetValue(JsonIsAvailableProperty);
-
-            set => this.SetValue(JsonIsAvailableProperty, value);
-        }
 
         /// <summary>
         /// Gets or sets the <see cref="ServerTypesProperty"/> dependency property.
@@ -86,27 +67,6 @@ namespace Common.Views
         /// </summary>
         /// <param name="d">The dependency object user control <see cref="DependencyObject" /></param>
         /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
-        private static void OnJsonIsAvailableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            (d as Login)?.JsonAvailabilityChanged(e);
-        }
-
-        /// <summary>
-        /// Instance handler which will handle any changes that occur to a particular instance.
-        /// </summary>
-        /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
-        private void JsonAvailabilityChanged(DependencyPropertyChangedEventArgs e)
-        {
-            if ((bool)e.NewValue) return;
-
-            this.BrowseJson.Visibility = Visibility.Hidden;
-        }
-
-        /// <summary>
-        /// Static callback handler which will handle any changes that occurs globally
-        /// </summary>
-        /// <param name="d">The dependency object user control <see cref="DependencyObject" /></param>
-        /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
         private static void OnServerTypesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             (d as Login)?.ServerTypesChanged(e);
@@ -118,10 +78,12 @@ namespace Common.Views
         /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
         private void ServerTypesChanged(DependencyPropertyChangedEventArgs e)
         {
-            if (e.NewValue is Dictionary<DataSource, string> newDataSourceValue)
-            {
-                this.ServerType.ItemsSource = newDataSourceValue;
-            }
+            if (!(e.NewValue is Dictionary<DataSource, string> newDataSourceValue)) return;
+
+            this.ServerType.ItemsSource = newDataSourceValue;
+            this.BrowseJson.Visibility = newDataSourceValue.ContainsKey(DataSource.JSON)
+                ? Visibility.Visible
+                : Visibility.Hidden;
         }
     }
 }
