@@ -88,7 +88,7 @@
 
                 <views:Login Grid.Row="0" Grid.Column="0"
                     x:Name="LoginTarget"
-                    JsonIsAvailable="False" />
+                    JsonIsAvailable="False" ServerTypes="{Binding Path=SyncerTargetServerTypes}" />
             </Grid>
         </StackPanel>
     </GroupBox>

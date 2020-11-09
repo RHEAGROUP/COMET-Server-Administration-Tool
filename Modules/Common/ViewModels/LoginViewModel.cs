@@ -55,7 +55,7 @@ namespace Common.ViewModels
     public class LoginViewModel : ReactiveObject
     {
         /// <summary>
-        /// Gets or sets data source server type
+        /// Gets data source server type
         /// </summary>
         public static Dictionary<DataSource, string> ServerTypes { get; } =
             new Dictionary<DataSource, string>
@@ -63,6 +63,25 @@ namespace Common.ViewModels
                 { DataSource.CDP4, "CDP4 WebServices" },
                 { DataSource.WSP, "OCDT WSP Server" },
                 { DataSource.JSON, "JSON" }
+            };
+
+        /// <summary>
+        /// Gets data source server type (migration target)
+        /// </summary>
+        public static Dictionary<DataSource, string> MigrationTargetServerTypes { get; } =
+            new Dictionary<DataSource, string>
+            {
+                { DataSource.CDP4, "CDP4 WebServices" }
+            };
+
+        /// <summary>
+        /// Gets data source server type (syncer target)
+        /// </summary>
+        public static Dictionary<DataSource, string> SyncerTargetServerTypes { get; } =
+            new Dictionary<DataSource, string>
+            {
+                { DataSource.CDP4, "CDP4 WebServices" },
+                { DataSource.WSP, "OCDT WSP Server" }
             };
 
         /// <summary>

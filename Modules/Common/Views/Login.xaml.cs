@@ -25,10 +25,10 @@
 
 namespace Common.Views
 {
-    using System.Linq;
-    using ViewModels;
+    using System.Collections.Generic;
     using System.Windows;
     using System.Windows.Controls;
+    using ViewModels;
 
     /// <summary>
     /// Interaction logic for Login.xaml
@@ -42,16 +42,16 @@ namespace Common.Views
             "JsonIsAvailable",
             typeof(bool),
             typeof(Login),
-            new PropertyMetadata(true, new PropertyChangedCallback(OnDataSourceAvailabilityChanged)));
+            new PropertyMetadata(true, new PropertyChangedCallback(OnJsonIsAvailableChanged)));
 
         /// <summary>
-        /// <see cref="DependencyProperty"/> that can be set in XAML to indicate that the OnlyCdp4IsAvailable is available
+        /// <see cref="DependencyProperty"/> that can be set in XAML to specify different ServerTypes options
         /// </summary>
-        public static readonly DependencyProperty OnlyCdp4IsAvailableProperty = DependencyProperty.RegisterAttached(
-            "OnlyCdp4IsAvailable",
-            typeof(bool),
+        public static readonly DependencyProperty ServerTypesProperty = DependencyProperty.RegisterAttached(
+            "ServerTypes",
+            typeof(Dictionary<DataSource, string>),
             typeof(Login),
-            new PropertyMetadata(false, new PropertyChangedCallback(OnDataSourceAvailabilityChanged)));
+            new PropertyMetadata(new Dictionary<DataSource, string>(), new PropertyChangedCallback(OnServerTypesChanged)));
 
         /// <summary>
         /// Gets or sets the <see cref="JsonIsAvailableProperty"/> dependency property.
@@ -64,13 +64,13 @@ namespace Common.Views
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="OnlyCdp4IsAvailableProperty"/> dependency property.
+        /// Gets or sets the <see cref="ServerTypesProperty"/> dependency property.
         /// </summary>
-        public bool OnlyCdp4IsAvailable
+        public Dictionary<DataSource, string> ServerTypes
         {
-            get => (bool)this.GetValue(OnlyCdp4IsAvailableProperty);
+            get => (Dictionary<DataSource, string>)this.GetValue(ServerTypesProperty);
 
-            set => this.SetValue(OnlyCdp4IsAvailableProperty, value);
+            set => this.SetValue(ServerTypesProperty, value);
         }
 
         /// <summary>
@@ -86,39 +86,42 @@ namespace Common.Views
         /// </summary>
         /// <param name="d">The dependency object user control <see cref="DependencyObject" /></param>
         /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
-        private static void OnDataSourceAvailabilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnJsonIsAvailableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            (d as Login)?.DataSourceAvailabilityChanged(e);
+            (d as Login)?.JsonAvailabilityChanged(e);
         }
 
         /// <summary>
         /// Instance handler which will handle any changes that occur to a particular instance.
         /// </summary>
         /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
-        private void DataSourceAvailabilityChanged(DependencyPropertyChangedEventArgs e)
+        private void JsonAvailabilityChanged(DependencyPropertyChangedEventArgs e)
         {
-            var newValue = (bool) e.NewValue;
-
-            switch (e.Property.Name)
-            {
-                case "JsonIsAvailable":
-                    if (!newValue)
-                    {
-                        this.ServerType.ItemsSource =
-                            LoginViewModel.ServerTypes.Where(item => item.Key != ViewModels.DataSource.JSON);
-                    }
-
-                    break;
-                case "OnlyCdp4IsAvailable":
-                    if (newValue)
-                    {
-                        this.ServerType.ItemsSource =
-                            LoginViewModel.ServerTypes.Where(item => item.Key == ViewModels.DataSource.CDP4);
-                    }
-                    break;
-            }
+            if ((bool)e.NewValue) return;
 
             this.BrowseJson.Visibility = Visibility.Hidden;
+        }
+
+        /// <summary>
+        /// Static callback handler which will handle any changes that occurs globally
+        /// </summary>
+        /// <param name="d">The dependency object user control <see cref="DependencyObject" /></param>
+        /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
+        private static void OnServerTypesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            (d as Login)?.ServerTypesChanged(e);
+        }
+
+        /// <summary>
+        /// Instance handler which will handle any changes that occur to a particular instance.
+        /// </summary>
+        /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
+        private void ServerTypesChanged(DependencyPropertyChangedEventArgs e)
+        {
+            if (e.NewValue is Dictionary<DataSource, string> newDataSourceValue)
+            {
+                this.ServerType.ItemsSource = newDataSourceValue;
+            }
         }
     }
 }

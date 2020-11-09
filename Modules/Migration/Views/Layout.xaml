@@ -106,7 +106,7 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Row="0" Grid.Column="0">
-                    <common:Login x:Name="LoginTarget" OnlyCdp4IsAvailable="True" />
+                    <common:Login x:Name="LoginTarget" JsonIsAvailable="False" ServerTypes="{Binding Path=MigrationTargetServerTypes}" />
                 </StackPanel>
                 <StackPanel Grid.Row="0" Grid.Column="1">
                     <views:ServerInfo
