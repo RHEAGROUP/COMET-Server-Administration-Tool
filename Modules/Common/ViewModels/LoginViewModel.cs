@@ -55,7 +55,7 @@ namespace Common.ViewModels
     public class LoginViewModel : ReactiveObject
     {
         /// <summary>
-        /// Gets or sets data source server type
+        /// Gets data source server type
         /// </summary>
         public static Dictionary<DataSource, string> ServerTypes { get; } =
             new Dictionary<DataSource, string>

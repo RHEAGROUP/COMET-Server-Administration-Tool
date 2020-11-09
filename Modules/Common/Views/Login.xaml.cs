@@ -25,10 +25,10 @@
 
 namespace Common.Views
 {
-    using System.Linq;
-    using ViewModels;
+    using System.Collections.Generic;
     using System.Windows;
     using System.Windows.Controls;
+    using ViewModels;
 
     /// <summary>
     /// Interaction logic for Login.xaml
@@ -36,22 +36,22 @@ namespace Common.Views
     public partial class Login : UserControl
     {
         /// <summary>
-        /// <see cref="DependencyProperty"/> that can be set in XAML to indicate that the JsonIsAvailable is available
+        /// <see cref="DependencyProperty"/> that can be set in XAML to specify different ServerTypes options
         /// </summary>
-        public static readonly DependencyProperty JsonIsAvailableProperty = DependencyProperty.RegisterAttached(
-            "JsonIsAvailable",
-            typeof(bool),
+        public static readonly DependencyProperty ServerTypesProperty = DependencyProperty.RegisterAttached(
+            "ServerTypes",
+            typeof(Dictionary<DataSource, string>),
             typeof(Login),
-            new PropertyMetadata(true, new PropertyChangedCallback(OnSetJsonIsAvailableChanged)));
+            new PropertyMetadata(new Dictionary<DataSource, string>(), new PropertyChangedCallback(OnServerTypesChanged)));
 
         /// <summary>
-        /// Gets or sets the <see cref="JsonIsAvailableProperty"/> dependency property.
+        /// Gets or sets the <see cref="ServerTypesProperty"/> dependency property.
         /// </summary>
-        public bool JsonIsAvailable
+        public Dictionary<DataSource, string> ServerTypes
         {
-            get => (bool)this.GetValue(JsonIsAvailableProperty);
+            get => (Dictionary<DataSource, string>)this.GetValue(ServerTypesProperty);
 
-            set => this.SetValue(JsonIsAvailableProperty, value);
+            set => this.SetValue(ServerTypesProperty, value);
         }
 
         /// <summary>
@@ -67,21 +67,23 @@ namespace Common.Views
         /// </summary>
         /// <param name="d">The dependency object user control <see cref="DependencyObject" /></param>
         /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
-        private static void OnSetJsonIsAvailableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnServerTypesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            (d as Login)?.OnSetTextChanged(e);
+            (d as Login)?.ServerTypesChanged(e);
         }
 
         /// <summary>
         /// Instance handler which will handle any changes that occur to a particular instance.
         /// </summary>
         /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
-        private void OnSetTextChanged(DependencyPropertyChangedEventArgs e)
+        private void ServerTypesChanged(DependencyPropertyChangedEventArgs e)
         {
-            if ((bool) e.NewValue) return;
+            if (!(e.NewValue is Dictionary<DataSource, string> newDataSourceValue)) return;
 
-            this.ServerType.ItemsSource = LoginViewModel.ServerTypes.Where(item => item.Key != ViewModels.DataSource.JSON);
-            this.BrowseJson.Visibility = Visibility.Hidden;
+            this.ServerType.ItemsSource = newDataSourceValue;
+            this.BrowseJson.Visibility = newDataSourceValue.ContainsKey(DataSource.JSON)
+                ? Visibility.Visible
+                : Visibility.Hidden;
         }
     }
 }

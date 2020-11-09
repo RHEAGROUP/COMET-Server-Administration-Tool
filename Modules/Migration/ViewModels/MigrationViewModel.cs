@@ -26,6 +26,7 @@
 namespace Migration.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
@@ -39,6 +40,15 @@ namespace Migration.ViewModels
     /// </summary>
     public class MigrationViewModel : ReactiveObject
     {
+        /// <summary>
+        /// Gets data source server type
+        /// </summary>
+        public static Dictionary<DataSource, string> MigrationTargetServerTypes { get; } =
+            new Dictionary<DataSource, string>
+            {
+                {DataSource.CDP4, "CDP4 WebServices"}
+            };
+
         /// <summary>
         /// Migration class reference
         /// </summary>

@@ -235,8 +235,8 @@ namespace Migration.Utils
                         this.SourceSession.Assembler.Cache,
                         this.SourceSession.Credentials.Uri);
 
-                    model.Iteration.Add(iteration);
-                    tasks.Add(this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain)
+                        model.Iteration.Add(iteration);
+                        tasks.Add(this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain)
                         .ContinueWith(t =>
                         {
                             var iterationDescription = $"'{modelSetup.Name}'.'{iterationSetup.IterationIid}'";
@@ -280,6 +280,11 @@ namespace Migration.Utils
                 return false;
             }
 
+            if (this.TargetSession.RetrieveSiteDirectory() is null)
+            {
+                await this.TargetSession.Open();
+            }
+
             this.NotifyStep(MigrationStep.ExportStart);
 
             var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
@@ -292,29 +297,29 @@ namespace Migration.Utils
                 {
                     using (var multipartContent = this.CreateMultipartContent())
                     {
-                        await httpClient.PostAsync(targetUrl, multipartContent).ContinueWith( (t) =>
+                        await httpClient.PostAsync(targetUrl, multipartContent).ContinueWith((t) =>
                         {
-                            if (t.IsFaulted)
-                            {
-                                if (t.Exception?.InnerException != null)
-                                {
-                                    throw t.Exception?.InnerException;
-                                }
+                           if (t.IsFaulted)
+                           {
+                               if (t.Exception?.InnerException != null)
+                               {
+                                   throw t.Exception?.InnerException;
+                               }
 
-                                throw new Exception("Unknown inner exception");
-                            }
+                               throw new Exception("Unknown inner exception");
+                           }
 
-                            Logger.Info($"Server status response {t.Result.StatusCode}");
-                            success = t.Result.IsSuccessStatusCode;
+                           Logger.Info($"Server status response {t.Result.StatusCode}");
+                           success = t.Result.IsSuccessStatusCode;
 
-                            if (success)
-                            {
-                                Logger.Info("Finished pushing data");
-                            }
-                            else
-                            {
-                                Logger.Error("Unable to push data. Server returned error. Please check server logs.");
-                            }
+                           if (success)
+                           {
+                               Logger.Info("Finished pushing data");
+                           }
+                           else
+                           {
+                               Logger.Error("Unable to push data. Server returned error. Please check server logs.");
+                           }
                         });
                     }
                 }

@@ -88,7 +88,8 @@
 
                 <views:Login Grid.Row="0" Grid.Column="0"
                     x:Name="LoginTarget"
-                    JsonIsAvailable="False" />
+                    ServerTypes="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dxlc:LayoutGroup}},
+                                                        Path=DataContext.SyncerTargetServerTypes}" />
             </Grid>
         </StackPanel>
     </GroupBox>
