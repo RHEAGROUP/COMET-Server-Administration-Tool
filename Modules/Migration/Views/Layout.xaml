@@ -106,7 +106,7 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Row="0" Grid.Column="0">
-                    <common:Login x:Name="LoginTarget" JsonIsAvailable="False" />
+                    <common:Login x:Name="LoginTarget" OnlyCdp4IsAvailable="True" />
                 </StackPanel>
                 <StackPanel Grid.Row="0" Grid.Column="1">
                     <views:ServerInfo

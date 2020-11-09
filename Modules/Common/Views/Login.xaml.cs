@@ -42,7 +42,16 @@ namespace Common.Views
             "JsonIsAvailable",
             typeof(bool),
             typeof(Login),
-            new PropertyMetadata(true, new PropertyChangedCallback(OnSetJsonIsAvailableChanged)));
+            new PropertyMetadata(true, new PropertyChangedCallback(OnDataSourceAvailabilityChanged)));
+
+        /// <summary>
+        /// <see cref="DependencyProperty"/> that can be set in XAML to indicate that the OnlyCdp4IsAvailable is available
+        /// </summary>
+        public static readonly DependencyProperty OnlyCdp4IsAvailableProperty = DependencyProperty.RegisterAttached(
+            "OnlyCdp4IsAvailable",
+            typeof(bool),
+            typeof(Login),
+            new PropertyMetadata(false, new PropertyChangedCallback(OnDataSourceAvailabilityChanged)));
 
         /// <summary>
         /// Gets or sets the <see cref="JsonIsAvailableProperty"/> dependency property.
@@ -52,6 +61,16 @@ namespace Common.Views
             get => (bool)this.GetValue(JsonIsAvailableProperty);
 
             set => this.SetValue(JsonIsAvailableProperty, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="OnlyCdp4IsAvailableProperty"/> dependency property.
+        /// </summary>
+        public bool OnlyCdp4IsAvailable
+        {
+            get => (bool)this.GetValue(OnlyCdp4IsAvailableProperty);
+
+            set => this.SetValue(OnlyCdp4IsAvailableProperty, value);
         }
 
         /// <summary>
@@ -67,20 +86,38 @@ namespace Common.Views
         /// </summary>
         /// <param name="d">The dependency object user control <see cref="DependencyObject" /></param>
         /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
-        private static void OnSetJsonIsAvailableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnDataSourceAvailabilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            (d as Login)?.OnSetTextChanged(e);
+            (d as Login)?.DataSourceAvailabilityChanged(e);
         }
 
         /// <summary>
         /// Instance handler which will handle any changes that occur to a particular instance.
         /// </summary>
         /// <param name="e">The dependency object changed event args <see cref="DependencyPropertyChangedEventArgs"/></param>
-        private void OnSetTextChanged(DependencyPropertyChangedEventArgs e)
+        private void DataSourceAvailabilityChanged(DependencyPropertyChangedEventArgs e)
         {
-            if ((bool) e.NewValue) return;
+            var newValue = (bool) e.NewValue;
 
-            this.ServerType.ItemsSource = LoginViewModel.ServerTypes.Where(item => item.Key != ViewModels.DataSource.JSON);
+            switch (e.Property.Name)
+            {
+                case "JsonIsAvailable":
+                    if (!newValue)
+                    {
+                        this.ServerType.ItemsSource =
+                            LoginViewModel.ServerTypes.Where(item => item.Key != ViewModels.DataSource.JSON);
+                    }
+
+                    break;
+                case "OnlyCdp4IsAvailable":
+                    if (newValue)
+                    {
+                        this.ServerType.ItemsSource =
+                            LoginViewModel.ServerTypes.Where(item => item.Key == ViewModels.DataSource.CDP4);
+                    }
+                    break;
+            }
+
             this.BrowseJson.Visibility = Visibility.Hidden;
         }
     }
