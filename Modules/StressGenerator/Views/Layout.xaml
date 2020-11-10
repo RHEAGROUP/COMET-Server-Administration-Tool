@@ -5,9 +5,151 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+    xmlns:common="clr-namespace:Common.Views;assembly=Common"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     Header="Stress Generator"
     Orientation="Vertical"
     mc:Ignorable="d"
     VerticalAlignment="Stretch"
     HorizontalAlignment="Stretch">
+    <GroupBox Header="Connection" Margin="0" Height="320">
+        <Grid HorizontalAlignment="Left">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <common:Login HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" />
+            <dxlc:LayoutItemLabel
+                Grid.Row="1"
+                Grid.Column="0"
+                Height="Auto"
+                Margin="5"
+                FontSize="12"
+                Content="Model" />
+            <ComboBox
+                Grid.Row="1"
+                Grid.Column="1"
+                FontSize="12"
+                Margin="5" />
+            <CheckBox
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                IsChecked="{Binding Path=DeleteAllElements}"
+                Margin="5"
+                Content="Delete all elements" />
+        </Grid>
+    </GroupBox>
+    <GroupBox Header="Parameters" HorizontalAlignment="Stretch" Height="230">
+        <Grid HorizontalAlignment="Left">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Time interval -->
+            <dxlc:LayoutItemLabel
+                Grid.Row="0"
+                Grid.Column="0"
+                Height="Auto"
+                Margin="5"
+                FontSize="12"
+                Content="Time interval" />
+            <dxe:TextEdit
+                Grid.Row="0"
+                Grid.Column="1"
+                Height="Auto"
+                Margin="5"
+                FontSize="12"
+                Width="250" />
+
+            <!-- Test objects number -->
+            <dxlc:LayoutItemLabel
+                Grid.Row="1"
+                Grid.Column="0"
+                Height="Auto"
+                Margin="5"
+                FontSize="12"
+                Content="Test objects number" />
+            <dxe:TextEdit
+                Grid.Row="1"
+                Grid.Column="1"
+                Height="Auto"
+                Margin="5"
+                FontSize="12"
+                Width="250" />
+
+            <!-- Element name -->
+            <dxlc:LayoutItemLabel
+                Grid.Row="2"
+                Grid.Column="0"
+                Height="Auto"
+                Margin="5"
+                FontSize="12"
+                Content="Element name" />
+            <dxe:TextEdit
+                Grid.Row="2"
+                Grid.Column="1"
+                Height="Auto"
+                Margin="5"
+                FontSize="12"
+                Width="250" />
+
+            <!-- Element short name -->
+            <TextBlock
+                Margin="5"
+                Grid.Row="3"
+                Grid.Column="0"
+                TextWrapping="WrapWithOverflow">
+                Element short name
+            </TextBlock>
+            <dxe:TextEdit
+                Grid.Row="3"
+                Grid.Column="1"
+                Height="Auto"
+                Margin="5"
+                FontSize="12"
+                MaxHeight="22"
+                Width="250" />
+        </Grid>
+    </GroupBox>
+    <StackPanel Margin="0" HorizontalAlignment="Left" MaxHeight="30">
+        <Button
+            MinWidth="100"
+            IsEnabled="{Binding Path=CanStart}"
+            Command="{Binding Path=StartCommand}"
+            Height="Auto"
+            MaxWidth="100"
+            Margin="0 5 0 5"
+            FontSize="12">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="{dx:DXImage Image=Export_16x16.png}" Stretch="Uniform" />
+                <TextBlock Text="Start" VerticalAlignment="Center" Margin="5 0 0 0" />
+            </StackPanel>
+        </Button>
+    </StackPanel>
+    <GroupBox Header="Output" HorizontalAlignment="Stretch">
+        <dxe:TextEdit
+            VerticalAlignment="Stretch"
+            FontSize="12"
+            TextWrapping="Wrap"
+            AcceptsReturn="True"
+            VerticalContentAlignment="Top"
+            VerticalScrollBarVisibility="Visible"
+            IsReadOnly="True"
+            Text="{Binding Path=Output, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+    </GroupBox>
 </dxlc:LayoutGroup>
