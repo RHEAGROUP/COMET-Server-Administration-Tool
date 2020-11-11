@@ -34,12 +34,18 @@ namespace StressGenerator.ViewModels
     using CDP4Dal;
     using Common.ViewModels;
     using ReactiveUI;
+    using Utils;
 
     /// <summary>
     /// The view-model for the StressGenerator tool
     /// </summary>
     public class StressGeneratorViewModel : ReactiveObject
     {
+        /// <summary>
+        /// The <see cref="StressGeneratorManager"/> used to build the helper sync classes
+        /// </summary>
+        private readonly StressGeneratorManager stressGenerator = StressGeneratorManager.GetInstance();
+
         /// <summary>
         /// Backing field for the source view model <see cref="LoginViewModel"/>
         /// </summary>
@@ -243,6 +249,8 @@ namespace StressGenerator.ViewModels
         /// </returns>
         private async Task ExecuteStressCommand()
         {
+            this.stressGenerator.Init(new StressGeneratorConfiguration(this.SourceViewModel.ServerSession, this.TimeInterval, this.TestObjectsNumber, this.ElementName, this.ElementShortName, this.DeleteAllElements));
+            await this.stressGenerator.GenerateTestObjects(this.SelectedEngineeringModelSetup);
         }
 
         /// <summary>
