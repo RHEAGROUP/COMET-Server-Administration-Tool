@@ -12,6 +12,7 @@ environment:
   # https://github.com/RHEAGROUP/DEHP-Common/wiki/Build-And-Release#modifying-the-github-token
   GITHUB_TOKEN:
     secure: uS7/WlBplrAs/j9ab9P3SUN7GZyf4QAHZX//YpDOzXG/DZ6o1MGHdIWLHHdDYM5P
+  GITHUB_MAIN_BRANCH: development
   matrix:
     - TAG_SCENARIO: true
     - TAG_SCENARIO: false
@@ -36,7 +37,7 @@ for:
     build_script:
       - cmd: msbuild CDP4-SAT.sln -p:Configuration=Release /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
     after_build:
-      - cmd: 7z a CDP4-SAT-%APPVEYOR_REPO_TAG_NAME%.zip %APPVEYOR_BUILD_FOLDER%\CDP4-SAT\bin\Release\net472\*
+      - cmd: 7z a CDP4-SAT-%APPVEYOR_REPO_TAG_NAME%.zip %APPVEYOR_BUILD_FOLDER%\CDP4-SAT\bin\Release\net452\*
 
     artifacts:
       - path: CDP4-SAT-%APPVEYOR_REPO_TAG_NAME%.zip
@@ -68,8 +69,8 @@ for:
       - ps: >-
           if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
             Write-Host Sonar Scanning PR# $env:APPVEYOR_PULL_REQUEST_NUMBER
-            SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.pullrequest.key=$env:APPVEYOR_PULL_REQUEST_NUMBER /d:sonar.pullrequest.provider=GitHub /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME /d:sonar.pullrequest.base=development
-          } elseif ($env:APPVEYOR_REPO_BRANCH -eq "development") {
+            SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.pullrequest.key=$env:APPVEYOR_PULL_REQUEST_NUMBER /d:sonar.pullrequest.provider=GitHub /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME /d:sonar.pullrequest.base=$env:GITHUB_MAIN_BRANCH
+          } elseif ($env:APPVEYOR_REPO_BRANCH -eq $env:GITHUB_MAIN_BRANCH) {
             Write-Host Sonar Scanning branch $env:APPVEYOR_REPO_BRANCH
             SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.branch.name=$env:APPVEYOR_REPO_BRANCH /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
           } else {
@@ -92,7 +93,7 @@ for:
         -excludebyattribute:*.ExcludeFromCodeCoverageAttribute
     after_test:
       - ps: >-
-          if ($env:APPVEYOR_PULL_REQUEST_NUMBER -Or $env:APPVEYOR_REPO_BRANCH -eq "development") {
+          if ($env:APPVEYOR_PULL_REQUEST_NUMBER -Or $env:APPVEYOR_REPO_BRANCH -eq $env:GITHUB_MAIN_BRANCH) {
             SonarScanner.MSBuild.exe end /d:"sonar.login=$env:SONARCLOUD_TOKEN"
           }
 
