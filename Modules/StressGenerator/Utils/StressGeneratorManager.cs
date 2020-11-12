@@ -23,8 +23,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using CDP4Common.Types;
-
 namespace StressGenerator.Utils
 {
     using System;
@@ -36,6 +34,7 @@ namespace StressGenerator.Utils
     using System.Threading.Tasks;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Dal.Operations;
     using NLog;
     using ViewModels;
@@ -45,8 +44,6 @@ namespace StressGenerator.Utils
     /// </summary>
     internal class StressGeneratorManager
     {
-        private const string GenericRdlShortName = "Generic_RDL";
-
         /// <summary>
         /// The NLog logger
         /// </summary>
@@ -94,50 +91,63 @@ namespace StressGenerator.Utils
         {
             if (this.configuration == null)
             {
-                Logger.Error("Stree generator configuration is not initialised.");
+                Logger.Error("Stress generator configuration is not initialised.");
                 return;
             }
 
-            var activeDomains = engineeringModelSetup.ActiveDomain.ToList();
-            var siteDirectory = this.configuration.Session.RetrieveSiteDirectory();
+            var session = this.configuration.Session;
+            var siteDirectory = session.RetrieveSiteDirectory();
 
             if (siteDirectory == null)
             {
-                await this.configuration.Session.Open();
-                this.configuration.Session.RetrieveSiteDirectory();
+                await session.Open();
+                session.RetrieveSiteDirectory();
             }
 
             var lastIteration = await this.OpenLastIterationOfEngineeringModel(engineeringModelSetup);
 
             if (lastIteration is null)
             {
-                Logger.Error($"Invalid iteration. Engineering model {engineeringModelSetup.ShortName} must contain at least one iteration");
+                Logger.Error(
+                    $"Invalid iteration. Engineering model {engineeringModelSetup.ShortName} must contain at least one active iteration");
                 return;
             }
 
-            var cloneLastIteration = lastIteration.Clone(true);
-
-            if (!this.CheckIfIterationReferencesGenericRdl(cloneLastIteration))
+            if (!this.CheckIfIterationReferencesGenericRdl(lastIteration))
             {
-                Logger.Error($"Invalid RDL chain. Engineering model {engineeringModelSetup.ShortName} must reference Site RDL \"{GenericRdlShortName}\".");
+                Logger.Error(
+                    $"Invalid RDL chain. Engineering model {engineeringModelSetup.ShortName} must reference Site RDL \"{StressGeneratorConfiguration.GenericRdlShortName}\".");
                 return;
             }
 
-            await this.DeleteAllElementsIfRequested(cloneLastIteration);
+            Iteration clonedLastIteration = null;
 
-            var start = this.FindHighestNumberOnElementDefinitions(cloneLastIteration) + 1;
+            if (this.configuration.DeleteAllElements)
+            {
+                clonedLastIteration = lastIteration.Clone(true);
+                clonedLastIteration.Element.Clear();
+            }
+
+            var start = this.FindHighestNumberOnElementDefinitions(lastIteration) + 1;
+            var activeDomains = engineeringModelSetup.ActiveDomain.ToList();
 
             for (var number = start; number < start + this.configuration.TestObjectsNumber; number++)
             {
+                lastIteration =
+                    session.OpenIterations.Keys.FirstOrDefault(it =>
+                        lastIteration != null && it.Iid == lastIteration.Iid);
+                clonedLastIteration = lastIteration?.Clone(true);
+
                 var elementOwner = activeDomains[number % activeDomains.Count];
                 var parameterOwner = activeDomains[(number + 1) % activeDomains.Count];
 
-                await this.GenerateElementDefinition(lastIteration, cloneLastIteration, elementOwner, parameterOwner, number);
+                await this.GenerateElementDefinition(lastIteration, clonedLastIteration, elementOwner, parameterOwner,
+                    number);
 
                 Thread.Sleep(this.configuration.TimeInterval);
             }
 
-            await this.configuration.Session.Close();
+            await session.Close();
         }
 
         /// <summary>
@@ -151,14 +161,17 @@ namespace StressGenerator.Utils
         /// </returns>
         private async Task<Iteration> OpenLastIterationOfEngineeringModel(EngineeringModelSetup modelSetup)
         {
+            var session = this.configuration.Session;
+
             var model = new EngineeringModel(
                 modelSetup.EngineeringModelIid,
-                this.configuration.Session.Assembler.Cache,
-                this.configuration.Session.Credentials.Uri)
+                session.Assembler.Cache,
+                session.Credentials.Uri)
             {
                 EngineeringModelSetup = modelSetup
             };
-            var lastIterationSetup = modelSetup.IterationSetup.OrderBy(iterationSetups => iterationSetups.IterationNumber)
+            var lastIterationSetup = modelSetup.IterationSetup
+                .OrderBy(iterationSetups => iterationSetups.IterationNumber)
                 .LastOrDefault(iterationSetup => !iterationSetup.IsDeleted);
 
             if (lastIterationSetup is null)
@@ -168,70 +181,43 @@ namespace StressGenerator.Utils
 
             var lastIteration = new Iteration(
                 lastIterationSetup.IterationIid,
-                this.configuration.Session.Assembler.Cache,
-                this.configuration.Session.Credentials.Uri);
+                session.Assembler.Cache,
+                session.Credentials.Uri);
 
             model.Iteration.Add(lastIteration);
 
             try
             {
-                await Task.Run(async () => { await this.configuration.Session.Read(lastIteration, this.configuration.Session.ActivePerson.DefaultDomain); });
+                await session.Read(lastIteration, session.ActivePerson.DefaultDomain);
 
-                Logger.Info($"Engineering Model {model.EngineeringModelSetup.ShortName} Iteration {lastIterationSetup.IterationNumber} \"{lastIterationSetup.Description}\" created on {lastIterationSetup.CreatedOn} was successfully loaded");
+                Logger.Info(
+                    $"Engineering Model {model.EngineeringModelSetup.ShortName} Iteration {lastIterationSetup.IterationNumber} \"{lastIterationSetup.Description}\" created on {lastIterationSetup.CreatedOn} was successfully loaded");
             }
             catch (Exception ex)
             {
-                Logger.Error($"Engineering Model {model.EngineeringModelSetup.ShortName} Iteration cannot be created. Exception: {ex.Message}");
                 lastIteration = null;
+                Logger.Error(
+                    $"Engineering Model {model.EngineeringModelSetup.ShortName} Iteration cannot be created. Exception: {ex.Message}");
             }
 
             return lastIteration;
         }
 
         /// <summary>
-        /// Delete all existing element definitions from the iteration, if requested
-        /// </summary>
-        /// <param name="iteration">Last iteration from the model <see cref="Iteration" /></param>
-        /// <returns></returns>
-        private async Task DeleteAllElementsIfRequested(Iteration iteration)
-        {
-            if (!this.configuration.DeleteAllElements)
-            {
-                return;
-            }
-
-            try
-            {
-                var transactionContext = TransactionContextResolver.ResolveContext(iteration);
-                var containerTransaction = new ThingTransaction(transactionContext, iteration);
-
-                iteration.Element.Clear();
-
-                await Task.Run(async () => { await this.configuration.Session.Write(containerTransaction.FinalizeTransaction()); });
-                Logger.Info(
-                    $"Deleted all existing Element Definitions from model \"{(iteration.IterationSetup.Container as EngineeringModelSetup)?.ShortName}\"");
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(
-                    $"Exception occurs when deleting existing Element Definitions. Exception: {ex.Message}");
-            }
-        }
-
-        /// <summary>
         /// Check that the engineering model references the Generic RDL
         /// </summary>
-        /// <param name="iteration">Last iteration from the model <see cref="Iteration" /></param>
+        /// <param name="iteration">Last originalIteration from the model <see cref="Iteration" /></param>
         /// <returns></returns>
         private bool CheckIfIterationReferencesGenericRdl(Iteration iteration)
         {
             var referencesGenericRdl = false;
-            var modelRdl = (iteration.Container as EngineeringModel)?.EngineeringModelSetup.RequiredRdl.FirstOrDefault();
+            var modelRdl = (iteration.Container as EngineeringModel)?.EngineeringModelSetup.RequiredRdl
+                .FirstOrDefault();
             var chainedRdl = modelRdl?.RequiredRdl;
 
             while (chainedRdl != null)
             {
-                if (chainedRdl.ShortName == GenericRdlShortName)
+                if (chainedRdl.ShortName == StressGeneratorConfiguration.GenericRdlShortName)
                 {
                     referencesGenericRdl = true;
                     break;
@@ -246,7 +232,7 @@ namespace StressGenerator.Utils
         /// <summary>
         /// Find highest number in the name or short name of the element definitions.
         /// </summary>
-        /// <param name="iteration">The iteration <see cref="Iteration"/></param>
+        /// <param name="iteration">The originalIteration <see cref="Iteration"/></param>
         /// <returns>
         /// The highest number that was found, or zero if no matching element definitions were found.
         /// </returns>
@@ -279,42 +265,55 @@ namespace StressGenerator.Utils
         /// <summary>
         /// Generate an <see cref="ElementDefinition"/> with given <see cref="StressGeneratorConfiguration"/>
         /// </summary>
-        /// <param name="iteration">The original iteration <see cref="Iteration" /></param>
-        /// <param name="cloneIteration">The clone of the original iteration <see cref="Iteration" /></param>
+        /// <param name="originalIteration">The original originalIteration <see cref="Iteration" /></param>
+        /// <param name="clonedIteration">The clone of the original originalIteration <see cref="Iteration" /></param>
         /// <param name="elementOwner">The element owner <see cref="DomainOfExpertise"/></param>
         /// <param name="lastParameterOwner">The parameter owner <see cref="DomainOfExpertise"/> for the last parameter</param>
         /// <param name="objectNumber">The object number</param>
-        private async Task GenerateElementDefinition(Iteration iteration, Iteration cloneIteration, DomainOfExpertise elementOwner,
+        private async Task GenerateElementDefinition(Iteration originalIteration, Iteration clonedIteration,
+            DomainOfExpertise elementOwner,
             DomainOfExpertise lastParameterOwner, int objectNumber)
         {
-            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.configuration.Session.Assembler.Cache, new Uri(this.configuration.Session.DataSourceUri))
-                {
-                    Name = $"{this.configuration.ElementName} #{objectNumber:D3}",
-                    ShortName = $"{this.configuration.ElementShortName} #{objectNumber:D3}",
-                    Container = iteration,
-                    Owner = elementOwner
-                };
+            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.configuration.Session.Assembler.Cache,
+                new Uri(this.configuration.Session.DataSourceUri))
+            {
+                Name = $"{this.configuration.ElementName} #{objectNumber:D3}",
+                ShortName = $"{this.configuration.ElementShortName} #{objectNumber:D3}",
+                Container = clonedIteration,
+                Owner = elementOwner
+            };
 
-            var parameters =  this.GenerateParameters(elementOwner, lastParameterOwner, objectNumber);
+            var parameters = this.GenerateParameters(elementOwner, lastParameterOwner, objectNumber);
 
             if (parameters != null)
             {
                 elementDefinition.Parameter.AddRange(parameters);
             }
 
+            clonedIteration.Element.Add(elementDefinition);
+
             try
             {
-                var transactionContext = TransactionContextResolver.ResolveContext(iteration);
+                var transactionContext = TransactionContextResolver.ResolveContext(originalIteration);
                 var operationContainer = new OperationContainer(transactionContext.ContextRoute());
-                operationContainer.AddOperation(new Operation(iteration.ToDto(), cloneIteration.ToDto(), OperationKind.Update));
+                operationContainer.AddOperation(new Operation(originalIteration.ToDto(), clonedIteration.ToDto(),
+                    OperationKind.Update));
+
+                foreach (var newThing in elementDefinition.QueryContainedThingsDeep())
+                {
+                    operationContainer.AddOperation(new Operation(null, newThing.ToDto(),
+                        OperationKind.Create));
+                }
 
                 await this.configuration.Session.Dal.Write(operationContainer);
 
-                Logger.Info($"Generated Element Definition \"{elementDefinition.Name} ({elementDefinition.ShortName})\" owned by {elementOwner.ShortName}");
+                Logger.Info(
+                    $"Generated Element Definition \"{elementDefinition.Name} ({elementDefinition.ShortName})\" owned by {elementOwner.ShortName}");
             }
             catch (Exception ex)
             {
-                Logger.Error($"Cannot generate Element Definition \"{elementDefinition.Name} ({elementDefinition.ShortName})\" owned by {elementOwner.ShortName}. Exception: {ex.Message}");
+                Logger.Error(
+                    $"Cannot generate Element Definition \"{elementDefinition.Name} ({elementDefinition.ShortName})\" owned by {elementOwner.ShortName}. Exception: {ex.Message}");
             }
         }
 
@@ -325,20 +324,24 @@ namespace StressGenerator.Utils
         /// <param name="lastParameterOwner">The parameter owner <see cref="DomainOfExpertise"/> for the last parameter</param>
         /// <param name="objectNumber">The object number</param>
         /// <returns>The generated parameters list</returns>
-        private List<Parameter> GenerateParameters(DomainOfExpertise elementOwner, DomainOfExpertise lastParameterOwner, int objectNumber) {
+        private List<Parameter> GenerateParameters(DomainOfExpertise elementOwner, DomainOfExpertise lastParameterOwner,
+            int objectNumber)
+        {
             var parameterCount = 0;
             var switchAlternator = true;
             var configList = new List<Tuple<ParameterType, double>>();
             var parametersList = new List<Parameter>();
+            var session = this.configuration.Session;
 
-            var siteReferenceDataLibraries = this.configuration.Session.OpenReferenceDataLibraries.OfType<SiteReferenceDataLibrary>();
+            var siteReferenceDataLibraries = session.OpenReferenceDataLibraries.OfType<SiteReferenceDataLibrary>();
             var parameterTypes = siteReferenceDataLibraries.FirstOrDefault()?.ParameterType.ToList();
 
             if (parameterTypes == null) return parametersList;
 
             foreach (var keyValue in this.configuration.ParamValueConfig)
             {
-                configList.Add(new Tuple<ParameterType, double>(parameterTypes.Single(x => x.ShortName == keyValue.Key), keyValue.Value));
+                configList.Add(new Tuple<ParameterType, double>(parameterTypes.Single(x => x.ShortName == keyValue.Key),
+                    keyValue.Value));
             }
 
             foreach (var config in configList)
@@ -346,25 +349,23 @@ namespace StressGenerator.Utils
                 var (paramType, paramValue) = config;
                 var parameterValue = (paramValue + objectNumber - 1).ToString(CultureInfo.InvariantCulture);
 
-                var parameter = new Parameter(Guid.NewGuid(), this.configuration.Session.Assembler.Cache, new Uri(this.configuration.Session.DataSourceUri))
+                var parameter = new Parameter(Guid.NewGuid(), session.Assembler.Cache,
+                    new Uri(session.DataSourceUri))
                 {
                     ParameterType = paramType as QuantityKind,
                     Scale = (paramType as QuantityKind)?.DefaultScale,
                     Owner = parameterCount == configList.Count - 1 ? lastParameterOwner : elementOwner
                 };
 
-                var parameterValueSet = new ParameterValueSet();
-                if (switchAlternator)
+                var parameterValueSet = new ParameterValueSet
                 {
-                    parameterValueSet.ValueSwitch = ParameterSwitchKind.MANUAL;
-                    parameterValueSet.Manual = new ValueArray<string>(new List<string> { parameterValue });
-                }
-                else
-                {
-                    parameterValueSet.ValueSwitch = ParameterSwitchKind.COMPUTED;
-                    parameterValueSet.Formula = new ValueArray<string>(new List<string> { "=" + parameterValue });
-                    parameterValueSet.Computed = new ValueArray<string>(new List<string> { parameterValue });
-                }
+                    ValueSwitch = switchAlternator ? ParameterSwitchKind.MANUAL : ParameterSwitchKind.COMPUTED,
+                    Manual = new ValueArray<string>(new List<string> {parameterValue}),
+                    Computed = new ValueArray<string>(new List<string> {parameterValue}),
+                    Reference = new ValueArray<string>(new List<string> {parameterValue}),
+                    Formula = new ValueArray<string>(new List<string> {"=" + parameterValue}),
+                    Published = new ValueArray<string>(new List<string> {parameterValue})
+                };
 
                 parameter.ValueSet.Add(parameterValueSet);
 

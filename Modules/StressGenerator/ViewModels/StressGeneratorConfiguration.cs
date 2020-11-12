@@ -34,9 +34,24 @@ namespace StressGenerator.ViewModels
     internal class StressGeneratorConfiguration
     {
         /// <summary>
+        /// Generic RDL short name
+        /// </summary>
+        public const string GenericRdlShortName = "Generic_RDL";
+
+        /// <summary>
+        /// Minimum time interval in seconds for test data generation
+        /// </summary>
+        public const int MinTimeInterval = 5;
+
+        /// <summary>
+        /// Minimum number of test objects
+        /// </summary>
+        public const int MinNumberOfTestObjects = 50;
+
+        /// <summary>
         /// Maximum number of test objects
         /// </summary>
-        private const int MaximumNumberOfTestObjects = 500;
+        public const int MaxNumberOfTestObjects = 500;
 
         /// <summary>
         /// Parameters values configuration
@@ -83,20 +98,22 @@ namespace StressGenerator.ViewModels
         /// Initialize a new instance of <see cref="StressGeneratorConfiguration" />
         /// </summary>
         /// <param name="session"></param>
-        /// <param name="timeInterval"></param>
+        /// <param name="timeInterval">Gets or sets the time interval in seconds for test data generation</param>
         /// <param name="testObjectsNumber"></param>
         /// <param name="elementName"></param>
         /// <param name="elementShortName"></param>
         /// <param name="deleteAllElements"></param>
-        public StressGeneratorConfiguration(ISession session, int timeInterval, int testObjectsNumber, string elementName, string elementShortName, bool deleteAllElements)
+        public StressGeneratorConfiguration(ISession session, int timeInterval, int testObjectsNumber,
+            string elementName, string elementShortName, bool deleteAllElements)
         {
             this.Session = session;
             this.TimeInterval = timeInterval * 1000;
             this.TestObjectsNumber = testObjectsNumber;
-            if (this.TestObjectsNumber <= 0 || this.TestObjectsNumber > MaximumNumberOfTestObjects)
+            if (this.TestObjectsNumber <= 0 || this.TestObjectsNumber > MaxNumberOfTestObjects)
             {
-                this.TestObjectsNumber = MaximumNumberOfTestObjects;
+                this.TestObjectsNumber = MaxNumberOfTestObjects;
             }
+
             this.ElementName = elementName.Trim();
             this.ElementShortName = elementShortName.Trim().Replace(" ", "_");
             this.DeleteAllElements = deleteAllElements;
