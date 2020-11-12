@@ -5,9 +5,184 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+    xmlns:common="clr-namespace:Common.Views;assembly=Common"
+    xmlns:viewModels="clr-namespace:StressGenerator.ViewModels"
+    xmlns:behaviors="clr-namespace:StressGenerator.Behaviors"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     Header="Stress Generator"
     Orientation="Vertical"
     mc:Ignorable="d"
     VerticalAlignment="Stretch"
     HorizontalAlignment="Stretch">
+
+    <dxlc:LayoutGroup.DataContext>
+        <viewModels:StressGeneratorViewModel />
+    </dxlc:LayoutGroup.DataContext>
+
+    <GroupBox Header="Connection" Margin="0" Height="320">
+        <Grid HorizontalAlignment="Left">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <common:Login
+                HorizontalAlignment="Stretch"
+                Grid.Row="0"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                x:Name="LoginSource"
+                ServerTypes="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dxlc:LayoutGroup}},
+                                                        Path=DataContext.StressGeneratorTargetServerTypes}" />
+            <dxlc:LayoutItemLabel
+                Grid.Row="1"
+                Grid.Column="0"
+                Height="Auto"
+                Margin="5"
+                FontSize="12"
+                Content="Model" />
+            <ComboBox
+                ItemsSource="{Binding Path=EngineeringModelSetupList, Mode=OneTime }"
+                SelectedValue="{Binding Path=SelectedEngineeringModelSetup, Mode=TwoWay}"
+                Grid.Row="1"
+                Grid.Column="1"
+                FontSize="12"
+                Margin="5">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <CheckBox
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                IsChecked="{Binding Path=DeleteAllElements}"
+                Margin="5"
+                Content="Delete all elements" />
+        </Grid>
+    </GroupBox>
+    <GroupBox Header="Parameters" HorizontalAlignment="Stretch" Height="230">
+        <Grid HorizontalAlignment="Left">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Time interval -->
+            <dxlc:LayoutItemLabel
+                Grid.Row="0"
+                Grid.Column="0"
+                Height="Auto"
+                Margin="5"
+                FontSize="12"
+                Content="Time interval" />
+            <dxe:TextEdit
+                Text="{Binding Path=TimeInterval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Mask="\d+" MaskType="RegEx" MaskUseAsDisplayFormat="True"
+                Grid.Row="0"
+                Grid.Column="1"
+                Height="Auto"
+                Margin="5"
+                FontSize="12"
+                Width="250" />
+
+            <!-- Test objects number -->
+            <dxlc:LayoutItemLabel
+                Grid.Row="1"
+                Grid.Column="0"
+                Height="Auto"
+                Margin="5"
+                FontSize="12"
+                Content="Test objects number" />
+            <dxe:TextEdit
+                Mask="\d+" MaskType="RegEx" MaskUseAsDisplayFormat="True"
+                Text="{Binding Path=TestObjectsNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Grid.Row="1"
+                Grid.Column="1"
+                Height="Auto"
+                Margin="5"
+                FontSize="12"
+                Width="250" />
+
+            <!-- Element name -->
+            <dxlc:LayoutItemLabel
+                Grid.Row="2"
+                Grid.Column="0"
+                Height="Auto"
+                Margin="5"
+                FontSize="12"
+                Content="Element name" />
+            <dxe:TextEdit
+                Text="{Binding Path=ElementName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Grid.Row="2"
+                Grid.Column="1"
+                Height="Auto"
+                Margin="5"
+                FontSize="12"
+                Width="250" />
+
+            <!-- Element short name -->
+            <TextBlock
+                Margin="5"
+                Grid.Row="3"
+                Grid.Column="0"
+                TextWrapping="WrapWithOverflow">
+                Element short name
+            </TextBlock>
+            <dxe:TextEdit
+                Text="{Binding Path=ElementShortName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Grid.Row="3"
+                Grid.Column="1"
+                Height="Auto"
+                Margin="5"
+                FontSize="12"
+                MaxHeight="22"
+                Width="250" />
+        </Grid>
+    </GroupBox>
+    <StackPanel Margin="0" HorizontalAlignment="Left" MaxHeight="30">
+        <Button
+            MinWidth="100"
+            IsEnabled="{Binding Path=CanStress}"
+            Command="{Binding Path=StressCommand}"
+            Height="Auto"
+            MaxWidth="100"
+            Margin="0 5 0 5"
+            FontSize="12">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="{dx:DXImage Image=Export_16x16.png}" Stretch="Uniform" />
+                <TextBlock Text="Start" VerticalAlignment="Center" Margin="5 0 0 0" />
+            </StackPanel>
+        </Button>
+    </StackPanel>
+    <GroupBox Header="Output" HorizontalAlignment="Stretch">
+        <dxe:TextEdit
+            VerticalAlignment="Stretch"
+            FontSize="12"
+            TextWrapping="Wrap"
+            AcceptsReturn="True"
+            VerticalContentAlignment="Top"
+            VerticalScrollBarVisibility="Visible"
+            IsReadOnly="True"
+            Text="{Binding Path=Output, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+    </GroupBox>
+
+    <dxmvvm:Interaction.Behaviors>
+        <behaviors:StressGeneratorBehavior />
+    </dxmvvm:Interaction.Behaviors>
 </dxlc:LayoutGroup>
