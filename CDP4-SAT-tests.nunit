@@ -1,0 +1,9 @@
+<NUnitProject>
+  <Settings activeconfig="Debug" processModel="Default" domainUsage="Default" />
+  <Config name="Debug">
+    <assembly path="Migration.Tests/bin/Debug/net452/App.Tests.dll" />
+  </Config>
+  <Config name="Release">
+    <assembly path="Migration.Tests/bin/Debug/net452/App.Tests.dll" />
+  </Config>
+</NUnitProject>

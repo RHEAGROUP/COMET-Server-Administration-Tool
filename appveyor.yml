@@ -1,21 +1,21 @@
 image: Visual Studio 2019
 environment:
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  TEST_RESULT: 'TestResult.xml'
+  TEST_COVERAGE: 'CoverResults.xml'
+  SONARCLOUD_PROJECT_KEY: RHEAGROUP_CDP4-SAT
+  SONARCLOUD_ORGANIZATION: rheagroup
+  SONARCLOUD_URL: 'https://sonarcloud.io'
+  SONARCLOUD_TOKEN:
+    secure: th/5nKHJ0jW1sM3a0bs0cohRLIeMAx4Y5Do/al3L11XbWHOgoCdNYrNBQmSo9tFs
+  # To be changed in the future since this token belongs to a personal account.
+  # https://github.com/RHEAGROUP/DEHP-Common/wiki/Build-And-Release#modifying-the-github-token
+  GITHUB_TOKEN:
+    secure: uS7/WlBplrAs/j9ab9P3SUN7GZyf4QAHZX//YpDOzXG/DZ6o1MGHdIWLHHdDYM5P
   matrix:
     - TAG_SCENARIO: true
-    - DOTNET_CLI_TELEMETRY_OPTOUT: true
-      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
-      TEST_RESULT:    'TestResult.xml'
-      TEST_COVERAGE:  'CoverResults.xml'
-      SONARCLOUD_PROJECT_KEY: RHEAGROUP_CDP4-SAT
-      SONARCLOUD_ORGANIZATION: rheagroup
-      SONARCLOUD_URL: 'https://sonarcloud.io'
-      SONARCLOUD_TOKEN:
-        secure: th/5nKHJ0jW1sM3a0bs0cohRLIeMAx4Y5Do/al3L11XbWHOgoCdNYrNBQmSo9tFs
-      # To be changed in the future since this token belongs to a personal account.
-      # https://github.com/RHEAGROUP/DEHP-Common/wiki/Build-And-Release#modifying-the-github-token
-      GITHUB_TOKEN:
-        secure: uS7/WlBplrAs/j9ab9P3SUN7GZyf4QAHZX//YpDOzXG/DZ6o1MGHdIWLHHdDYM5P
-      TAG_SCENARIO: false
+    - TAG_SCENARIO: false
 
 skip_branch_with_pr: true
 
