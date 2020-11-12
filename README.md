@@ -6,7 +6,12 @@ The Concurrent Design Platform Server Administration Tool is compliant with ECSS
 
 AppVeyor is used to build and test the CDP4-SAT
 
-TBD
+
+Branch | Build Status
+------- | :------------
+Development |  [![Build Status](https://ci.appveyor.com/api/projects/status/vrivbuoe4lcve4j9/branch/development?svg=true)](https://ci.appveyor.com/api/projects/status/vrivbuoe4lcve4j9)
+
+[![Build history](https://buildstats.info/appveyor/chart/rheagroup/dehp-ecosimpro)](https://ci.appveyor.com/project/rheagroup/dehp-ecosimpro/history)
 
 ## SonarQube Status:
 

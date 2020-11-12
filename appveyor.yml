@@ -66,16 +66,16 @@ for:
       - cmd: set "JAVA_HOME=C:\Program Files\Java\jdk11"
       - cmd: set "PATH=C:\Program Files\Java\jdk11\bin;%PATH%"
       - cmd: java -version
-      - ps: >-
-          if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
-            Write-Host Sonar Scanning PR# $env:APPVEYOR_PULL_REQUEST_NUMBER
-            SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.pullrequest.key=$env:APPVEYOR_PULL_REQUEST_NUMBER /d:sonar.pullrequest.provider=GitHub /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME /d:sonar.pullrequest.base=$env:GITHUB_MAIN_BRANCH
-          } elseif ($env:APPVEYOR_REPO_BRANCH -eq $env:GITHUB_MAIN_BRANCH) {
-            Write-Host Sonar Scanning branch $env:APPVEYOR_REPO_BRANCH
-            SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.branch.name=$env:APPVEYOR_REPO_BRANCH /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
-          } else {
-            Write-Host Skipping Sonar Scanning
-          }
+#      - ps: >-
+#          if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
+#            Write-Host Sonar Scanning PR# $env:APPVEYOR_PULL_REQUEST_NUMBER
+#            SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.pullrequest.key=$env:APPVEYOR_PULL_REQUEST_NUMBER /d:sonar.pullrequest.provider=GitHub /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME /d:sonar.pullrequest.base=$env:GITHUB_MAIN_BRANCH
+#          } elseif ($env:APPVEYOR_REPO_BRANCH -eq $env:GITHUB_MAIN_BRANCH) {
+#            Write-Host Sonar Scanning branch $env:APPVEYOR_REPO_BRANCH
+#            SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.branch.name=$env:APPVEYOR_REPO_BRANCH /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
+#          } else {
+#            Write-Host Skipping Sonar Scanning
+#          }
     build:
       project: CDP4-SAT.sln
 
@@ -91,11 +91,11 @@ for:
         -output:"%TEST_COVERAGE%"
         -filter:"+[CDP4-SAT*]* -[*.Tests*]* -[*.Views]*""
         -excludebyattribute:*.ExcludeFromCodeCoverageAttribute
-    after_test:
-      - ps: >-
-          if ($env:APPVEYOR_PULL_REQUEST_NUMBER -Or $env:APPVEYOR_REPO_BRANCH -eq $env:GITHUB_MAIN_BRANCH) {
-            SonarScanner.MSBuild.exe end /d:"sonar.login=$env:SONARCLOUD_TOKEN"
-          }
+#    after_test:
+#      - ps: >-
+#          if ($env:APPVEYOR_PULL_REQUEST_NUMBER -Or $env:APPVEYOR_REPO_BRANCH -eq $env:GITHUB_MAIN_BRANCH) {
+#            SonarScanner.MSBuild.exe end /d:"sonar.login=$env:SONARCLOUD_TOKEN"
+#          }
 
 notifications:
   - provider: Email
