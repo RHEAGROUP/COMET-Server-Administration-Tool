@@ -270,7 +270,7 @@ namespace StressGenerator.ViewModels
         {
             this.EngineeringModelSetupList.Clear();
 
-            foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
+            foreach (var modelSetup in siteDirectory.Model.Where(m => m.Name.StartsWith("Stresser")).OrderBy(m => m.Name))
             {
                 this.EngineeringModelSetupList.Add(modelSetup);
             }
