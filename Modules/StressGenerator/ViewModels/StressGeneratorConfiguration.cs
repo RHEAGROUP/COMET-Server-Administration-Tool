@@ -56,12 +56,13 @@ namespace StressGenerator.ViewModels
         /// <summary>
         /// Parameters values configuration
         /// </summary>
-        public readonly List<KeyValuePair<string, double>> ParamValueConfig = new List<KeyValuePair<string, double>>
+        public static readonly List<KeyValuePair<string, double>> ParamValueConfig = new List<KeyValuePair<string, double>>
         {
             new KeyValuePair<string, double>("m", 12.5),
             new KeyValuePair<string, double>("mass_margin", 10),
             new KeyValuePair<string, double>("P_on", 33.5),
-            new KeyValuePair<string, double>("P_stby", 5.7)
+            new KeyValuePair<string, double>("P_stby", 5.7),
+            new KeyValuePair<string, double>("V", 15.7)
         };
 
         /// <summary>
