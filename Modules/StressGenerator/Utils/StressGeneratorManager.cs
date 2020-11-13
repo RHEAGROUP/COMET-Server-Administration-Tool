@@ -117,28 +117,28 @@ namespace StressGenerator.Utils
                 return;
             }
 
-            Iteration clonedIteration;
-
-            if (this.configuration.DeleteAllElements)
-            {
-                clonedIteration = iteration.Clone(true);
-                clonedIteration.Element.Clear();
-            }
-
             var start = this.FindHighestNumberOnElementDefinitions(iteration) + 1;
             var activeDomains = engineeringModelSetup.ActiveDomain.ToList();
+            var clearRequested = false;
 
             for (var number = start; number < start + this.configuration.TestObjectsNumber; number++)
             {
                 iteration =
                     session.OpenIterations.Keys.FirstOrDefault(it =>
                         iteration != null && it.Iid == iteration.Iid);
-                clonedIteration = iteration?.Clone(true);
+                var clonedIteration = iteration?.Clone(true);
 
                 if (clonedIteration != null)
                 {
                     var elementOwner = activeDomains[number % activeDomains.Count];
                     var parameterOwner = activeDomains[(number + 1) % activeDomains.Count];
+
+                    if (this.configuration.DeleteAllElements && !clearRequested)
+                    {
+                        clearRequested = true;
+                        clonedIteration.Element.Clear();
+                    }
+
                     var elementDefinition = ElementDefinitionGenerator.Create(this.configuration.Session,
                         $"{configuration.ElementName} #{number:D3}", $"{configuration.ElementShortName} #{number:D3}",
                         clonedIteration, elementOwner, parameterOwner, number);
