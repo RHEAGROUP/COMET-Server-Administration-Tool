@@ -27,7 +27,6 @@ namespace StressGenerator.Utils
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -46,13 +45,8 @@ namespace StressGenerator.Utils
         /// <param name="elementName">Element definition name</param>
         /// <param name="elementShortName">Element definition short name</param>
         /// <param name="iteration">The iteration container <see cref="Iteration"/></param>
-        /// <param name="elementOwner">Element definition owner <see cref="DomainOfExpertise"/></param>
-        /// <param name="lastParamOwner">Parameter definition owner <see cref="DomainOfExpertise"/></param>
-        /// <param name="objectNumber">Element definition number counter</param>
         /// <returns></returns>
-        public static ElementDefinition Create(ISession session, string elementName, string elementShortName, Iteration iteration,
-            DomainOfExpertise elementOwner,
-            DomainOfExpertise lastParamOwner, int objectNumber)
+        public static ElementDefinition Create(ISession session, string elementName, string elementShortName, Iteration iteration)
         {
             var elementDefinition = new ElementDefinition(Guid.NewGuid(), session.Assembler.Cache,
                 new Uri(session.DataSourceUri))
@@ -60,10 +54,10 @@ namespace StressGenerator.Utils
                 Name = elementName,
                 ShortName = elementShortName,
                 Container = iteration,
-                Owner = elementOwner
+                Owner = session.ActivePerson.DefaultDomain
             };
 
-            var parameters = CreateParameters(session, elementOwner, lastParamOwner, objectNumber);
+            var parameters = CreateParameters(session, session.ActivePerson.DefaultDomain);
 
             if (parameters != null)
             {
@@ -78,22 +72,19 @@ namespace StressGenerator.Utils
         /// </summary>
         /// <param name="session">Server session <see cref="ISession"/></param>
         /// <param name="elementOwner">Element definition owner <see cref="DomainOfExpertise"/></param>
-        /// <param name="lastParamOwner">Parameter definition owner <see cref="DomainOfExpertise"/></param>
-        /// <param name="objectNumber">Element definition number counter</param>
         /// <returns></returns>
-        private static List<Parameter> CreateParameters(ISession session,
-            DomainOfExpertise elementOwner,
-            DomainOfExpertise lastParamOwner, int objectNumber)
+        private static List<Parameter> CreateParameters(ISession session, DomainOfExpertise elementOwner)
         {
-            var paramCount = 0;
-            var switchAlternator = true;
             var configList = new List<Tuple<ParameterType, double>>();
             var parametersList = new List<Parameter>();
 
             var siteReferenceDataLibraries = session.OpenReferenceDataLibraries.OfType<SiteReferenceDataLibrary>();
             var parameterTypes = siteReferenceDataLibraries.FirstOrDefault()?.ParameterType.ToList();
 
-            if (parameterTypes == null) return parametersList;
+            if (parameterTypes == null)
+            {
+                return parametersList;
+            }
 
             foreach (var keyValue in StressGeneratorConfiguration.ParamValueConfig)
             {
@@ -103,17 +94,10 @@ namespace StressGenerator.Utils
 
             foreach (var config in configList)
             {
-                var (paramType, paramValue) = config;
-                var parameterValue = (paramValue + objectNumber - 1).ToString(CultureInfo.InvariantCulture);
+                var (paramType, _) = config;
 
-                var parameter = ParameterGenerator.Create(session, paramType, parameterValue,
-                    paramCount == configList.Count - 1 ? lastParamOwner : elementOwner,
-                    switchAlternator ? ParameterSwitchKind.MANUAL : ParameterSwitchKind.REFERENCE);
-
+                var parameter = ParameterGenerator.Create(session, paramType, elementOwner);
                 parametersList.Add(parameter);
-
-                paramCount++;
-                switchAlternator = !switchAlternator;
             }
 
             return parametersList;

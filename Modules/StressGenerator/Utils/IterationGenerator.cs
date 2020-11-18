@@ -80,13 +80,13 @@ namespace StressGenerator.Utils
                 await session.Read(lastIteration, session.ActivePerson.DefaultDomain);
 
                 Logger.Info(
-                    $"Engineering Model {model.EngineeringModelSetup.ShortName} Iteration {lastIterationSetup.IterationNumber} \"{lastIterationSetup.Description}\" created on {lastIterationSetup.CreatedOn} was successfully loaded");
+                    $"EngineeringModel {model.EngineeringModelSetup.ShortName} Iteration {lastIterationSetup.IterationNumber} \"{lastIterationSetup.Description}\" created on {lastIterationSetup.CreatedOn} was successfully loaded");
             }
             catch (Exception ex)
             {
                 lastIteration = null;
                 Logger.Error(
-                    $"Engineering Model {model.EngineeringModelSetup.ShortName} Iteration cannot be created. Exception: {ex.Message}");
+                    $"EngineeringModel {model.EngineeringModelSetup.ShortName} Iteration cannot be created. Exception: {ex.Message}");
             }
 
             return lastIteration;

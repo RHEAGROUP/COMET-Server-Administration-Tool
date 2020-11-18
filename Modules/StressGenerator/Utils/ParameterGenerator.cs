@@ -27,6 +27,7 @@ namespace StressGenerator.Utils
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using CDP4Dal;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -41,35 +42,43 @@ namespace StressGenerator.Utils
         /// Create a new instance of <see cref="ParameterGenerator" />
         /// </summary>
         /// <param name="session">Server session <see cref="ISession"/></param>
-        /// <param name="paramType">Parameter type <see cref="ParameterType"/></param>
-        /// <param name="paramValue">Parameter value</param>
-        /// <param name="paramOwner">Parameter owner <see cref="DomainOfExpertise"/></param>
-        /// <param name="paramValueSwitch">Parameter value switch <see cref="ParameterSwitchKind"/></param>
+        /// <param name="parameterType">Parameter type <see cref="ParameterType"/></param>
+        /// <param name="parameterOwner">Parameter owner <see cref="DomainOfExpertise"/></param>
         /// <returns>A parameter instance <see cref="Parameter"/></returns>
-        public static Parameter Create(ISession session, ParameterType paramType,
-            string paramValue, DomainOfExpertise paramOwner, ParameterSwitchKind paramValueSwitch)
+        public static Parameter Create(ISession session, ParameterType parameterType, DomainOfExpertise parameterOwner)
         {
             var parameter = new Parameter(Guid.NewGuid(), session.Assembler.Cache,
                 new Uri(session.DataSourceUri))
             {
-                ParameterType = paramType as QuantityKind,
-                Scale = (paramType as QuantityKind)?.DefaultScale,
-                Owner = paramOwner
+                ParameterType = parameterType as QuantityKind,
+                Scale = (parameterType as QuantityKind)?.DefaultScale,
+                Owner = parameterOwner
             };
-
-            var parameterValueSet = new ParameterValueSet
-            {
-                ValueSwitch = paramValueSwitch,
-                Manual = new ValueArray<string>(new List<string> {paramValue}),
-                Computed = new ValueArray<string>(new List<string> {paramValue}),
-                Reference = new ValueArray<string>(new List<string> {paramValue}),
-                Formula = new ValueArray<string>(new List<string> {"=" + paramValue}),
-                Published = new ValueArray<string>(new List<string> {paramValue})
-            };
-
-            parameter.ValueSet.Add(parameterValueSet);
 
             return parameter;
+        }
+
+        /// <summary>
+        /// Clone existing value sets and update its values
+        /// </summary>
+        /// <param name="parameterValueSet">New value set value <see cref="IValueSet"/></param>
+        /// <param name="parameterValueSwitch">New value switch value <see cref="ParameterSwitchKind"/></param>
+        /// <param name="parameterValue">New value represented as string</param>
+        /// <returns></returns>
+        public static ParameterValueSetBase UpdateValueSets(IEnumerable<IValueSet> parameterValueSet, ParameterSwitchKind parameterValueSwitch, string parameterValue)
+        {
+            var valueSetClone = ((ParameterValueSet)parameterValueSet.FirstOrDefault())?.Clone(false);
+
+            if (valueSetClone == null) return null;
+
+            valueSetClone.ValueSwitch = parameterValueSwitch;
+            valueSetClone.Manual = new ValueArray<string>(new List<string> {parameterValue});
+            valueSetClone.Computed = new ValueArray<string>(new List<string> {parameterValue});
+            valueSetClone.Reference = new ValueArray<string>(new List<string> {parameterValue});
+            valueSetClone.Formula = new ValueArray<string>(new List<string> {parameterValue});
+            valueSetClone.Published = new ValueArray<string>(new List<string> {parameterValue});
+
+            return valueSetClone;
         }
     }
 }
