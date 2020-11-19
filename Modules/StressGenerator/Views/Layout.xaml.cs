@@ -23,6 +23,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using DevExpress.Xpf.Editors;
+
 namespace StressGenerator.Views
 {
     /// <summary>
@@ -36,6 +38,17 @@ namespace StressGenerator.Views
         public Layout()
         {
             InitializeComponent();
+        }
+
+        private void BaseEdit_OnEditValueChanged(object sender, EditValueChangedEventArgs e)
+        {
+            if (!(sender is TextEdit textEdit))
+            {
+                return;
+            }
+
+            textEdit.Focus();
+            textEdit.SelectionStart = textEdit.Text.Length;
         }
     }
 }
