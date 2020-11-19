@@ -252,6 +252,7 @@ namespace StressGenerator.ViewModels
         /// </returns>
         private async Task ExecuteStressCommand()
         {
+            this.stressGenerator.NotifyMessageEvent += StressGeneratorMessageHandler;
             this.stressGenerator.Init(new StressGeneratorConfiguration(
                 this.SourceViewModel.ServerSession,
                 this.TimeInterval,
@@ -263,13 +264,23 @@ namespace StressGenerator.ViewModels
         }
 
         /// <summary>
+        /// Add text message to the output panel
+        /// </summary>
+        /// <param name="message">The text message</param>
+        private void StressGeneratorMessageHandler(string message)
+        {
+            if (string.IsNullOrEmpty(message)) return;
+
+            this.Output += $"{DateTime.Now:HH:mm:ss} {message}{Environment.NewLine}";
+        }
+
+        /// <summary>
         /// Bind engineering models to the reactive list
         /// </summary>
         /// <param name="siteDirectory">The <see cref="SiteDirectory"/> top container</param>
         private void BindEngineeringModels(SiteDirectory siteDirectory)
         {
             this.EngineeringModelSetupList.Clear();
-
             foreach (var modelSetup in siteDirectory.Model.Where(m => m.Name.StartsWith("Stresser")).OrderBy(m => m.Name))
             {
                 this.EngineeringModelSetupList.Add(modelSetup);

@@ -25,13 +25,11 @@
 
 namespace StressGenerator.Utils
 {
-    using System;
     using System.Linq;
     using System.Threading.Tasks;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
-    using NLog;
     using ViewModels;
 
     /// <summary>
@@ -39,11 +37,6 @@ namespace StressGenerator.Utils
     /// </summary>
     internal static class IterationGenerator
     {
-        /// <summary>
-        /// The NLog logger
-        /// </summary>
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         /// <summary>
         /// Create a new instance of <see cref="Iteration" />
         /// </summary>
@@ -71,23 +64,10 @@ namespace StressGenerator.Utils
             var lastIteration = new Iteration(
                 lastIterationSetup.IterationIid,
                 session.Assembler.Cache,
-                session.Credentials.Uri);
-
+                session.Credentials.Uri) {IterationSetup = lastIterationSetup};
             model.Iteration.Add(lastIteration);
 
-            try
-            {
-                await session.Read(lastIteration, session.ActivePerson.DefaultDomain);
-
-                Logger.Info(
-                    $"EngineeringModel {model.EngineeringModelSetup.ShortName} Iteration {lastIterationSetup.IterationNumber} \"{lastIterationSetup.Description}\" created on {lastIterationSetup.CreatedOn} was successfully loaded");
-            }
-            catch (Exception ex)
-            {
-                lastIteration = null;
-                Logger.Error(
-                    $"EngineeringModel {model.EngineeringModelSetup.ShortName} Iteration cannot be created. Exception: {ex.Message}");
-            }
+            await session.Read(lastIteration, session.ActivePerson.DefaultDomain);
 
             return lastIteration;
         }
