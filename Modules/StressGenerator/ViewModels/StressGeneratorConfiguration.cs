@@ -41,12 +41,12 @@ namespace StressGenerator.ViewModels
         /// <summary>
         /// Minimum time interval in seconds for test data generation
         /// </summary>
-        public const int MinTimeInterval = 5;
+        public const int MinTimeInterval = 0;
 
         /// <summary>
         /// Minimum number of test objects
         /// </summary>
-        public const int MinNumberOfTestObjects = 50;
+        public const int MinNumberOfTestObjects = 5;
 
         /// <summary>
         /// Maximum number of test objects
