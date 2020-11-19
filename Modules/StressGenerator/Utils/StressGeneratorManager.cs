@@ -34,7 +34,6 @@ namespace StressGenerator.Utils
     using System.Threading.Tasks;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Dal;
     using CDP4Dal.Operations;
     using NLog;
     using ViewModels;
@@ -105,63 +104,26 @@ namespace StressGenerator.Utils
             }
 
             // Generate ElementDefinition list
-            var generatedElementsList = await this.GenerateElementDefinitions(session, engineeringModelSetup);
-
-            if (generatedElementsList == null)
-            {
-                Logger.Error("Generated ElementDefinition list is empty.");
-                return;
-            }
+            var generatedElementsList = await this.GenerateElementDefinitions(engineeringModelSetup);
 
             // Refresh session
             await session.Refresh();
 
             // Generate ParameterValueSets
-            await GenerateParameterValueSets(session, generatedElementsList);
+            await GenerateParameterValueSets(generatedElementsList);
 
             // Close session
             await session.Close();
         }
 
         /// <summary>
-        /// Generate ParameterValueSet for each parameter that belongs to a generated element definition
-        /// </summary>
-        /// <param name="session">The current opened server session <see cref="ISession"/></param>
-        /// <param name="generatedElementsList">The generated element definition list</param>
-        /// <returns></returns>
-        private async Task GenerateParameterValueSets(ISession session, List<ElementDefinition> generatedElementsList)
-        {
-            var generatedIteration = session.OpenIterations
-                .FirstOrDefault(it => it.Key.Iid == generatedElementsList.FirstOrDefault()?.Container.Iid).Key;
-
-            if (generatedIteration == null)
-            {
-                Logger.Error("Cannot found Iteration that contains generated ElementDefinition list.");
-                return;
-            }
-
-            var index = 0;
-            foreach (var elementDefinition in generatedIteration.Element)
-            {
-                foreach (var parameter in elementDefinition.Parameter)
-                {
-                    await WriteParametersValueSets(parameter, index);
-                }
-
-                index++;
-            }
-        }
-
-        /// <summary>
         /// Generate a set of test element definition base on configuration specified <see cref="StressGeneratorConfiguration"/>
         /// </summary>
-        /// <param name="session">The current opened server session <see cref="ISession"/></param>
         /// <param name="engineeringModelSetup">The selected engineering model for test <see cref="EngineeringModelSetup"/></param>
         /// <returns>List of <see cref="ElementDefinition"/></returns>
-        private async Task<List<ElementDefinition>> GenerateElementDefinitions(ISession session,
-            EngineeringModelSetup engineeringModelSetup)
+        private async Task<List<ElementDefinition>> GenerateElementDefinitions(EngineeringModelSetup engineeringModelSetup)
         {
-            var iteration = await IterationGenerator.Create(session, engineeringModelSetup);
+            var iteration = await IterationGenerator.Create(this.configuration.Session, engineeringModelSetup);
 
             if (iteration is null)
             {
@@ -185,7 +147,7 @@ namespace StressGenerator.Utils
             {
                 // Always read and clone the iteration
                 iteration =
-                    session.OpenIterations.Keys.FirstOrDefault(it =>
+                    this.configuration.Session.OpenIterations.Keys.FirstOrDefault(it =>
                         iteration != null && it.Iid == iteration.Iid);
                 var clonedIteration = iteration?.Clone(true);
 
@@ -211,6 +173,40 @@ namespace StressGenerator.Utils
             }
 
             return generatedElementsList;
+        }
+
+        /// <summary>
+        /// Generate ParameterValueSet for each parameter that belongs to a generated element definition
+        /// </summary>
+        /// <param name="generatedElementsList">The generated element definition list</param>
+        /// <returns></returns>
+        private async Task GenerateParameterValueSets(List<ElementDefinition> generatedElementsList)
+        {
+            if (generatedElementsList == null)
+            {
+                Logger.Error("Generated ElementDefinition list is empty.");
+                return;
+            }
+
+            var generatedIteration = this.configuration.Session.OpenIterations
+                .FirstOrDefault(it => it.Key.Iid == generatedElementsList.FirstOrDefault()?.Container.Iid).Key;
+
+            if (generatedIteration == null)
+            {
+                Logger.Error("Cannot found Iteration that contains generated ElementDefinition list.");
+                return;
+            }
+
+            var index = 0;
+            foreach (var elementDefinition in generatedIteration.Element)
+            {
+                foreach (var parameter in elementDefinition.Parameter)
+                {
+                    await WriteParametersValueSets(parameter, index);
+                }
+
+                index++;
+            }
         }
 
         /// <summary>Find highest number in the name or short name of the element definitions.</summary>
