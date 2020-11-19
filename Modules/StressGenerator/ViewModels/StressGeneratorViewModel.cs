@@ -242,6 +242,8 @@ namespace StressGenerator.ViewModels
                 canExecuteStress,
                 _ => this.ExecuteStressCommand(),
                 RxApp.MainThreadScheduler);
+
+            this.stressGenerator.NotifyMessageEvent += StressGeneratorMessageHandler;
         }
 
         /// <summary>
@@ -252,7 +254,6 @@ namespace StressGenerator.ViewModels
         /// </returns>
         private async Task ExecuteStressCommand()
         {
-            this.stressGenerator.NotifyMessageEvent += StressGeneratorMessageHandler;
             this.stressGenerator.Init(new StressGeneratorConfiguration(
                 this.SourceViewModel.ServerSession,
                 this.TimeInterval,

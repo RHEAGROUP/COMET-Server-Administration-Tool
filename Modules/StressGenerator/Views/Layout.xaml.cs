@@ -23,10 +23,10 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using DevExpress.Xpf.Editors;
-
 namespace StressGenerator.Views
 {
+    using DevExpress.Xpf.Editors;
+
     /// <summary>
     /// Interaction logic for Layout.xaml
     /// </summary>
@@ -40,6 +40,11 @@ namespace StressGenerator.Views
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Scroll up output window
+        /// </summary>
+        /// <param name="sender">The sender control <see cref="TextEdit"/></param>
+        /// <param name="e">The <see cref="EditValueChangedEventArgs"/></param>
         private void BaseEdit_OnEditValueChanged(object sender, EditValueChangedEventArgs e)
         {
             if (!(sender is TextEdit textEdit))

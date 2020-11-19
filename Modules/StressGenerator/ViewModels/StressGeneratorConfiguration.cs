@@ -98,12 +98,12 @@ namespace StressGenerator.ViewModels
         /// <summary>
         /// Initialize a new instance of <see cref="StressGeneratorConfiguration" />
         /// </summary>
-        /// <param name="session"></param>
-        /// <param name="timeInterval">Gets or sets the time interval in seconds for test data generation</param>
-        /// <param name="testObjectsNumber"></param>
-        /// <param name="elementName"></param>
-        /// <param name="elementShortName"></param>
-        /// <param name="deleteAllElements"></param>
+        /// <param name="session">Server session <see cref="ISession"/></param>
+        /// <param name="timeInterval">Time interval in seconds for test data generation</param>
+        /// <param name="testObjectsNumber">The number of the test objects to be generated</param>
+        /// <param name="elementName">First part of generated element definition name</param>
+        /// <param name="elementShortName">First part of generated element definition short name</param>
+        /// <param name="deleteAllElements">Flag that trigger deleting of all elements in the engineering model</param>
         public StressGeneratorConfiguration(ISession session, int timeInterval, int testObjectsNumber,
             string elementName, string elementShortName, bool deleteAllElements)
         {

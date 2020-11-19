@@ -41,15 +41,14 @@ namespace StressGenerator.Utils
         /// <summary>
         /// Create a new instance of <see cref="ParameterGenerator" />
         /// </summary>
-        /// <param name="session">Server session <see cref="ISession"/></param>
         /// <param name="parameterType">Parameter type <see cref="ParameterType"/></param>
         /// <param name="parameterOwner">Parameter owner <see cref="DomainOfExpertise"/></param>
         /// <returns>A parameter instance <see cref="Parameter"/></returns>
-        public static Parameter Create(ISession session, ParameterType parameterType, DomainOfExpertise parameterOwner)
+        public static Parameter Create(ParameterType parameterType, DomainOfExpertise parameterOwner)
         {
-            var parameter = new Parameter(Guid.NewGuid(), session.Assembler.Cache,
-                new Uri(session.DataSourceUri))
+            var parameter = new Parameter
             {
+                Iid = Guid.NewGuid(),
                 ParameterType = parameterType as QuantityKind,
                 Scale = (parameterType as QuantityKind)?.DefaultScale,
                 Owner = parameterOwner
@@ -61,10 +60,10 @@ namespace StressGenerator.Utils
         /// <summary>
         /// Clone existing value sets and update its values
         /// </summary>
-        /// <param name="parameterValueSet">New value set value <see cref="IValueSet"/></param>
+        /// <param name="parameterValueSet">New value set value <see cref="IEnumerable{IValueSet}"/></param>
         /// <param name="parameterValueSwitch">New value switch value <see cref="ParameterSwitchKind"/></param>
         /// <param name="parameterValue">New value represented as string</param>
-        /// <returns></returns>
+        /// <returns>The value set that will be cloned <see cref="ParameterValueSetBase" /></returns>
         public static ParameterValueSetBase UpdateValueSets(IEnumerable<IValueSet> parameterValueSet, ParameterSwitchKind parameterValueSwitch, string parameterValue)
         {
             var valueSetClone = ((ParameterValueSet)parameterValueSet.FirstOrDefault())?.Clone(false);

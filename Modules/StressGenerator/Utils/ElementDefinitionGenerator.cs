@@ -30,7 +30,6 @@ namespace StressGenerator.Utils
     using System.Linq;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Dal;
     using ViewModels;
 
     /// <summary>
@@ -41,23 +40,23 @@ namespace StressGenerator.Utils
         /// <summary>
         /// Helper class for creating element definition for test purposes
         /// </summary>
-        /// <param name="session">Server session <see cref="ISession"/></param>
         /// <param name="elementName">Element definition name</param>
         /// <param name="elementShortName">Element definition short name</param>
         /// <param name="iteration">The iteration container <see cref="Iteration"/></param>
-        /// <returns></returns>
-        public static ElementDefinition Create(ISession session, string elementName, string elementShortName, Iteration iteration)
+        /// <param name="elementOwner">Element definition owner <see cref="DomainOfExpertise"/></param>
+        /// <returns>An element definition instance <see cref="ElementDefinition"/></returns>
+        public static ElementDefinition Create(string elementName, string elementShortName, Iteration iteration, DomainOfExpertise elementOwner)
         {
-            var elementDefinition = new ElementDefinition(Guid.NewGuid(), session.Assembler.Cache,
-                new Uri(session.DataSourceUri))
+            var elementDefinition = new ElementDefinition
             {
+                Iid = Guid.NewGuid(),
                 Name = elementName,
                 ShortName = elementShortName,
                 Container = iteration,
-                Owner = session.ActivePerson.DefaultDomain
+                Owner = elementOwner
             };
 
-            var parameters = CreateParameters(session, session.ActivePerson.DefaultDomain);
+            var parameters = CreateParameters(elementOwner);
 
             if (parameters != null)
             {
@@ -70,16 +69,14 @@ namespace StressGenerator.Utils
         /// <summary>
         /// Create parameter list
         /// </summary>
-        /// <param name="session">Server session <see cref="ISession"/></param>
         /// <param name="elementOwner">Element definition owner <see cref="DomainOfExpertise"/></param>
-        /// <returns></returns>
-        private static List<Parameter> CreateParameters(ISession session, DomainOfExpertise elementOwner)
+        /// <returns>Parameters list that has been created <see cref="List{Parameter}"/></returns>
+        private static List<Parameter> CreateParameters(DomainOfExpertise elementOwner)
         {
             var configList = new List<Tuple<ParameterType, double>>();
             var parametersList = new List<Parameter>();
-
-            var siteReferenceDataLibraries = session.OpenReferenceDataLibraries.OfType<SiteReferenceDataLibrary>();
-            var parameterTypes = siteReferenceDataLibraries.FirstOrDefault()?.ParameterType.ToList();
+            var siteReferenceDataLibraries = (elementOwner.Container as SiteDirectory)?.SiteReferenceDataLibrary;
+            var parameterTypes = siteReferenceDataLibraries?.FirstOrDefault()?.ParameterType.ToList();
 
             if (parameterTypes == null)
             {
@@ -96,7 +93,7 @@ namespace StressGenerator.Utils
             {
                 var (paramType, _) = config;
 
-                var parameter = ParameterGenerator.Create(session, paramType, elementOwner);
+                var parameter = ParameterGenerator.Create(paramType, elementOwner);
                 parametersList.Add(parameter);
             }
 
