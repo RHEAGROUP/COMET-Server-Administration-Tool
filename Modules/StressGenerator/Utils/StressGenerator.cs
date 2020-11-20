@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="StressGeneratorManager.cs" company="RHEA System S.A.">
+// <copyright file="StressGenerator.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -41,7 +41,7 @@ namespace StressGenerator.Utils
     /// <summary>
     /// The purpose of this class is to assist in the simulation of concurrent multi-user testing
     /// </summary>
-    internal class StressGeneratorManager
+    internal class StressGenerator
     {
         /// <summary>
         /// The NLog logger
@@ -56,7 +56,7 @@ namespace StressGenerator.Utils
         /// <summary>
         /// The singleton class instance
         /// </summary>
-        private static readonly StressGeneratorManager Instance = new StressGeneratorManager();
+        private static readonly StressGenerator Instance = new StressGenerator();
 
         // TODO #81 Unify output messages mechanism inside SAT solution
         /// <summary>
@@ -87,12 +87,12 @@ namespace StressGenerator.Utils
         /// <returns>
         /// The singleton class instance
         /// </returns>
-        internal static StressGeneratorManager GetInstance() => Instance;
+        internal static StressGenerator GetInstance() => Instance;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StressGeneratorManager"/> class
+        /// Initializes a new instance of the <see cref="StressGenerator"/> class
         /// </summary>
-        private StressGeneratorManager()
+        private StressGenerator()
         {
         }
 

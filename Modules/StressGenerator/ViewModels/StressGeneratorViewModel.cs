@@ -42,9 +42,9 @@ namespace StressGenerator.ViewModels
     public class StressGeneratorViewModel : ReactiveObject
     {
         /// <summary>
-        /// The <see cref="StressGeneratorManager"/> used to build the helper sync classes
+        /// The <see cref="StressGenerator"/> used to build the helper sync classes
         /// </summary>
-        private readonly StressGeneratorManager stressGenerator = StressGeneratorManager.GetInstance();
+        private readonly StressGenerator stressGenerator = StressGenerator.GetInstance();
 
         /// <summary>
         /// Backing field for the source view model <see cref="LoginViewModel"/>
