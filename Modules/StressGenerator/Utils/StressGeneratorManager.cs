@@ -165,14 +165,14 @@ namespace StressGenerator.Utils
                 return;
             }
 
-            // Generate ElementDefinition list
-            var generatedElementsList = await this.GenerateElementDefinitions(iteration);
+            // Generate and write ElementDefinition list
+            var generatedElementsList = await this.GenerateAndWriteElementDefinitions(iteration);
 
             // Refresh session
             await session.Refresh();
 
-            // Generate ParameterValueSets
-            await GenerateParameterValueSets(generatedElementsList);
+            // Generate and write ParameterValueSets
+            await GenerateAndWriteParameterValueSets(generatedElementsList);
 
             // Close session
             await session.Close();
@@ -194,17 +194,17 @@ namespace StressGenerator.Utils
             try
             {
                 this.NotifyMessage(
-                    $"Loading last iteration from EngineeringModel {engineeringModelSetup.ShortName}...");
+                    $"Loading last iteration from EngineeringModel {engineeringModelSetup.ShortName} ...");
 
                 iteration = await IterationGenerator.Create(this.configuration.Session, engineeringModelSetup);
 
                 this.NotifyMessage(
-                    $"Successfully load EngineeringModel {engineeringModelSetup.ShortName}(Iteration {iteration.IterationSetup.IterationNumber}).");
+                    $"Successfully loaded EngineeringModel {engineeringModelSetup.ShortName} (Iteration {iteration.IterationSetup.IterationNumber}).");
             }
             catch (Exception ex)
             {
                 this.NotifyMessage(
-                    $"Invalid iteration. Engineering model {engineeringModelSetup.ShortName} must contain at least one active iteration. Exception: {ex.Message}",
+                    $"Invalid iteration. Engineering model {engineeringModelSetup.ShortName} must contain at least one active iteration. Exception: {ex.Message}.",
                     LogVerbosity.Error);
 
                 return null;
@@ -223,17 +223,17 @@ namespace StressGenerator.Utils
         }
 
         /// <summary>
-        /// Generate a set of test element definition base on configuration
+        /// Generate and write a set of test element definition base on configuration
         /// </summary>
         /// <param name="iteration">Latest server session read <see cref="Iteration"/></param>
         /// <returns>
         /// A <see cref="Task{List}"/> of <see cref="ElementDefinition"/>, or null if the iteration could not be found
         /// </returns>
-        private async Task<List<ElementDefinition>> GenerateElementDefinitions(Iteration iteration)
+        private async Task<List<ElementDefinition>> GenerateAndWriteElementDefinitions(Iteration iteration)
         {
             if (iteration == null)
             {
-                this.NotifyMessage("Cannot found Iteration that contains generated ElementDefinition list.",
+                this.NotifyMessage("Cannot find Iteration that contains generated ElementDefinition list.",
                     LogVerbosity.Error);
                 return null;
             }
@@ -249,22 +249,27 @@ namespace StressGenerator.Utils
                         iteration != null && it.Iid == iteration.Iid);
                 var clonedIteration = iteration?.Clone(true);
 
-                if (clonedIteration != null)
+                if (clonedIteration == null)
                 {
-                    if (this.configuration.DeleteAllElements && !clearRequested)
-                    {
-                        clearRequested = true;
-                        clonedIteration.Element.Clear();
-                    }
-
-                    var elementDefinition = ElementDefinitionGenerator.Create($"{configuration.ElementName} #{number:D3}", $"{configuration.ElementShortName} #{number:D3}",
-                        clonedIteration, this.configuration.Session.ActivePerson.DefaultDomain);
-
-                    clonedIteration.Element.Add(elementDefinition);
-                    generatedElementsList.Add(elementDefinition);
-
-                    await WriteElementDefinition(elementDefinition, iteration, clonedIteration);
+                    continue;
                 }
+
+                if (this.configuration.DeleteAllElements && !clearRequested)
+                {
+                    clearRequested = true;
+                    clonedIteration.Element.Clear();
+                }
+
+                var elementDefinition = ElementDefinitionGenerator.Create(
+                    $"{configuration.ElementName} #{number:D3}",
+                    $"{configuration.ElementShortName} #{number:D3}",
+                    clonedIteration,
+                    this.configuration.Session.ActivePerson.DefaultDomain);
+
+                clonedIteration.Element.Add(elementDefinition);
+                generatedElementsList.Add(elementDefinition);
+
+                await WriteElementDefinition(elementDefinition, iteration, clonedIteration);
 
                 Thread.Sleep(this.configuration.TimeInterval);
             }
@@ -273,13 +278,13 @@ namespace StressGenerator.Utils
         }
 
         /// <summary>
-        /// Generate ParameterValueSet for each parameter that belongs to a generated element definition
+        /// Generate and write ParameterValueSet for each parameter that belongs to a generated element definition
         /// </summary>
         /// <param name="generatedElementsList">The generated element definition list</param>
         /// <returns>
         /// The <see cref="Task"/>
         /// </returns>
-        private async Task GenerateParameterValueSets(List<ElementDefinition> generatedElementsList)
+        private async Task GenerateAndWriteParameterValueSets(List<ElementDefinition> generatedElementsList)
         {
             if (generatedElementsList == null)
             {
@@ -292,7 +297,7 @@ namespace StressGenerator.Utils
 
             if (generatedIteration == null)
             {
-                this.NotifyMessage("Cannot found Iteration that contains generated ElementDefinition list.",
+                this.NotifyMessage("Cannot find Iteration that contains generated ElementDefinition list.",
                     LogVerbosity.Error);
                 return;
             }
@@ -300,7 +305,7 @@ namespace StressGenerator.Utils
             var index = 0;
             foreach (var elementDefinition in generatedIteration.Element)
             {
-                this.NotifyMessage($"Start generate ParameterValueSet for {generatedIteration.Element[index].Name}({generatedIteration.Element[index].ShortName}).",
+                this.NotifyMessage($"Generating ParameterValueSet for {generatedIteration.Element[index].Name} ({generatedIteration.Element[index].ShortName}).",
                     LogVerbosity.Info);
                 foreach (var parameter in elementDefinition.Parameter)
                 {
@@ -371,13 +376,13 @@ namespace StressGenerator.Utils
                 await this.configuration.Session.Dal.Write(operationContainer);
 
                 this.NotifyMessage(
-                    $"Successfully generate ElementDefinition {elementDefinition.Name}({elementDefinition.ShortName})",
+                    $"Successfully generated ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName}).",
                     LogVerbosity.Info);
             }
             catch (Exception ex)
             {
                 this.NotifyMessage(
-                    $"Cannot generate ElementDefinition {elementDefinition.Name}({elementDefinition.ShortName}). Exception: {ex.Message}",
+                    $"Cannot generate ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName}). Exception: {ex.Message}.",
                     LogVerbosity.Error);
             }
         }
@@ -410,12 +415,12 @@ namespace StressGenerator.Utils
                 await this.configuration.Session.Write(operationContainer);
 
                 this.NotifyMessage(
-                    $"Successfully generate ValueSet(Published value: {parameterValue}) for parameter {parameter.ParameterType.Name}({parameter.ParameterType.ShortName}).");
+                    $"Successfully generated ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name}({parameter.ParameterType.ShortName}).");
             }
             catch (Exception ex)
             {
                 this.NotifyMessage(
-                    $"Cannot update ValueSet(Published value: {parameterValue}) for parameter {parameter.ParameterType.Name}({parameter.ParameterType.ShortName}). Exception: {ex.Message}");
+                    $"Cannot update ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name}({parameter.ParameterType.ShortName}). Exception: {ex.Message}.");
             }
         }
     }
