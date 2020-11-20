@@ -55,7 +55,7 @@ namespace StressGenerator.Utils
             var lastIterationSetup = modelSetup.IterationSetup
                 .OrderBy(iterationSetups => iterationSetups.IterationNumber)
                 .LastOrDefault(iterationSetup => !iterationSetup.IsDeleted);
-
+            
             if (lastIterationSetup is null)
             {
                 return null;
@@ -79,7 +79,6 @@ namespace StressGenerator.Utils
         /// <returns>True if iteration references generic Rdl, false otherwise</returns>
         public static bool CheckIfIterationReferencesGenericRdl(Iteration iteration)
         {
-            var referencesGenericRdl = false;
             var modelRdl = (iteration.Container as EngineeringModel)?.EngineeringModelSetup.RequiredRdl
                 .FirstOrDefault();
             var chainedRdl = modelRdl?.RequiredRdl;
@@ -88,14 +87,13 @@ namespace StressGenerator.Utils
             {
                 if (chainedRdl.ShortName == StressGeneratorConfiguration.GenericRdlShortName)
                 {
-                    referencesGenericRdl = true;
-                    break;
+                    return true;
                 }
 
                 chainedRdl = chainedRdl.RequiredRdl;
             }
 
-            return referencesGenericRdl;
+            return false;
         }
     }
 }
