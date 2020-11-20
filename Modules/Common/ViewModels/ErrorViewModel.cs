@@ -151,8 +151,8 @@ namespace Common.ViewModels
 
             this.WhenAnyValue(vm => vm.ServerSession).Subscribe(session =>
             {
-                BindPocoErrors(session);
-                BindRuleCheckerErrors(session);
+                this.BindPocoErrors(session);
+                this.BindRuleCheckerErrors(session);
             });
 
             this.PocoSelectRowCommand = ReactiveCommand.Create();

@@ -351,6 +351,10 @@ MigrationBackup/
 ### Example user template template
 ### Example user template
 
+/**/*.bak
+
+/**/*.bak
+
 # IntelliJ project files
 .idea
 *.iml

@@ -55,13 +55,13 @@
                 <dxg:GridColumn AllowColumnFiltering="False"
                                 Width="60"
                                 Header="Severity"
-                                ToolTip="{Binding Severity}"
                                 FieldName="Severity">
                     <dxg:GridColumn.CellTemplate>
                         <DataTemplate>
                             <Image HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
                                    Width="16"
+                                   ToolTip="{Binding Path=Value}"
                                    Height="16"
                                    Source="{Binding Path=Value, Converter={StaticResource SeverityToImageConverter}}">
                             </Image>

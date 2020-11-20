@@ -34,6 +34,7 @@ namespace Migration.ViewModels
     using Utils;
     using ReactiveUI;
     using Common.ViewModels;
+    using Views;
 
     /// <summary>
     /// The view-model for the Migration that lets users to migrate models between different data servers
@@ -235,6 +236,23 @@ namespace Migration.ViewModels
 
             if (!result)
             {
+                this.OperationMessageHandler("Migration import of data failed");
+                return;
+            }
+
+            // pop a wizard with POCO errors for whole session
+            var vm = new FixCoordinalityErrorsDialogViewModel(this.migration.SourceSession);
+
+            var fixDialog = new FixCoordinalityErrorsDialog
+            {
+                DataContext = vm
+            };
+
+            var fixResult = fixDialog.ShowDialog();
+
+            if (fixResult != true)
+            {
+                this.OperationMessageHandler("Migration canceled");
                 return;
             }
 
@@ -242,10 +260,16 @@ namespace Migration.ViewModels
 
             if (!result)
             {
+                this.OperationMessageHandler("Migration pack of data failed");
                 return;
             }
 
-            await this.migration.ExportData();
+            result = await this.migration.ExportData();
+
+            if (!result)
+            {
+                this.OperationMessageHandler("Migration export failed");
+            }
 
             // TODO #33 add cleanup after migration
         }

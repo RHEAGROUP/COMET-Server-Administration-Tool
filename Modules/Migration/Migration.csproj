@@ -14,6 +14,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Views\FixCoordinalityErrorsDialog.xaml" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="CDP4Common-CE" Version="6.3.0" />
     <PackageReference Include="CDP4Dal-CE" Version="6.3.0" />
     <PackageReference Include="CDP4JsonFileDal-CE" Version="6.3.0" />
@@ -21,30 +24,30 @@
     <PackageReference Include="CDP4Rules-CE" Version="6.3.0" />
     <PackageReference Include="CDP4ServicesDal-CE" Version="6.3.0" />
     <PackageReference Include="CDP4WspDal-CE" Version="6.3.0" />
-    <PackageReference Include="DevExpress.CodeParser" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Data" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Data.Desktop" Version="20.1.7" />
-    <PackageReference Include="DevExpress.DataAccess" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Images" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Mvvm" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Office.Core" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Pdf.Core" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Pdf.Drawing" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Printing.Core" Version="20.1.7" />
-    <PackageReference Include="DevExpress.RichEdit.Core" Version="20.1.7" />
-    <PackageReference Include="DevExpress.RichEdit.Export" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Wpf.Core" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Wpf.Grid" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Wpf.Layout" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Wpf.Navigation" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Wpf.Office" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Wpf.Printing" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Wpf.Themes.Office2019Colorful" Version="20.1.7" />
-    <PackageReference Include="DevExpress.Xpo" Version="20.1.7" />
+    <PackageReference Include="DevExpress.CodeParser" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Data" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Data.Desktop" Version="20.1.8" />
+    <PackageReference Include="DevExpress.DataAccess" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Images" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Mvvm" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Office.Core" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Pdf.Core" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Printing.Core" Version="20.1.8" />
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="20.1.8" />
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.Core" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.Layout" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.Navigation" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.Office" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.Printing" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.Themes.Office2019Colorful" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Xpo" Version="20.1.8" />
     <PackageReference Include="DotNetZip" Version="1.13.8" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="Microsoft.Bcl" Version="1.1.10" />
@@ -76,6 +79,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\FixCoordinalityErrorsDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ServerInfo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
