@@ -305,6 +305,11 @@ namespace StressGenerator.Utils
             var index = 0;
             foreach (var elementDefinition in generatedIteration.Element)
             {
+                // Write value sets only for the generated elements
+                if (generatedElementsList.All(el => el.Iid != elementDefinition.Iid))
+                {
+                    continue;
+                }
                 this.NotifyMessage($"Generating ParameterValueSet for {generatedIteration.Element[index].Name} ({generatedIteration.Element[index].ShortName}).",
                     LogVerbosity.Info);
                 foreach (var parameter in elementDefinition.Parameter)
