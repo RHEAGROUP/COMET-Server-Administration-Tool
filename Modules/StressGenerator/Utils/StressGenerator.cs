@@ -310,8 +310,10 @@ namespace StressGenerator.Utils
                 {
                     continue;
                 }
+
                 this.NotifyMessage($"Generating ParameterValueSet for {generatedIteration.Element[index].Name} ({generatedIteration.Element[index].ShortName}).",
                     LogVerbosity.Info);
+
                 foreach (var parameter in elementDefinition.Parameter)
                 {
                     await WriteParametersValueSets(parameter, index);
@@ -420,12 +422,12 @@ namespace StressGenerator.Utils
                 await this.configuration.Session.Write(operationContainer);
 
                 this.NotifyMessage(
-                    $"Successfully generated ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name}({parameter.ParameterType.ShortName}).");
+                    $"Successfully generated ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName}).");
             }
             catch (Exception ex)
             {
                 this.NotifyMessage(
-                    $"Cannot update ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name}({parameter.ParameterType.ShortName}). Exception: {ex.Message}.");
+                    $"Cannot update ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName}). Exception: {ex.Message}.");
             }
         }
     }
