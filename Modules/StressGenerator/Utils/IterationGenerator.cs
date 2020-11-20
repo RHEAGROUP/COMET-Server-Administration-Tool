@@ -52,14 +52,10 @@ namespace StressGenerator.Utils
             {
                 EngineeringModelSetup = modelSetup
             };
+
             var lastIterationSetup = modelSetup.IterationSetup
                 .OrderBy(iterationSetups => iterationSetups.IterationNumber)
-                .LastOrDefault(iterationSetup => !iterationSetup.IsDeleted);
-            
-            if (lastIterationSetup is null)
-            {
-                return null;
-            }
+                .Single(iterationSetup => !iterationSetup.IsDeleted && iterationSetup.FrozenOn == null);
 
             var lastIteration = new Iteration(
                 lastIterationSetup.IterationIid,
