@@ -194,7 +194,7 @@ namespace StressGenerator.Utils
             try
             {
                 this.NotifyMessage(
-                    $"Loading last iteration from EngineeringModel {engineeringModelSetup.ShortName} ...");
+                    $"Loading last iteration from EngineeringModel {engineeringModelSetup.ShortName}...");
 
                 iteration = await IterationGenerator.Create(this.configuration.Session, engineeringModelSetup);
 
