@@ -1,11 +1,11 @@
 ﻿<UserControl
-    x:Class="CDP4SAT.Views.MainView"
+    x:Class="App.Views.MainView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
-    xmlns:viewModels="clr-namespace:CDP4SAT.ViewModels"
+    xmlns:viewModels="clr-namespace:App.ViewModels"
     xmlns:migrationViews="clr-namespace:Migration.Views;assembly=Migration"
     xmlns:syncerViews="clr-namespace:Syncer.Views;assembly=Syncer"
     xmlns:stressGeneratorViews="clr-namespace:StressGenerator.Views;assembly=StressGenerator"
