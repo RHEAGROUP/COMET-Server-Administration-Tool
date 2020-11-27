@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <RootNamespace>App.Tests</RootNamespace>
-    <AssemblyName>App.Tests</AssemblyName>
+    <RootNamespace>Migration.Tests</RootNamespace>
+    <AssemblyName>Migration.Tests</AssemblyName>
     <TargetFramework>net452</TargetFramework>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
-    <AssemblyTitle>CDP4-SAT.Tests</AssemblyTitle>
-    <Product>CDP4-SAT.Tests</Product>
-    <Copyright>Copyright ©  2020</Copyright>
+    <AssemblyTitle>Migration.Tests</AssemblyTitle>
+    <Product>Migration.Tests</Product>
+    <Copyright>Copyright © 2020</Copyright>
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
