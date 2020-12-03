@@ -53,18 +53,16 @@ namespace Syncer.Utils.Sync
             : base(sourceSession, targetSession) { }
 
         /// <summary>
-        /// Method syncing the given <paramref name="selectedThings"/> from the source server to the target server
+        /// Method syncing the given <paramref name="selectedIids"/> from the source server to the target server
         /// </summary>
-        /// <param name="selectedThings">
-        /// A list of things to sync
+        /// <param name="selectedIids">
+        /// A list of thing iids to sync
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>
         /// </returns>
-        protected internal override async Task Sync(IEnumerable<Thing> selectedThings)
+        public override async Task Sync(IEnumerable<Guid> selectedIids)
         {
-            var selectedIids = new HashSet<Guid>(selectedThings.Select(thing => thing.Iid));
-
             var operationContainer = new OperationContainer(this.TargetSiteDirectory.Route);
 
             var cloneTargetSiteDirectory = this.TargetSiteDirectory.Clone(false);

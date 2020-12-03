@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Migration.Tests", "Modules\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "App", "App\App.csproj", "{195A601C-3905-4FD6-9C37-30F359C6D753}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Syncer.Tests", "Modules\Syncer.Tests\Syncer.Tests.csproj", "{09E9476A-EA4C-4E0D-993D-5003E784C059}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{195A601C-3905-4FD6-9C37-30F359C6D753}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{195A601C-3905-4FD6-9C37-30F359C6D753}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{195A601C-3905-4FD6-9C37-30F359C6D753}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09E9476A-EA4C-4E0D-993D-5003E784C059}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09E9476A-EA4C-4E0D-993D-5003E784C059}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09E9476A-EA4C-4E0D-993D-5003E784C059}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09E9476A-EA4C-4E0D-993D-5003E784C059}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -61,6 +67,7 @@ Global
 		{984BD61A-3256-4ACA-8953-7751FC454790} = {53302909-5F6D-484F-BCD5-0760A3B92DD2}
 		{E65B83A1-1CF0-45BE-A1FE-6D60C2F844CD} = {53302909-5F6D-484F-BCD5-0760A3B92DD2}
 		{EC675A58-6D57-4E6E-A4CA-9CE38D736E0F} = {53302909-5F6D-484F-BCD5-0760A3B92DD2}
+		{09E9476A-EA4C-4E0D-993D-5003E784C059} = {53302909-5F6D-484F-BCD5-0760A3B92DD2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {37AE4295-ADFC-4A46-9211-441034E2CFA1}

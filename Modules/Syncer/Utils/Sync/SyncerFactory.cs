@@ -32,7 +32,7 @@ namespace Syncer.Utils.Sync
     /// <summary>
     /// A factory class used to build the helper <see cref="Syncer"/> classes
     /// </summary>
-    internal class SyncerFactory
+    public class SyncerFactory
     {
         /// <summary>
         /// The singleton class instance
@@ -45,7 +45,7 @@ namespace Syncer.Utils.Sync
         /// <returns>
         /// The singleton class instance
         /// </returns>
-        internal static SyncerFactory GetInstance() => Instance;
+        public static SyncerFactory GetInstance() => Instance;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SyncerFactory"/> class
@@ -67,7 +67,7 @@ namespace Syncer.Utils.Sync
         /// <returns>
         /// The newly created helper <see cref="Syncer"/> class
         /// </returns>
-        internal Syncer CreateSyncer(ThingType type, ISession sourceSession, ISession targetSession)
+        public Syncer CreateSyncer(ThingType type, ISession sourceSession, ISession targetSession)
         {
             switch (type)
             {
