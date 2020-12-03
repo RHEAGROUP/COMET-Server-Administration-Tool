@@ -285,7 +285,7 @@ namespace Common.ViewModels
 
                 // when no trailing slash is provided it can lead to loss of nested paths
                 // see https://stackoverflow.com/questions/22543723/create-new-uri-from-base-uri-and-relative-path-slash-makes-a-difference
-                // for consistency, all uri's are now appended, cannot rely on user getting it right.
+                // for consistency, all URIs are now appended, cannot rely on user getting it right.
                 if (this.SelectedDataSource != DataSource.JSON && !this.Uri.EndsWith("/"))
                 {
                     this.Uri += "/";
