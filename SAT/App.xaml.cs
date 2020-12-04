@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace App
+namespace SAT
 {
     using System;
     using System.Windows;

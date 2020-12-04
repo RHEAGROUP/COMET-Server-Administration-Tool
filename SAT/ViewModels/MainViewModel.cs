@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainView.xaml.cs" company="RHEA System S.A.">
+// <copyright file="MainViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -23,21 +23,20 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace App.Views
+namespace SAT.ViewModels
 {
-    using System.Windows.Controls;
+    using DevExpress.Mvvm;
 
     /// <summary>
-    /// Interaction logic for MainView.xaml
+    /// The view-model for the Main window
     /// </summary>
-    public partial class MainView : UserControl
+    public class MainViewModel : ViewModelBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MainView"/> user control class.
+        /// Initializes a new instance of the <see cref="MainViewModel"/> class.
         /// </summary>
-        public MainView()
+        public MainViewModel()
         {
-            InitializeComponent();
         }
     }
 }

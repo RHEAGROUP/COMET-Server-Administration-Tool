@@ -9,8 +9,8 @@
     <Product>CDP4SAT</Product>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <RootNamespace>App</RootNamespace>
-    <AssemblyName>App</AssemblyName>
+    <RootNamespace>SAT</RootNamespace>
+    <AssemblyName>SAT</AssemblyName>
     <Company>RHEA System S.A</Company>
     <Description>The CDP4 Server Administration Tool</Description>
     <Copyright>Copyright © RHEA System S.A</Copyright>
