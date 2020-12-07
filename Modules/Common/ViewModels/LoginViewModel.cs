@@ -137,7 +137,7 @@ namespace Common.ViewModels
         public ISession ServerSession
         {
             get => this.session;
-            private set => this.RaiseAndSetIfChanged(ref this.session, value);
+            set => this.RaiseAndSetIfChanged(ref this.session, value);
         }
 
         /// <summary>

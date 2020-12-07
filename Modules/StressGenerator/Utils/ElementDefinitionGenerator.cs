@@ -85,6 +85,11 @@ namespace StressGenerator.Utils
 
             foreach (var keyValue in StressGeneratorConfiguration.ParamValueConfig)
             {
+                if (parameterTypes.All(x => x.ShortName != keyValue.Key))
+                {
+                    continue;
+                }
+
                 configList.Add(new Tuple<ParameterType, double>(parameterTypes.Single(x => x.ShortName == keyValue.Key),
                     keyValue.Value));
             }

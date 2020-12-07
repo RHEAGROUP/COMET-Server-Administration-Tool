@@ -3,9 +3,11 @@
   <Config name="Debug">
     <assembly path="Modules/Migration.Tests/bin/Debug/net452/Migration.Tests.dll" />
     <assembly path="Modules/Syncer.Tests/bin/Debug/net452/Syncer.Tests.dll" />
+    <assembly path="Modules/StressGenerator.Tests/bin/Debug/net452/StressGenerator.Tests.dll" />
   </Config>
   <Config name="Release">
     <assembly path="Modules/Migration.Tests/bin/Release/net452/Migration.Tests.dll" />
     <assembly path="Modules/Syncer.Tests/bin/Release/net452/Syncer.Tests.dll" />
+    <assembly path="Modules/StressGenerator.Tests/bin/Release/net452/StressGenerator.Tests.dll" />
   </Config>
 </NUnitProject>

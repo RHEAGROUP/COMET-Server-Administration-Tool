@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Syncer.Tests", "Modules\Syn
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SAT", "SAT\SAT.csproj", "{15228E30-401B-4FE2-9B7E-21BC9EF5D50E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StressGenerator.Tests", "Modules\StressGenerator.Tests\StressGenerator.Tests.csproj", "{8DC4BDF7-8F76-48D8-81D5-109F02DFA7CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{15228E30-401B-4FE2-9B7E-21BC9EF5D50E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{15228E30-401B-4FE2-9B7E-21BC9EF5D50E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{15228E30-401B-4FE2-9B7E-21BC9EF5D50E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DC4BDF7-8F76-48D8-81D5-109F02DFA7CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DC4BDF7-8F76-48D8-81D5-109F02DFA7CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DC4BDF7-8F76-48D8-81D5-109F02DFA7CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DC4BDF7-8F76-48D8-81D5-109F02DFA7CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -68,6 +74,7 @@ Global
 		{E65B83A1-1CF0-45BE-A1FE-6D60C2F844CD} = {53302909-5F6D-484F-BCD5-0760A3B92DD2}
 		{EC675A58-6D57-4E6E-A4CA-9CE38D736E0F} = {53302909-5F6D-484F-BCD5-0760A3B92DD2}
 		{09E9476A-EA4C-4E0D-993D-5003E784C059} = {53302909-5F6D-484F-BCD5-0760A3B92DD2}
+		{8DC4BDF7-8F76-48D8-81D5-109F02DFA7CE} = {53302909-5F6D-484F-BCD5-0760A3B92DD2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {37AE4295-ADFC-4A46-9211-441034E2CFA1}
