@@ -34,12 +34,18 @@ namespace StressGenerator.ViewModels
     using CDP4Dal;
     using Common.ViewModels;
     using ReactiveUI;
+    using Utils;
 
     /// <summary>
     /// The view-model for the StressGenerator tool
     /// </summary>
     public class StressGeneratorViewModel : ReactiveObject
     {
+        /// <summary>
+        /// The <see cref="StressGenerator"/> used to build the helper sync classes
+        /// </summary>
+        private readonly StressGenerator stressGenerator = StressGenerator.GetInstance();
+
         /// <summary>
         /// Backing field for the source view model <see cref="LoginViewModel"/>
         /// </summary>
@@ -60,8 +66,8 @@ namespace StressGenerator.ViewModels
         public static Dictionary<DataSource, string> StressGeneratorTargetServerTypes { get; } =
             new Dictionary<DataSource, string>
             {
-                { DataSource.CDP4, "CDP4 WebServices" },
-                { DataSource.WSP, "OCDT WSP Server" }
+                {DataSource.CDP4, "CDP4 WebServices"},
+                {DataSource.WSP, "OCDT WSP Server"}
             };
 
         /// <summary>
@@ -196,8 +202,8 @@ namespace StressGenerator.ViewModels
         /// </summary>
         public StressGeneratorViewModel()
         {
-            this.TimeInterval = 5;
-            this.TestObjectsNumber = 50;
+            this.TimeInterval = StressGeneratorConfiguration.MinTimeInterval;
+            this.TestObjectsNumber = StressGeneratorConfiguration.MinNumberOfTestObjects;
             this.ElementName = "Element";
             this.ElementShortName = "ED";
             this.EngineeringModelSetupList = new ReactiveList<EngineeringModelSetup>();
@@ -208,12 +214,15 @@ namespace StressGenerator.ViewModels
                 vm => vm.TestObjectsNumber,
                 vm => vm.ElementName,
                 vm => vm.ElementShortName,
-                (sourceLoggedIn, timeInterval, testObjectsNumber, name, shortName) =>
+                vm => vm.SelectedEngineeringModelSetup,
+                (sourceLoggedIn, timeInterval, testObjectsNumber, name, shortName, modelSetup) =>
                     sourceLoggedIn &&
-                    timeInterval >= 5 &&
-                    testObjectsNumber >= 50 && testObjectsNumber <= 500 &&
+                    timeInterval >= StressGeneratorConfiguration.MinTimeInterval &&
+                    testObjectsNumber >= StressGeneratorConfiguration.MinNumberOfTestObjects &&
+                    testObjectsNumber <= StressGeneratorConfiguration.MaxNumberOfTestObjects &&
                     !string.IsNullOrEmpty(name) &&
-                    !string.IsNullOrEmpty(shortName));
+                    !string.IsNullOrEmpty(shortName) &&
+                    modelSetup != null);
 
             canExecuteStress.ToProperty(this, vm => vm.CanStress, out this.canStress);
 
@@ -233,6 +242,8 @@ namespace StressGenerator.ViewModels
                 canExecuteStress,
                 _ => this.ExecuteStressCommand(),
                 RxApp.MainThreadScheduler);
+
+            this.stressGenerator.NotifyMessageEvent += StressGeneratorMessageHandler;
         }
 
         /// <summary>
@@ -243,6 +254,25 @@ namespace StressGenerator.ViewModels
         /// </returns>
         private async Task ExecuteStressCommand()
         {
+            this.stressGenerator.Init(new StressGeneratorConfiguration(
+                this.SourceViewModel.ServerSession,
+                this.TimeInterval,
+                this.TestObjectsNumber,
+                this.ElementName,
+                this.ElementShortName,
+                this.DeleteAllElements));
+            await this.stressGenerator.GenerateTestObjects(this.SelectedEngineeringModelSetup);
+        }
+
+        /// <summary>
+        /// Add text message to the output panel
+        /// </summary>
+        /// <param name="message">The text message</param>
+        private void StressGeneratorMessageHandler(string message)
+        {
+            if (string.IsNullOrEmpty(message)) return;
+
+            this.Output += $"{DateTime.Now:HH:mm:ss} {message}{Environment.NewLine}";
         }
 
         /// <summary>
@@ -252,8 +282,7 @@ namespace StressGenerator.ViewModels
         private void BindEngineeringModels(SiteDirectory siteDirectory)
         {
             this.EngineeringModelSetupList.Clear();
-
-            foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
+            foreach (var modelSetup in siteDirectory.Model.Where(m => m.Name.StartsWith("Stresser")).OrderBy(m => m.Name))
             {
                 this.EngineeringModelSetupList.Add(modelSetup);
             }
