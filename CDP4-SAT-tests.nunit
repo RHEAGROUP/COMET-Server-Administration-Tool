@@ -1,9 +1,11 @@
 <NUnitProject>
   <Settings activeconfig="Debug" processModel="Default" domainUsage="Default" />
   <Config name="Debug">
-    <assembly path="Migration.Tests/bin/Debug/net452/App.Tests.dll" />
+    <assembly path="Modules/Migration.Tests/bin/Debug/net452/Migration.Tests.dll" />
+    <assembly path="Modules/Syncer.Tests/bin/Debug/net452/Syncer.Tests.dll" />
   </Config>
   <Config name="Release">
-    <assembly path="Migration.Tests/bin/Debug/net452/App.Tests.dll" />
+    <assembly path="Modules/Migration.Tests/bin/Release/net452/Migration.Tests.dll" />
+    <assembly path="Modules/Syncer.Tests/bin/Release/net452/Syncer.Tests.dll" />
   </Config>
 </NUnitProject>
