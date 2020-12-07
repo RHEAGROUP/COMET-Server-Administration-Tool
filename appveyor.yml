@@ -104,7 +104,7 @@ for:
         -returntargetcode
         -hideskipped:All
         -output:"%TEST_COVERAGE%"
-        -filter:"+[SAT*]* +[Common*]* +[Migration*]* +[StressGenerator*]* +[Syncer*]* -[*.Tests*]* -[*.Views]*""
+        -filter:"+[SAT*]* +[Common*]* +[Migration*]* +[StressGenerator*]* +[Syncer*]* -[*.Tests*]* -[*.Views*]*""
         -excludebyattribute:*.ExcludeFromCodeCoverageAttribute
     after_test:
     - ps: >-
