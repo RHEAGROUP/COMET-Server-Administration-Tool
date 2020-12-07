@@ -7,11 +7,11 @@
 namespace Migration.Tests
 {
     using Common.ViewModels;
+    using Migration.ViewModels;
     using Moq;
     using NUnit.Framework;
     using ReactiveUI;
     using System.Reactive.Concurrency;
-    using ViewModels;
 
     /// <summary>
     /// Suite of tests for the <see cref="MigrationViewModel"/>
@@ -25,11 +25,14 @@ namespace Migration.Tests
         private const string SourceUsername = "admin";
         private const string SourcePassword = "pass";
 
-        /// <summary>
-        /// Set target and source servers required by the migration
-        /// </summary>
-        private void SetTargetAndSourceServers()
+        [SetUp]
+        public void SetUp()
         {
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
+            this.migrationViewModel = new Mock<MigrationViewModel>();
+            this.migrationViewModel.Object.AddSubscriptions();
+
             this.migrationViewModel.Object.SourceViewModel = new LoginViewModel
             {
                 SelectedDataSource = DataSource.CDP4,
@@ -47,20 +50,9 @@ namespace Migration.Tests
             };
         }
 
-        [SetUp]
-        public void SetUp()
-        {
-            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
-
-            this.migrationViewModel = new Mock<MigrationViewModel>();
-            this.migrationViewModel.Object.AddSubscriptions();
-        }
-
         [Test]
         public void VerifyIfMigrationStartWithSourceAndTargetSessionSet()
         {
-            SetTargetAndSourceServers();
-
             Assert.DoesNotThrowAsync(async () =>
                 await this.migrationViewModel.Object.SourceViewModel.LoginCommand.ExecuteAsyncTask());
             Assert.AreEqual(true, this.migrationViewModel.Object.SourceViewModel.LoginSuccessfully);
@@ -78,8 +70,6 @@ namespace Migration.Tests
         [Test]
         public void VerifyIfMigrationNotStartWithoutSourceAndTargetSessionSet()
         {
-            SetTargetAndSourceServers();
-
             Assert.IsNull(this.migrationViewModel.Object.SourceViewModel.ServerSession);
             Assert.IsNull(this.migrationViewModel.Object.TargetViewModel.ServerSession);
         }

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainViewModel.cs" company="RHEA System S.A.">
+// <copyright file="MainView.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -23,20 +23,21 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4SAT.ViewModels
+namespace SAT.Views
 {
-    using DevExpress.Mvvm;
+    using System.Windows.Controls;
 
     /// <summary>
-    /// The view-model for the Main window
+    /// Interaction logic for MainView.xaml
     /// </summary>
-    public class MainViewModel : ViewModelBase
+    public partial class MainView : UserControl
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MainViewModel"/> class.
+        /// Initializes a new instance of the <see cref="MainView"/> user control class.
         /// </summary>
-        public MainViewModel()
+        public MainView()
         {
+            InitializeComponent();
         }
     }
 }

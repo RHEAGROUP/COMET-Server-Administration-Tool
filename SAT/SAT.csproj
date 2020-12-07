@@ -1,0 +1,123 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>1.0.0</ProductVersion>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net452</TargetFramework>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <AssemblyTitle>CDP4SAT</AssemblyTitle>
+    <Product>CDP4SAT</Product>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <RootNamespace>SAT</RootNamespace>
+    <AssemblyName>SAT</AssemblyName>
+    <Company>RHEA System S.A</Company>
+    <Description>The CDP4 Server Administration Tool</Description>
+    <Copyright>Copyright © RHEA System S.A</Copyright>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="CDP4Common-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4Dal-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4JsonFileDal-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4Rules-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4ServicesDal-CE" Version="6.3.0" />
+    <PackageReference Include="CDP4WspDal-CE" Version="6.3.0" />
+    <PackageReference Include="CommonServiceLocator" Version="1.3" />
+    <PackageReference Include="DevExpress.CodeParser" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Data" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Data.Desktop" Version="20.1.8" />
+    <PackageReference Include="DevExpress.DataAccess" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Images" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Mvvm" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Office.Core" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Pdf.Core" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Printing.Core" Version="20.1.8" />
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="20.1.8" />
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.Core" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.Layout" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.Themes.Office2019Colorful" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Xpo" Version="20.1.8" />
+    <PackageReference Include="DotNetZip" Version="1.13.8" />
+    <PackageReference Include="ExceptionReporter" Version="2.1.2" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+    <PackageReference Include="Microsoft.Bcl" Version="1.1.10" />
+    <PackageReference Include="Microsoft.Bcl.Build" Version="1.0.21" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="NLog" Version="4.6.8" />
+    <PackageReference Include="reactiveui-core.Net40" Version="6.5.0" />
+    <PackageReference Include="Rx-Core" Version="2.2.5" />
+    <PackageReference Include="Rx-Interfaces" Version="2.2.5" />
+    <PackageReference Include="Rx-Linq" Version="2.2.5" />
+    <PackageReference Include="Rx-Main" Version="2.2.5" />
+    <PackageReference Include="Rx-PlatformServices" Version="2.2.5" />
+    <PackageReference Include="Rx-XAML" Version="2.2.5" />
+    <PackageReference Include="Splat.Net40" Version="1.6.2" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Licenses.licx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MsBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MainView.xaml">
+      <Generator>MsBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\cdplogo3d_48x48.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Modules\Migration\Migration.csproj" />
+    <ProjectReference Include="..\Modules\StressGenerator\StressGenerator.csproj" />
+    <ProjectReference Include="..\Modules\Syncer\Syncer.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+</Project>

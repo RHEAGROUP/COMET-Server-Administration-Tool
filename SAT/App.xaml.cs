@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4SAT
+namespace SAT
 {
     using System;
     using System.Windows;

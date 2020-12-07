@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainView.xaml.cs" company="RHEA System S.A.">
+// <copyright file="MainWindow.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -23,19 +23,16 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4SAT.Views
+namespace SAT
 {
-    using System.Windows.Controls;
+    using DevExpress.Xpf.Core;
 
     /// <summary>
-    /// Interaction logic for MainView.xaml
+    /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainView : UserControl
+    public partial class MainWindow : ThemedWindow
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MainView"/> user control class.
-        /// </summary>
-        public MainView()
+        public MainWindow()
         {
             InitializeComponent();
         }

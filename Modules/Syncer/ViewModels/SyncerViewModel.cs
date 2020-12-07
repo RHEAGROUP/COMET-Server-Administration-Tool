@@ -230,18 +230,18 @@ namespace Syncer.ViewModels
                 this.SourceViewModel.ServerSession,
                 this.TargetViewModel.ServerSession);
 
-            IEnumerable<Thing> selectedThings;
+            IEnumerable<Guid> selectedIids;
             switch (this.SelectedThingType)
             {
                 case ThingType.DomainOfExpertise:
-                    selectedThings = this.DomainOfExpertiseViewModel.DomainsOfExpertise
+                    selectedIids = this.DomainOfExpertiseViewModel.DomainsOfExpertise
                         .Where(r => r.IsSelected)
-                        .Select(r => r.Thing);
+                        .Select(r => r.Thing.Iid);
                     break;
                 case ThingType.SiteReferenceDataLibrary:
-                    selectedThings = this.SiteReferenceDataLibraryViewModel.SiteReferenceDataLibraries
+                    selectedIids = this.SiteReferenceDataLibraryViewModel.SiteReferenceDataLibraries
                         .Where(r => r.IsSelected)
-                        .Select(r => r.Thing);
+                        .Select(r => r.Thing.Iid);
                     break;
                 default:
                     throw new ArgumentException("Invalid value", nameof(this.SelectedThingType));
@@ -249,7 +249,7 @@ namespace Syncer.ViewModels
 
             try
             {
-                await syncer.Sync(selectedThings);
+                await syncer.Sync(selectedIids);
                 UpdateOutput("Sync successful");
             }
             catch (Exception e)

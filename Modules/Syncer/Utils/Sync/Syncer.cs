@@ -37,7 +37,7 @@ namespace Syncer.Utils.Sync
     /// <summary>
     /// A helper class used for syncing <see cref="Thing"/>s of certain kinds
     /// </summary>
-    internal abstract class Syncer
+    public abstract class Syncer
     {
         /// <summary>
         /// The NLog logger
@@ -85,15 +85,15 @@ namespace Syncer.Utils.Sync
         }
 
         /// <summary>
-        /// Method syncing the given <paramref name="selectedThings"/> from the source server to the target server
+        /// Method syncing the given <paramref name="selectedIids"/> from the source server to the target server
         /// </summary>
-        /// <param name="selectedThings">
-        /// A list of things to sync
+        /// <param name="selectedIids">
+        /// A list of thing iids to sync
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>
         /// </returns>
-        protected internal abstract Task Sync(IEnumerable<Thing> selectedThings);
+        public abstract Task Sync(IEnumerable<Guid> selectedIids);
 
         /// <summary>
         /// Creates a <see cref="OperationKind.Update"/> or <see cref="OperationKind.Create"/> <see cref="Operation"/>
