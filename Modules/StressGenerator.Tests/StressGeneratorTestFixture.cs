@@ -112,10 +112,12 @@ namespace StressGenerator.Tests
         }
 
         [Test]
-        public void VerifyThatStressGeneratorWorksIfOpenIterationIsPresent()
+        public void VerifyThatStressGeneratorPropertiesAreSetsWithMinimumNumberOfTestObjects()
         {
+            this.stressGeneratorViewModel.TestObjectsNumber = Int16.MinValue;
+
+            this.assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
             this.session.Setup(x => x.OpenIterations).Returns(
                 new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
                 {
@@ -127,6 +129,24 @@ namespace StressGenerator.Tests
             Assert.AreEqual(1, this.modifiedThings.Count);
             // Five element definition and five parameters will be added
             Assert.AreEqual(10, this.generatedThings.Count);
+        }
+
+        [Test]
+        public void VerifyThatStressGeneratorWorksIfOpenIterationIsPresent()
+        {
+            this.assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            this.session.Setup(x => x.ActivePerson).Returns(this.person);
+            this.session.Setup(x => x.OpenIterations).Returns(
+                new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
+                {
+                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
+                });
+
+            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
+            // Iteration will be modified
+            Assert.AreEqual(1, this.modifiedThings.Count);
+            // Five element definition and five parameters will be added
+            Assert.AreEqual(this.stressGeneratorViewModel.TestObjectsNumber * 2, this.generatedThings.Count);
         }
 
         [Test]
