@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SiteReferenceDataLibraryTestFixture.cs" company="RHEA System S.A.">
+// <copyright file="StressGeneratorTestFixtureFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -23,26 +23,29 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.Linq;
-using CDP4Common.CommonData;
-using CDP4Dal.Operations;
-using Common.ViewModels;
-using StressGenerator.ViewModels;
-
 namespace StressGenerator.Tests
 {
-    using CDP4Common.SiteDirectoryData;
-    using CDP4Dal;
-    using CDP4Dal.DAL;
-    using Moq;
-    using NUnit.Framework;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+    using CDP4Dal;
+    using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
+    using Common.ViewModels;
+    using Moq;
+    using NUnit.Framework;
+    using ViewModels;
 
+    /// <summary>
+    /// Suite of tests for the <see cref="StressGeneratorViewModel"/>
+    /// </summary>
+    [TestFixture]
     public class StressGeneratorTestFixtureFixture
     {
         private readonly Credentials credentials = new Credentials(
@@ -92,39 +95,7 @@ namespace StressGenerator.Tests
 
             this.InitSessionThings();
 
-            this.dal.Setup(x => x.Open(this.credentials, It.IsAny<CancellationToken>()))
-                .Returns<Credentials, CancellationToken>(
-                    (dalCredentials, dalCancellationToken) => {
-                        var result = this.sessionThings.Values.ToList() as IEnumerable<CDP4Common.DTO.Thing>;
-                        return Task.FromResult(result);
-                    });
-
-            this.dal.Setup(x => x.Write(It.IsAny<OperationContainer>(), It.IsAny<IEnumerable<string>>()))
-                .Returns<OperationContainer, IEnumerable<string>>((operationContainer, files) =>
-                {
-                    foreach (var operation in operationContainer.Operations)
-                    {
-                        var operationThing = operation.ModifiedThing;
-
-                        switch (operation.OperationKind)
-                        {
-                            case OperationKind.Create:
-                                if (!generatedThings.ContainsKey(operationThing.Iid))
-                                {
-                                    generatedThings[operationThing.Iid] = operationThing;
-                                }
-                                break;
-                            case OperationKind.Update:
-                                if (!modifiedThings.ContainsKey(operationThing.Iid))
-                                {
-                                    modifiedThings[operationThing.Iid] = operationThing;
-                                }
-                                break;
-                        }
-                    }
-
-                    return Task.FromResult((IEnumerable<CDP4Common.DTO.Thing>)new List<CDP4Common.DTO.Thing>());
-                });
+            this.InitDalOperations();
 
             this.InitViewModel();
         }
@@ -143,31 +114,41 @@ namespace StressGenerator.Tests
         [Test]
         public void VerifyThatStressGeneratorWorksIfOpenIterationIsPresent()
         {
-            this.stressGeneratorViewModel.StressCommand.Execute(null);
+            this.session.Setup(x => x.ActivePerson).Returns(this.person);
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            this.session.Setup(x => x.OpenIterations).Returns(
+                new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
+                {
+                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
+                });
+
+            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
+            // Iteration will be modified
             Assert.AreEqual(1, this.modifiedThings.Count);
+            // Five element definition and five parameters will be added
             Assert.AreEqual(10, this.generatedThings.Count);
         }
 
-        private void InitViewModel()
+        [Test]
+        public void VerifyThatStressGeneratorFailedIfSessionHasNoActivePerson()
         {
-            this.sourceViewModel = new LoginViewModel
-            {
-                SelectedDataSource = DataSource.CDP4,
-                UserName = credentials.UserName,
-                Password = credentials.Password,
-                Uri = credentials.Uri.ToString(),
-                ServerSession = this.session.Object
-            };
+            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
+            // No iteration will be modified
+            Assert.AreEqual(0, this.modifiedThings.Count);
+            // No element definition will be added
+            Assert.AreEqual(0, this.generatedThings.Count);
+        }
 
-            this.stressGeneratorViewModel = new StressGeneratorViewModel
-            {
-                SourceViewModel = this.sourceViewModel,
-                TimeInterval = 1,
-                TestObjectsNumber = 5,
-                ElementName = "ElementDefinition",
-                ElementShortName = "ED",
-                SelectedEngineeringModelSetup = this.engineeringModelSetup
-            };
+        [Test]
+        public void VerifyThatStressGeneratorFailedIfSessionHasNoOpenIteration()
+        {
+            this.session.Setup(x => x.ActivePerson).Returns(this.person);
+
+            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
+            // No iteration will be modified
+            Assert.AreEqual(0, this.modifiedThings.Count);
+            // No element definition will be added
+            Assert.AreEqual(0, this.generatedThings.Count);
         }
 
         private void InitSessionThings()
@@ -252,15 +233,68 @@ namespace StressGenerator.Tests
                 {this.iterationSetup.Iid, this.iterationSetup.ToDto()},
                 {this.engineeringModel.Iid, this.engineeringModel.ToDto()}
             };
+        }
 
-            this.session.Setup(x => x.ActivePerson).Returns(this.person);
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
-            this.session.Setup(x => x.OpenIterations).Returns(
-                new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
+        private void InitDalOperations()
+        {
+            this.dal.Setup(x => x.Open(this.credentials, It.IsAny<CancellationToken>()))
+                .Returns<Credentials, CancellationToken>(
+                    (dalCredentials, dalCancellationToken) =>
+                    {
+                        var result = this.sessionThings.Values.ToList() as IEnumerable<CDP4Common.DTO.Thing>;
+                        return Task.FromResult(result);
+                    });
+
+            this.dal.Setup(x => x.Write(It.IsAny<OperationContainer>(), It.IsAny<IEnumerable<string>>()))
+                .Returns<OperationContainer, IEnumerable<string>>((operationContainer, files) =>
                 {
-                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
-                });
+                    foreach (var operation in operationContainer.Operations)
+                    {
+                        var operationThing = operation.ModifiedThing;
 
+                        switch (operation.OperationKind)
+                        {
+                            case OperationKind.Create:
+                                if (!generatedThings.ContainsKey(operationThing.Iid))
+                                {
+                                    generatedThings[operationThing.Iid] = operationThing;
+                                }
+
+                                break;
+                            case OperationKind.Update:
+                                if (!modifiedThings.ContainsKey(operationThing.Iid))
+                                {
+                                    modifiedThings[operationThing.Iid] = operationThing;
+                                }
+
+                                break;
+                        }
+                    }
+
+                    return Task.FromResult((IEnumerable<CDP4Common.DTO.Thing>) new List<CDP4Common.DTO.Thing>());
+                });
+        }
+
+        private void InitViewModel()
+        {
+            this.sourceViewModel = new LoginViewModel
+            {
+                SelectedDataSource = DataSource.CDP4,
+                UserName = credentials.UserName,
+                Password = credentials.Password,
+                Uri = credentials.Uri.ToString(),
+                ServerSession = this.session.Object
+            };
+
+            this.stressGeneratorViewModel = new StressGeneratorViewModel
+            {
+                SourceViewModel = this.sourceViewModel,
+                TimeInterval = 1,
+                TestObjectsNumber = 5,
+                ElementName = "ElementDefinition",
+                ElementShortName = "ED",
+                SelectedEngineeringModelSetup = this.engineeringModelSetup
+            };
         }
     }
 }

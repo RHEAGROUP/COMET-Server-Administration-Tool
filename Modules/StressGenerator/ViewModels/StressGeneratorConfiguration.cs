@@ -110,7 +110,13 @@ namespace StressGenerator.ViewModels
             this.Session = session;
             this.TimeInterval = timeInterval * 1000;
             this.TestObjectsNumber = testObjectsNumber;
-            if (this.TestObjectsNumber <= 0 || this.TestObjectsNumber > MaxNumberOfTestObjects)
+
+            if (this.TestObjectsNumber < MinNumberOfTestObjects)
+            {
+                this.TestObjectsNumber = MinNumberOfTestObjects;
+            }
+
+            if (this.TestObjectsNumber > MaxNumberOfTestObjects)
             {
                 this.TestObjectsNumber = MaxNumberOfTestObjects;
             }

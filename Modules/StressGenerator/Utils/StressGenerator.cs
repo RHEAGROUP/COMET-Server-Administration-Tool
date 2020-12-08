@@ -238,6 +238,13 @@ namespace StressGenerator.Utils
                 return null;
             }
 
+            if (this.configuration.Session.OpenIterations == null)
+            {
+                this.NotifyMessage("This session does not contains open Iterations.",
+                    LogVerbosity.Error);
+                return null;
+            }
+
             var start = this.FindHighestNumberOnElementDefinitions(iteration) + 1;
             var clearRequested = false;
             var generatedElementsList = new List<ElementDefinition>();
