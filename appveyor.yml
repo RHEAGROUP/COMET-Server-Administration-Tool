@@ -17,8 +17,8 @@ environment:
 
     - DOTNET_CLI_TELEMETRY_OPTOUT: true
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
-      TEST_RESULT:    'TestResult.xml'
-      TEST_COVERAGE:  'CoverResults.xml'
+      TEST_RESULT: 'TestResult.xml'
+      TEST_COVERAGE: 'CoverResults.xml'
       SONARCLOUD_PROJECT_KEY: RHEAGROUP_CDP4-SAT
       SONARCLOUD_ORGANIZATION: rheagroup
       SONARCLOUD_URL: 'https://sonarcloud.io'
@@ -80,8 +80,8 @@ for:
       - cmd: java -version
       - ps: >-
           if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
-            Write-Host Sonar Scanning PR# $env:APPVEYOR_PULL_REQUEST_NUMBER
-            SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.pullrequest.key=$env:APPVEYOR_PULL_REQUEST_NUMBER /d:sonar.pullrequest.provider=GitHub /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
+            Write-Host Sonar Scanning PR# $env:APPVEYOR_PULL_REQUEST_NUMBER BRANCH $env:APPVEYOR_REPO_BRANCH
+            SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.pullrequest.key=$env:APPVEYOR_PULL_REQUEST_NUMBER /d:sonar.pullrequest.branch=$env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH /d:sonar.pullrequest.provider=GitHub /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
           } elseif ($env:APPVEYOR_REPO_BRANCH -eq "development") {
             Write-Host Sonar Scanning branch $env:APPVEYOR_REPO_BRANCH
             SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.branch.name=$env:APPVEYOR_REPO_BRANCH /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
@@ -104,7 +104,7 @@ for:
         -returntargetcode
         -hideskipped:All
         -output:"%TEST_COVERAGE%"
-        -filter:"+[SAT*]* +[Common*]* +[Migration*]* +[StressGenerator*]* +[Syncer*]* -[*.Tests*]* -[*.Views*]*""
+        -filter:"+[SAT*]* +[Common*]* +[Migration*]* +[StressGenerator*]* +[Syncer*]* -[*.Tests*]* -[*.Views*]*"
         -excludebyattribute:*.ExcludeFromCodeCoverageAttribute
     after_test:
     - ps: >-
