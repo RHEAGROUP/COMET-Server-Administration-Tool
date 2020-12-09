@@ -170,12 +170,12 @@ namespace Migration.Utils
         {
             this.dal = new JsonFileDal(new Version("1.0.0"));
 
-            if (Directory.Exists("Import"))
+            if (Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\Import"))
             {
-                Directory.Delete("Import", true);
+                Directory.Delete($"{AppDomain.CurrentDomain.BaseDirectory}\\Import", true);
             }
 
-            Directory.CreateDirectory("Import");
+            Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}\\Import");
         }
 
         /// <summary>
@@ -388,12 +388,6 @@ namespace Migration.Utils
                 var operation = new Operation(null, dto, OperationKind.Create);
                 operationContainer.AddOperation(operation);
                 operationContainers.Add(operationContainer);
-
-                // delete previous file if exists
-                if (System.IO.File.Exists(MigrationFileName))
-                {
-                    System.IO.File.Delete(MigrationFileName);
-                }
 
                 try
                 {
