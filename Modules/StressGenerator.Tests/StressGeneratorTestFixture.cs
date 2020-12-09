@@ -30,6 +30,7 @@ namespace StressGenerator.Tests
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Castle.Components.DictionaryAdapter;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -37,6 +38,7 @@ namespace StressGenerator.Tests
     using CDP4Dal;
     using CDP4Dal.DAL;
     using CDP4Dal.Operations;
+    using Common.Settings;
     using Common.ViewModels;
     using Moq;
     using NUnit.Framework;
@@ -84,6 +86,11 @@ namespace StressGenerator.Tests
             this.dal = new Mock<IDal>();
             this.dal.SetupProperty(d => d.Session);
             this.assembler = new Assembler(this.credentials.Uri);
+
+            AppSettingsHandler.Settings = new AppSettings
+            {
+                SavedUris = new List<string>()
+            };
 
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.Dal).Returns(this.dal.Object);

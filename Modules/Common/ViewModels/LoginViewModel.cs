@@ -243,7 +243,7 @@ namespace Common.ViewModels
         public ReactiveList<string> SavedUris
         {
             get => this.savedUris;
-            private set => this.RaiseAndSetIfChanged(ref this.savedUris, value);
+            set => this.RaiseAndSetIfChanged(ref this.savedUris, value);
         }
 
         /// <summary>

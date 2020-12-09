@@ -6,11 +6,13 @@
 
 namespace Migration.Tests
 {
+    using System.Collections.Generic;
     using Common.ViewModels;
     using Moq;
     using NUnit.Framework;
     using ReactiveUI;
     using System.Reactive.Concurrency;
+    using Common.Settings;
 
     /// <summary>
     /// Suite of tests for the <see cref="LoginViewModel"/>
@@ -29,6 +31,11 @@ namespace Migration.Tests
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            AppSettingsHandler.Settings = new AppSettings
+            {
+                SavedUris = new List<string>()
+            };
+
             this.loginViewModel = new Mock<LoginViewModel>
             {
                 Object =
@@ -36,7 +43,8 @@ namespace Migration.Tests
                     SelectedDataSource = DataSource.CDP4,
                     UserName = SourceUsername,
                     Password = SourcePassword,
-                    Uri = SourceServerUri
+                    Uri = SourceServerUri,
+                    SavedUris = new ReactiveList<string>()
                 }
             };
         }
