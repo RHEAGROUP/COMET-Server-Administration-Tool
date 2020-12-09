@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FixCoordinalityErrorsDialog.xaml.cs" company="RHEA System S.A.">
+// <copyright file="SettingsReloadedEvent.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 // 
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -23,25 +23,12 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Migration.Views
+namespace Common.Events
 {
-    using System.Windows;
-    using DevExpress.Xpf.Core;
-    using ViewModels;
-
     /// <summary>
-    ///     Interaction logic for FixCoordinalityErrorsDialog.xaml
+    /// A messagebus event to signify that settings have been reloaded
     /// </summary>
-    public partial class FixCoordinalityErrorsDialog : ThemedWindow
+    public class SettingsReloadedEvent
     {
-        public FixCoordinalityErrorsDialog()
-        {
-            InitializeComponent();
-        }
-
-        private void FixCoordinalityErrorsDialog_OnLoaded(object sender, RoutedEventArgs e)
-        {
-            ((IFixCoordinalityErrorsDialogViewModel) this.DataContext).BindPocoErrors();
-        }
     }
 }

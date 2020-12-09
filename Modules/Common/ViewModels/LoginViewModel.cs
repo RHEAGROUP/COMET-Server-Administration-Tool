@@ -35,9 +35,11 @@ namespace Common.ViewModels
     using CDP4JsonFileDal;
     using CDP4ServicesDal;
     using CDP4WspDal;
+    using Events;
     using Microsoft.Win32;
     using PlainObjects;
     using ReactiveUI;
+    using Settings;
 
     /// <summary>
     /// Enum describing the possible server types
@@ -183,9 +185,28 @@ namespace Common.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets whether the currently entered uri can be saved
+        /// </summary>
+        public bool CanSaveUri
+        {
+            get => this.canSaveUri;
+            private set => this.RaiseAndSetIfChanged(ref this.canSaveUri, value);
+        }
+
+        /// <summary>
         /// Backing field for the <see cref="Output"/> property
         /// </summary>
         private string output;
+
+        /// <summary>
+        /// Backing field for the <see cref="CanSaveUri"/> property
+        /// </summary>
+        private bool canSaveUri;
+
+        /// <summary>
+        /// Backing field for the <see cref="SavedUris"/> property
+        /// </summary>
+        private ReactiveList<string> savedUris;
 
         /// <summary>
         /// Gets or sets output panel log messages
@@ -207,9 +228,23 @@ namespace Common.ViewModels
         public ReactiveCommand<object> LoadSourceFile { get; private set; }
 
         /// <summary>
+        /// Gets the command to save the current URI
+        /// </summary>
+        public ReactiveCommand<object> SaveCurrentUri { get; private set; }
+
+        /// <summary>
         /// Gets or sets engineering models list
         /// </summary>
         public List<EngineeringModelRowViewModel> EngineeringModels { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of saved uris
+        /// </summary>
+        public ReactiveList<string> SavedUris
+        {
+            get => this.savedUris;
+            private set => this.RaiseAndSetIfChanged(ref this.savedUris, value);
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginViewModel"/> class.
@@ -221,9 +256,12 @@ namespace Common.ViewModels
                 vm => vm.Password,
                 vm => vm.Uri,
                 (username, password, uri) =>
-                    !string.IsNullOrEmpty(username) &&
-                    !string.IsNullOrEmpty(password) &&
-                    !string.IsNullOrEmpty(uri));
+                    !string.IsNullOrWhiteSpace(username) &&
+                    !string.IsNullOrWhiteSpace(password) &&
+                    !string.IsNullOrWhiteSpace(uri));
+
+            this.SavedUris = new ReactiveList<string>();
+            this.SavedUris.ChangeTrackingEnabled = true;
 
             this.WhenAnyValue(vm => vm.LoginFailed).Subscribe((loginFailed) =>
             {
@@ -244,13 +282,48 @@ namespace Common.ViewModels
                 this.JsonIsSelected = this.SelectedDataSource == DataSource.JSON;
             });
 
+            this.WhenAnyValue(vm => vm.Uri).Subscribe(_ => { this.ComputeCanSaveUri(); });
+            this.WhenAnyValue(vm => vm.SavedUris).Subscribe(_ => { this.ComputeCanSaveUri(); });
+
+            this.GetSavedUris();
+
+            CDPMessageBus.Current.Listen<SettingsReloadedEvent>().Subscribe(_ => this.GetSavedUris());
+
             this.LoginCommand =
                 ReactiveCommand.CreateAsyncTask(canLogin, x => this.ExecuteLogin(), RxApp.MainThreadScheduler);
             this.LoadSourceFile = ReactiveCommand.Create();
             this.LoadSourceFile.Subscribe(_ => this.ExecuteLoadSourceFile());
 
+            this.SaveCurrentUri = ReactiveCommand.Create();
+            this.SaveCurrentUri.Subscribe(_ => this.ExecuteSaveCurrentUri());
+
             this.LoginSuccessfully = false;
             this.LoginFailed = false;
+        }
+
+        /// <summary>
+        /// Gets the saved Uris
+        /// </summary>
+        private void GetSavedUris()
+        {
+            this.SavedUris = new ReactiveList<string>(AppSettingsHandler.Settings.SavedUris);
+        }
+
+        /// <summary>
+        /// Saves the current Uri to the list
+        /// </summary>
+        private void ExecuteSaveCurrentUri()
+        {
+            AppSettingsHandler.Settings.SavedUris.Add(this.Uri);
+            AppSettingsHandler.Save();
+        }
+
+        /// <summary>
+        /// Computes whether the uri can be saves
+        /// </summary>
+        private void ComputeCanSaveUri()
+        {
+            this.CanSaveUri = !string.IsNullOrWhiteSpace(this.Uri) && !this.SavedUris.Contains(this.Uri);
         }
 
         /// <summary>

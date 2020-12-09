@@ -25,6 +25,7 @@
 
 namespace SAT.ViewModels
 {
+    using Common.Settings;
     using DevExpress.Mvvm;
 
     /// <summary>
@@ -37,6 +38,7 @@ namespace SAT.ViewModels
         /// </summary>
         public MainViewModel()
         {
+            AppSettingsHandler.Load();
         }
     }
 }

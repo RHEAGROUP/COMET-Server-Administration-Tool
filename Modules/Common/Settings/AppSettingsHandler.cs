@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FixCoordinalityErrorsDialog.xaml.cs" company="RHEA System S.A.">
+// <copyright file="AppSettingsHandler.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 // 
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -23,25 +23,50 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Migration.Views
+namespace Common.Settings
 {
-    using System.Windows;
-    using DevExpress.Xpf.Core;
-    using ViewModels;
+    using System.IO;
+    using CDP4Dal;
+    using Events;
+    using Newtonsoft.Json;
 
     /// <summary>
-    ///     Interaction logic for FixCoordinalityErrorsDialog.xaml
+    /// Handles the saveing and retrieving settings files
     /// </summary>
-    public partial class FixCoordinalityErrorsDialog : ThemedWindow
+    public static class AppSettingsHandler
     {
-        public FixCoordinalityErrorsDialog()
+        /// <summary>
+        /// The settings.
+        /// </summary>
+        public static AppSettings Settings;
+
+        /// <summary>
+        /// The name of the settings file
+        /// </summary>
+        private static string settingsFileName = "appSettings.json";
+
+        /// <summary>
+        /// Loads the settings from file
+        /// </summary>
+        public static void Load()
         {
-            InitializeComponent();
+            var json = File.ReadAllText(settingsFileName);
+
+            Settings = JsonConvert.DeserializeObject<AppSettings>(json);
+
+            CDPMessageBus.Current.SendMessage(new SettingsReloadedEvent());
         }
 
-        private void FixCoordinalityErrorsDialog_OnLoaded(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Saves the settings to file
+        /// </summary>
+        public static void Save()
         {
-            ((IFixCoordinalityErrorsDialogViewModel) this.DataContext).BindPocoErrors();
+            var json = JsonConvert.SerializeObject(Settings);
+            File.WriteAllText(settingsFileName, json);
+
+            Load();
         }
+
     }
 }

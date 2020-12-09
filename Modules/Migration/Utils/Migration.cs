@@ -389,14 +389,15 @@ namespace Migration.Utils
                 operationContainer.AddOperation(operation);
                 operationContainers.Add(operationContainer);
 
+                // delete previous file if exists
+                if (System.IO.File.Exists(MigrationFileName))
+                {
+                    System.IO.File.Delete(MigrationFileName);
+                }
+
                 try
                 {
                     await this.dal.Write(operationContainers, extensionFiles);
-
-                    if (System.IO.File.Exists(MigrationFileName))
-                    {
-                        System.IO.File.Delete(MigrationFileName);
-                    }
                 }
                 catch (Exception ex)
                 {

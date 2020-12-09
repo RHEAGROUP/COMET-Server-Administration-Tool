@@ -30,6 +30,10 @@ namespace Migration.ViewModels
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Dal;
     using Common.ViewModels.PlainObjects;
     using ReactiveUI;
@@ -171,9 +175,129 @@ namespace Migration.ViewModels
         /// </summary>
         private void ExecuteFixCommand()
         {
-            this.Errors.Clear();
+            
             this.IsBusy = true;
 
+            foreach (var erroredRow in this.Errors)
+            {
+                if (erroredRow.Error.Contains("ShortName"))
+                {
+                    if (erroredRow.Thing is IShortNamedThing shortNamedThing)
+                    {
+                        shortNamedThing.ShortName = "UndefinedShortName";
+                    }
+                } else if (erroredRow.Error.Contains("Name"))
+                {
+                    if (erroredRow.Thing is INamedThing namedThing)
+                    {
+                        namedThing.Name = "Undefined Name";
+                    }
+                }
+                else if (erroredRow.Error.Contains("Content"))
+                {
+                    if (erroredRow.Thing is Definition contentThing)
+                    {
+                        contentThing.Content = "No Content";
+                    }
+                }
+                else if (erroredRow.Error.Contains("Extension"))
+                {
+                    if (erroredRow.Thing is FileType fileThing)
+                    {
+                        fileThing.Extension = "UnknownExtension";
+                    }
+                }
+                else if (erroredRow.Error.Contains("Description"))
+                {
+                    if (erroredRow.Thing is IterationSetup iterationSetupThing)
+                    {
+                        iterationSetupThing.Description = "No Description";
+                    }
+                }
+                else if (erroredRow.Error.Contains("Source is null"))
+                {
+                    if (erroredRow.Thing is Citation citationThing)
+                    {
+                        var topContainer = erroredRow.Thing.TopContainer;
+
+                        ReferenceSource referenceSource = null;
+
+                        const string referenceSourceName = "Undefined Source";
+
+                        switch (topContainer)
+                        {
+                            case SiteDirectory siteDirectory:
+                            {
+                                var srdl = siteDirectory.SiteReferenceDataLibrary.FirstOrDefault();
+                                if (srdl != null)
+                                {
+                                    referenceSource =
+                                        srdl.ReferenceSource.FirstOrDefault(rs => rs.Name == referenceSourceName);
+                                }
+
+                                break;
+                            }
+                            case EngineeringModel engineeringModel:
+                            {
+                                var rdl = engineeringModel.RequiredRdls.FirstOrDefault();
+
+                                if (rdl != null)
+                                {
+                                    referenceSource =
+                                        rdl.ReferenceSource.FirstOrDefault(rs => rs.Name == referenceSourceName);
+                                }
+
+                                break;
+                            }
+                        }
+
+                        var sourceExists = referenceSource != null;
+
+                        if (!sourceExists)
+                        {
+                            // was not created yet
+                            referenceSource = new ReferenceSource(Guid.NewGuid(), erroredRow.Thing.Cache,
+                                erroredRow.Thing.IDalUri)
+                            {
+                                Name = referenceSourceName,
+                                ShortName = "UndefinedSource",
+                                Author = "Undefined Author"
+                            };
+                        }
+
+                        if (!sourceExists)
+                        {
+                            // add to cache
+                            erroredRow.Thing.Cache.AddOrUpdate(new CacheKey(referenceSource.Iid, null),
+                                new Lazy<Thing>(() => referenceSource), (key, oldValue) => oldValue);
+
+                            // add to containers
+                            switch (topContainer)
+                            {
+                                case SiteDirectory siteDirectory:
+                                {
+                                    var srdl = siteDirectory.SiteReferenceDataLibrary.FirstOrDefault();
+                                    srdl?.ReferenceSource.Add(referenceSource);
+                                    break;
+                                }
+                                case EngineeringModel engineeringModel:
+                                {
+                                    var rdl = engineeringModel.RequiredRdls.FirstOrDefault();
+
+                                    rdl?.ReferenceSource.Add(referenceSource);
+                                    break;
+                                }
+                            }
+                        }
+
+                        citationThing.Source = referenceSource;
+                    }
+                }
+
+                erroredRow.Thing.ValidatePoco();
+            }
+
+            this.Errors.Clear();
             var d = Task.Run(this.GetErrorRows).Result;
 
             this.Errors.AddRange(d);

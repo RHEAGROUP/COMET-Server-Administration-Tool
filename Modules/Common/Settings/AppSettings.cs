@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FixCoordinalityErrorsDialog.xaml.cs" company="RHEA System S.A.">
+// <copyright file="AppSettings.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 // 
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -23,25 +23,18 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Migration.Views
+namespace Common.Settings
 {
-    using System.Windows;
-    using DevExpress.Xpf.Core;
-    using ViewModels;
+    using System.Collections.Generic;
 
     /// <summary>
-    ///     Interaction logic for FixCoordinalityErrorsDialog.xaml
+    /// The in-memory representation of the application settings
     /// </summary>
-    public partial class FixCoordinalityErrorsDialog : ThemedWindow
+    public class AppSettings
     {
-        public FixCoordinalityErrorsDialog()
-        {
-            InitializeComponent();
-        }
-
-        private void FixCoordinalityErrorsDialog_OnLoaded(object sender, RoutedEventArgs e)
-        {
-            ((IFixCoordinalityErrorsDialogViewModel) this.DataContext).BindPocoErrors();
-        }
+        /// <summary>
+        /// Gets or sets the list of saved uris
+        /// </summary>
+        public List<string> SavedUris { get; set; }
     }
 }
