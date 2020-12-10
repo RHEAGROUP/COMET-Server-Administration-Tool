@@ -21,8 +21,10 @@
     <dxlc:LayoutGroup.DataContext>
         <viewModels:MigrationViewModel />
     </dxlc:LayoutGroup.DataContext>
-
-    <GroupBox Header="Source" Height="320">
+    <TextBlock TextWrapping="Wrap" Height="50" Background="LightYellow" Padding="5">
+        Warning: Migraiting servers is potentially very dangerous operation. The data on the Target server will be entirely erased in the process, thus it is only recommended to migrate to fresh new installations.
+    </TextBlock>
+    <GroupBox Header="Source" Height="360">
         <StackPanel Margin="0" HorizontalAlignment="Stretch">
             <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
@@ -40,6 +42,7 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
@@ -48,8 +51,11 @@
                         <CheckBox Grid.Row="1" Grid.Column="0"
                             IsChecked="{Binding Path=FileIsChecked}"
                             Margin="5"
-                            Content="File" />
-                        <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
+                            Content="Include migration.json File" />
+                        <TextBlock Grid.Row="2" TextWrapping="Wrap" Width="350" Background="LightYellow" Padding="5">
+                            Warning: Migraiting without a migration.json file will leave you potentially locked out of the target server as passwords are not preserved in standard transfer.
+                        </TextBlock>
+                        <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal">
                             <GroupBox Header="migration.json">
                                 <StackPanel Margin="0 0 0 0" Orientation="Horizontal">
                                     <dxe:TextEdit
