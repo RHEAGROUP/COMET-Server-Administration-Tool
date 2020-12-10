@@ -30,7 +30,7 @@ namespace Migration.Views
     using ViewModels;
 
     /// <summary>
-    ///     Interaction logic for FixCoordinalityErrorsDialog.xaml
+    /// Interaction logic for FixCoordinalityErrorsDialog.xaml
     /// </summary>
     public partial class FixCoordinalityErrorsDialog : ThemedWindow
     {

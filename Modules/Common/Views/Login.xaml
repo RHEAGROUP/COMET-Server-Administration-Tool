@@ -78,19 +78,19 @@
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
             <dxe:ComboBoxEdit
                 Height="Auto"
-            Margin="5"
-            FontSize="12"
-            Width="200"
-            AutoComplete="True"
-            AllowRejectUnknownValues="False"
-            IsEnabled="{Binding Path=JsonIsSelected, Converter={StaticResource InverseBooleanConverter}}"
-            IncrementalFiltering="True"
-            EditValue="{Binding Path=Uri, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-            ItemsSource="{Binding SavedUris}">
-            <dxe:ComboBoxEdit.StyleSettings>
-                <dxe:ComboBoxStyleSettings />
-            </dxe:ComboBoxEdit.StyleSettings>
-        </dxe:ComboBoxEdit>
+                Margin="5"
+                FontSize="12"
+                Width="200"
+                AutoComplete="True"
+                AllowRejectUnknownValues="False"
+                IsEnabled="{Binding Path=JsonIsSelected, Converter={StaticResource InverseBooleanConverter}}"
+                IncrementalFiltering="True"
+                EditValue="{Binding Path=Uri, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                ItemsSource="{Binding SavedUris}">
+                <dxe:ComboBoxEdit.StyleSettings>
+                    <dxe:ComboBoxStyleSettings />
+                </dxe:ComboBoxEdit.StyleSettings>
+            </dxe:ComboBoxEdit>
             <Button
                 MinWidth="40"
                 Height="Auto"

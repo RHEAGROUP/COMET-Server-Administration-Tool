@@ -31,45 +31,43 @@ namespace Migration.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using CDP4Common.CommonData;
-    using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Common.Types;
     using CDP4Dal;
     using Common.ViewModels.PlainObjects;
     using ReactiveUI;
 
     /// <summary>
-    ///     The viewmodel of the migration coordinality fix wizard.
+    /// The viewmodel of the migration coordinality fix wizard.
     /// </summary>
     public class FixCoordinalityErrorsDialogViewModel : ReactiveObject, IFixCoordinalityErrorsDialogViewModel
     {
         /// <summary>
-        ///     The migration source <see cref="ISession" />
+        /// The migration source <see cref="ISession" />
         /// </summary>
         private readonly ISession migrationSourceSession;
 
         /// <summary>
-        ///     Out property for the <see cref="ErrorDetails" /> property
+        /// Out property for the <see cref="ErrorDetails" /> property
         /// </summary>
         private string errorDetails;
 
         /// <summary>
-        ///     Backing field for <see cref="Errors" />
+        /// Backing field for <see cref="Errors" />
         /// </summary>
         private ReactiveList<PocoErrorRowViewModel> errors;
 
         /// <summary>
-        ///     Backing field for <see cref="IsBusy" />
+        /// Backing field for <see cref="IsBusy" />
         /// </summary>
         private bool isBusy;
 
         /// <summary>
-        ///     Backing field for <see cref="SelectedError" />
+        /// Backing field for <see cref="SelectedError" />
         /// </summary>
         private PocoErrorRowViewModel selectedError;
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="FixCoordinalityErrorsDialogViewModel" /> class.
+        /// Initializes a new instance of the <see cref="FixCoordinalityErrorsDialogViewModel" /> class.
         /// </summary>
         /// <param name="migrationSourceSession">The migration source <see cref="ISession" /></param>
         public FixCoordinalityErrorsDialogViewModel(ISession migrationSourceSession)
@@ -90,7 +88,7 @@ namespace Migration.ViewModels
         }
 
         /// <summary>
-        ///     Gets or sets the selected error
+        /// Gets or sets the selected error
         /// </summary>
         public PocoErrorRowViewModel SelectedError
         {
@@ -99,7 +97,7 @@ namespace Migration.ViewModels
         }
 
         /// <summary>
-        ///     Gets or sets the list of all errors
+        /// Gets or sets the list of all errors
         /// </summary>
         public ReactiveList<PocoErrorRowViewModel> Errors
         {
@@ -108,7 +106,7 @@ namespace Migration.ViewModels
         }
 
         /// <summary>
-        ///     Gets or sets error details that will be displayed inside error details group
+        /// Gets or sets error details that will be displayed inside error details group
         /// </summary>
         public string ErrorDetails
         {
@@ -117,7 +115,7 @@ namespace Migration.ViewModels
         }
 
         /// <summary>
-        ///     Gets or sets a value indicating the busy status
+        /// Gets or sets a value indicating the busy status
         /// </summary>
         public bool IsBusy
         {
@@ -126,12 +124,12 @@ namespace Migration.ViewModels
         }
 
         /// <summary>
-        ///     Gets the fix <see cref="IReactiveCommand" />
+        /// Gets the fix <see cref="IReactiveCommand" />
         /// </summary>
         public ReactiveCommand<object> FixCommand { get; private set; }
 
         /// <summary>
-        ///     Apply PocoCardinality & PocoProperties to the E10-25 data set and bind errors to the reactive list
+        /// Apply PocoCardinality & PocoProperties to the E10-25 data set and bind errors to the reactive list
         /// </summary>
         public void BindPocoErrors()
         {
@@ -151,7 +149,7 @@ namespace Migration.ViewModels
         }
 
         /// <summary>
-        ///     Gets the list of <see cref="PocoErrorRowViewModel" />
+        /// Gets the list of <see cref="PocoErrorRowViewModel" />
         /// </summary>
         /// <returns>A list of rows containing all errors in cache.</returns>
         private async Task<List<PocoErrorRowViewModel>> GetErrorRows()
@@ -171,11 +169,10 @@ namespace Migration.ViewModels
         }
 
         /// <summary>
-        ///     Executes the command to fix POCO coordinality errors
+        /// Executes the command to fix POCO coordinality errors
         /// </summary>
         private void ExecuteFixCommand()
         {
-            
             this.IsBusy = true;
 
             foreach (var erroredRow in this.Errors)
@@ -186,7 +183,8 @@ namespace Migration.ViewModels
                     {
                         shortNamedThing.ShortName = "UndefinedShortName";
                     }
-                } else if (erroredRow.Error.Contains("Name"))
+                }
+                else if (erroredRow.Error.Contains("Name"))
                 {
                     if (erroredRow.Thing is INamedThing namedThing)
                     {
@@ -216,81 +214,14 @@ namespace Migration.ViewModels
                 }
                 else if (erroredRow.Error.Contains("Source is null"))
                 {
+                    // broken citations are a result of 10-25 paradox thus shall be removed
                     if (erroredRow.Thing is Citation citationThing)
                     {
-                        var topContainer = erroredRow.Thing.TopContainer;
-
-                        ReferenceSource referenceSource = null;
-
-                        const string referenceSourceName = "Undefined Source";
-
-                        switch (topContainer)
+                        if (citationThing.Container is Definition container)
                         {
-                            case SiteDirectory siteDirectory:
-                            {
-                                var srdl = siteDirectory.SiteReferenceDataLibrary.FirstOrDefault();
-                                if (srdl != null)
-                                {
-                                    referenceSource =
-                                        srdl.ReferenceSource.FirstOrDefault(rs => rs.Name == referenceSourceName);
-                                }
-
-                                break;
-                            }
-                            case EngineeringModel engineeringModel:
-                            {
-                                var rdl = engineeringModel.RequiredRdls.FirstOrDefault();
-
-                                if (rdl != null)
-                                {
-                                    referenceSource =
-                                        rdl.ReferenceSource.FirstOrDefault(rs => rs.Name == referenceSourceName);
-                                }
-
-                                break;
-                            }
+                            container.Citation.Remove(citationThing);
+                            container.Cache.TryRemove(citationThing.CacheKey, out var removedCitation);
                         }
-
-                        var sourceExists = referenceSource != null;
-
-                        if (!sourceExists)
-                        {
-                            // was not created yet
-                            referenceSource = new ReferenceSource(Guid.NewGuid(), erroredRow.Thing.Cache,
-                                erroredRow.Thing.IDalUri)
-                            {
-                                Name = referenceSourceName,
-                                ShortName = "UndefinedSource",
-                                Author = "Undefined Author"
-                            };
-                        }
-
-                        if (!sourceExists)
-                        {
-                            // add to cache
-                            erroredRow.Thing.Cache.AddOrUpdate(new CacheKey(referenceSource.Iid, null),
-                                new Lazy<Thing>(() => referenceSource), (key, oldValue) => oldValue);
-
-                            // add to containers
-                            switch (topContainer)
-                            {
-                                case SiteDirectory siteDirectory:
-                                {
-                                    var srdl = siteDirectory.SiteReferenceDataLibrary.FirstOrDefault();
-                                    srdl?.ReferenceSource.Add(referenceSource);
-                                    break;
-                                }
-                                case EngineeringModel engineeringModel:
-                                {
-                                    var rdl = engineeringModel.RequiredRdls.FirstOrDefault();
-
-                                    rdl?.ReferenceSource.Add(referenceSource);
-                                    break;
-                                }
-                            }
-                        }
-
-                        citationThing.Source = referenceSource;
                     }
                 }
 
