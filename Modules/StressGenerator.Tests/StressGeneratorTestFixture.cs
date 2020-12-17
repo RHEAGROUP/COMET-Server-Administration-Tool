@@ -30,7 +30,6 @@ namespace StressGenerator.Tests
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Castle.Components.DictionaryAdapter;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
