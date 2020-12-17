@@ -72,12 +72,12 @@ namespace Migration.ViewModels
         /// <summary>
         /// Backing field for the source view model <see cref="LoginViewModel"/>
         /// </summary>
-        private LoginViewModel loginSourceViewModel;
+        private ILoginViewModel loginSourceViewModel;
 
         /// <summary>
         /// Gets or sets the source view model
         /// </summary>
-        public LoginViewModel SourceViewModel
+        public ILoginViewModel SourceViewModel
         {
             get => this.loginSourceViewModel;
             set => this.RaiseAndSetIfChanged(ref this.loginSourceViewModel, value);
@@ -86,12 +86,12 @@ namespace Migration.ViewModels
         /// <summary>
         /// Backing field for the target view model <see cref="LoginViewModel"/>
         /// </summary>
-        private LoginViewModel loginTargetViewModel;
+        private ILoginViewModel loginTargetViewModel;
 
         /// <summary>
         /// Gets or sets the target view model
         /// </summary>
-        public LoginViewModel TargetViewModel
+        public ILoginViewModel TargetViewModel
         {
             get => this.loginTargetViewModel;
             set => this.RaiseAndSetIfChanged(ref this.loginTargetViewModel, value);

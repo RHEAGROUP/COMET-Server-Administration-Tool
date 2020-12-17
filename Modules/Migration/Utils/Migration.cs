@@ -213,6 +213,12 @@ namespace Migration.Utils
                 siteDirectory = this.SourceSession.RetrieveSiteDirectory();
             }
 
+            if (siteDirectory == null)
+            {
+                this.NotifyMessage("Cannot retrieve site directory");
+                return false;
+            }
+
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
                 if (!selectedModels.ToList().Any(em => em.Iid == modelSetup.Iid && em.IsSelected)) continue;

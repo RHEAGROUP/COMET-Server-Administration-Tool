@@ -54,7 +54,7 @@ namespace Common.ViewModels
     /// <summary>
     /// The view-model for the Login that allows users to connect to different data sources
     /// </summary>
-    public class LoginViewModel : ReactiveObject
+    public class LoginViewModel : ReactiveObject, ILoginViewModel
     {
         /// <summary>
         /// Gets data source server type
@@ -129,12 +129,21 @@ namespace Common.ViewModels
         private IDal dal;
 
         /// <summary>
+        /// Gets or sets dal
+        /// </summary>
+        public IDal Dal
+        {
+            get => this.dal;
+            private set => this.RaiseAndSetIfChanged(ref this.dal, value);
+        }
+
+        /// <summary>
         /// Backing field for the <see cref="ISession"/> property
         /// </summary>
         private ISession session;
 
         /// <summary>
-        /// Gets or sets login successfully flag
+        /// Gets or sets server session
         /// </summary>
         public ISession ServerSession
         {
@@ -345,13 +354,13 @@ namespace Common.ViewModels
                 switch (this.SelectedDataSource)
                 {
                     case DataSource.CDP4:
-                        this.dal = new CdpServicesDal();
+                        this.Dal = new CdpServicesDal();
                         break;
                     case DataSource.WSP:
-                        this.dal = new WspDal();
+                        this.Dal = new WspDal();
                         break;
                     case DataSource.JSON:
-                        this.dal = new JsonFileDal(new Version("1.0.0"));
+                        this.Dal = new JsonFileDal(new Version("1.0.0"));
                         break;
                 }
 
@@ -365,7 +374,7 @@ namespace Common.ViewModels
 
                 var credentials = new Credentials(this.UserName, this.Password, new Uri(this.Uri));
 
-                this.ServerSession = new Session(this.dal, credentials);
+                this.ServerSession = new Session(this.Dal, credentials);
 
                 await this.ServerSession.Open();
 
