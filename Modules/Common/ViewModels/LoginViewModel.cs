@@ -260,8 +260,7 @@ namespace Common.ViewModels
                     !string.IsNullOrWhiteSpace(password) &&
                     !string.IsNullOrWhiteSpace(uri));
 
-            this.SavedUris = new ReactiveList<string>();
-            this.SavedUris.ChangeTrackingEnabled = true;
+            this.SavedUris = new ReactiveList<string> {ChangeTrackingEnabled = true};
 
             this.WhenAnyValue(vm => vm.LoginFailed).Subscribe((loginFailed) =>
             {
