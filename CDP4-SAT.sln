@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SAT", "SAT\SAT.csproj", "{1
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StressGenerator.Tests", "Modules\StressGenerator.Tests\StressGenerator.Tests.csproj", "{8DC4BDF7-8F76-48D8-81D5-109F02DFA7CE}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SAT.Tests", "SAT.Tests\SAT.Tests.csproj", "{950128F9-201A-44F0-B5D0-EB82FE5DFBD5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{8DC4BDF7-8F76-48D8-81D5-109F02DFA7CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DC4BDF7-8F76-48D8-81D5-109F02DFA7CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8DC4BDF7-8F76-48D8-81D5-109F02DFA7CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{950128F9-201A-44F0-B5D0-EB82FE5DFBD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{950128F9-201A-44F0-B5D0-EB82FE5DFBD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{950128F9-201A-44F0-B5D0-EB82FE5DFBD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{950128F9-201A-44F0-B5D0-EB82FE5DFBD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
