@@ -140,9 +140,7 @@ namespace Migration.ViewModels
             this.Errors.Clear();
             this.IsBusy = true;
 
-            var d = Task.Run(this.GetErrorRows).Result;
-
-            this.Errors.AddRange(d);
+            this.Errors.AddRange(Task.Run(this.GetErrorRows).Result);
 
             this.IsBusy = false;
         }
@@ -151,7 +149,7 @@ namespace Migration.ViewModels
         /// Gets the list of <see cref="PocoErrorRowViewModel" />
         /// </summary>
         /// <returns>A list of rows containing all errors in cache.</returns>
-        private List<PocoErrorRowViewModel> GetErrorRows()
+        private async Task<List<PocoErrorRowViewModel>> GetErrorRows()
         {
             var result = new List<PocoErrorRowViewModel>();
 

@@ -25,10 +25,13 @@
 
 namespace Migration.ViewModels
 {
+    /// <summary>
+    /// The interface for the view model <see cref="FixCoordinalityErrorsDialogViewModel"/>
+    /// </summary>
     public interface IFixCoordinalityErrorsDialogViewModel
     {
         /// <summary>
-        ///     Apply PocoCardinality & PocoProperties to the E10-25 data set and bind errors to the reactive list
+        /// Apply PocoCardinality & PocoProperties to the E10-25 data set and bind errors to the reactive list
         /// </summary>
         void BindPocoErrors();
     }
