@@ -23,6 +23,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Diagnostics;
+
 namespace SAT.Tests
 {
     using System;
@@ -60,6 +62,7 @@ namespace SAT.Tests
             this.viewModel = new MainViewModel();
 
             Assert.IsNotNull(this.viewModel);
+            Assert.IsNotNull(AppSettingsHandler.Settings);
             Assert.IsTrue(AppSettingsHandler.Settings.SavedUris.Contains(DefaultUrl));
         }
 
@@ -67,9 +70,14 @@ namespace SAT.Tests
         public void CheckIfAppSettingsIsSaved()
         {
             this.viewModel = new MainViewModel();
+
             Assert.IsNotNull(this.viewModel);
+            Assert.IsNotNull(AppSettingsHandler.Settings);
+
+            Assert.IsFalse(AppSettingsHandler.Settings.SavedUris.Contains(NewUrl));
 
             AppSettingsHandler.Settings.SavedUris.Add(NewUrl);
+
             AppSettingsHandler.Save();
 
             Assert.IsTrue(AppSettingsHandler.Settings.SavedUris.Contains(NewUrl));
