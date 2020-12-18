@@ -226,6 +226,7 @@ namespace Migration.ViewModels
             }
 
             this.Errors.Clear();
+
             var d = Task.Run(this.GetErrorRows).Result;
 
             this.Errors.AddRange(d);

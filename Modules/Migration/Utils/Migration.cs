@@ -78,7 +78,13 @@ namespace Migration.Utils
         /// <summary>
         /// Data Access Layer used during migration process
         /// </summary>
-        private readonly JsonFileDal dal;
+        private IDal dal;
+
+        public IDal Dal
+        {
+            get => this.dal;
+            set => this.dal = value;
+        }
 
         /// <summary>
         ///  Gets or sets session of the migration source server <see cref="ISession"/>
@@ -168,7 +174,7 @@ namespace Migration.Utils
         /// </summary>
         public Migration()
         {
-            this.dal = new JsonFileDal(new Version("1.0.0"));
+            this.Dal = new JsonFileDal(new Version("1.0.0"));
 
             if (Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\Import"))
             {
@@ -211,12 +217,6 @@ namespace Migration.Utils
             {
                 await this.SourceSession.Open();
                 siteDirectory = this.SourceSession.RetrieveSiteDirectory();
-            }
-
-            if (siteDirectory == null)
-            {
-                this.NotifyMessage("Cannot retrieve site directory");
-                return false;
             }
 
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
@@ -356,7 +356,7 @@ namespace Migration.Utils
         {
             List<string> extensionFiles = null;
             var zipCredentials = new Credentials("admin", "pass", new Uri(ArchiveFileName));
-            var zipSession = new Session(this.dal, zipCredentials);
+            var zipSession = new Session(this.Dal, zipCredentials);
             var success = true;
 
             if (!string.IsNullOrEmpty(migrationFile))
@@ -397,7 +397,7 @@ namespace Migration.Utils
 
                 try
                 {
-                    await this.dal.Write(operationContainers, extensionFiles);
+                    await this.Dal.Write(operationContainers, extensionFiles);
                 }
                 catch (Exception ex)
                 {

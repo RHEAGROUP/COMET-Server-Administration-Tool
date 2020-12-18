@@ -53,7 +53,7 @@ namespace Migration.ViewModels
         /// <summary>
         /// Migration class reference
         /// </summary>
-        private readonly Migration migration;
+        public Migration MigrationFactory { get; private set; }
 
         /// <summary>
         /// Backing field for <see cref="FileIsChecked"/>
@@ -135,19 +135,21 @@ namespace Migration.ViewModels
         /// </summary>
         public bool CanMigrate => this.canMigrate.Value;
 
+        private IFixCoordinalityErrorsDialog fixDialog;
+
+        public IFixCoordinalityErrorsDialog FixDialog
+        {
+            get => this.fixDialog;
+            set => this.fixDialog = value;
+        }
+
         /// <summary>
         /// Add subscription to the login view models
         /// </summary>
         public void AddSubscriptions()
         {
-            this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(message =>
-            {
-                OperationMessageHandler(message);
-            });
-            this.WhenAnyValue(vm => vm.TargetViewModel.Output).Subscribe(message =>
-            {
-                OperationMessageHandler(message);
-            });
+            this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(OperationMessageHandler);
+            this.WhenAnyValue(vm => vm.TargetViewModel.Output).Subscribe(OperationMessageHandler);
 
             this.WhenAnyValue(
                 vm => vm.SourceViewModel.LoginSuccessfully,
@@ -156,7 +158,7 @@ namespace Migration.ViewModels
                 .Where(canContinue => canContinue)
                 .Subscribe(_ =>
             {
-                this.migration.SourceSession = this.SourceViewModel.ServerSession;
+                this.MigrationFactory.SourceSession = this.SourceViewModel.ServerSession;
             });
 
             this.WhenAnyValue(
@@ -166,7 +168,7 @@ namespace Migration.ViewModels
                 .Where(canContinue => canContinue)
                 .Subscribe(_ =>
             {
-                this.migration.TargetSession = this.TargetViewModel.ServerSession;
+                this.MigrationFactory.TargetSession = this.TargetViewModel.ServerSession;
             });
         }
 
@@ -196,9 +198,9 @@ namespace Migration.ViewModels
 
             this.FileIsChecked = false;
 
-            this.migration = new Migration();
-            this.migration.OperationMessageEvent += this.OperationMessageHandler;
-            this.migration.OperationStepEvent += this.OperationStepHandler;
+            this.MigrationFactory = new Migration();
+            this.MigrationFactory.OperationMessageEvent += this.OperationMessageHandler;
+            this.MigrationFactory.OperationStepEvent += this.OperationStepHandler;
 
             this.LoadMigrationFile = ReactiveCommand.Create();
             this.LoadMigrationFile.Subscribe(_ => this.ExecuteLoadMigrationFile());
@@ -232,7 +234,7 @@ namespace Migration.ViewModels
         /// <returns>The <see cref="Task"/></returns>
         private async Task ExecuteMigration()
         {
-            var result = await this.migration.ImportData(this.SourceViewModel.EngineeringModels);
+            var result = await this.MigrationFactory.ImportData(this.SourceViewModel.EngineeringModels);
 
             if (!result)
             {
@@ -241,12 +243,15 @@ namespace Migration.ViewModels
             }
 
             // pop a wizard with POCO errors for whole session
-            var vm = new FixCoordinalityErrorsDialogViewModel(this.migration.SourceSession);
+            var vm = new FixCoordinalityErrorsDialogViewModel(this.MigrationFactory.SourceSession);
 
-            var fixDialog = new FixCoordinalityErrorsDialog
+            if (this.FixDialog == null)
             {
-                DataContext = vm
-            };
+                this.FixDialog = new FixCoordinalityErrorsDialog
+                {
+                    DataContext = vm
+                };
+            }
 
             var fixResult = fixDialog.ShowDialog();
 
@@ -256,7 +261,7 @@ namespace Migration.ViewModels
                 return;
             }
 
-            result = await this.migration.PackData(this.MigrationFile);
+            result = await this.MigrationFactory.PackData(this.MigrationFile);
 
             if (!result)
             {
@@ -264,7 +269,7 @@ namespace Migration.ViewModels
                 return;
             }
 
-            result = await this.migration.ExportData();
+            result = await this.MigrationFactory.ExportData();
 
             if (!result)
             {

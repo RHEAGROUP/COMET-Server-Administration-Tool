@@ -29,10 +29,15 @@ namespace Migration.Views
     using DevExpress.Xpf.Core;
     using ViewModels;
 
+    public interface IFixCoordinalityErrorsDialog
+    {
+        bool? ShowDialog();
+    }
+
     /// <summary>
     /// Interaction logic for FixCoordinalityErrorsDialog.xaml
     /// </summary>
-    public partial class FixCoordinalityErrorsDialog : ThemedWindow
+    public partial class FixCoordinalityErrorsDialog : ThemedWindow, IFixCoordinalityErrorsDialog
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FixCoordinalityErrorsDialog"/> class.
@@ -50,6 +55,11 @@ namespace Migration.Views
         private void FixCoordinalityErrorsDialog_OnLoaded(object sender, RoutedEventArgs e)
         {
             ((IFixCoordinalityErrorsDialogViewModel) this.DataContext).BindPocoErrors();
+        }
+
+        public new bool? ShowDialog()
+        {
+            return base.ShowDialog();
         }
     }
 }
