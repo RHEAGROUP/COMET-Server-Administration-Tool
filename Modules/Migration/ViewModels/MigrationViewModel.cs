@@ -245,13 +245,10 @@ namespace Migration.ViewModels
             // pop a wizard with POCO errors for whole session
             var vm = new FixCoordinalityErrorsDialogViewModel(this.MigrationFactory.SourceSession);
 
-            if (this.FixDialog == null)
+            this.FixDialog = new FixCoordinalityErrorsDialog
             {
-                this.FixDialog = new FixCoordinalityErrorsDialog
-                {
-                    DataContext = vm
-                };
-            }
+                DataContext = vm
+            };
 
             var fixResult = fixDialog.ShowDialog();
 

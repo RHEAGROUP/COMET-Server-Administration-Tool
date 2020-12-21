@@ -78,13 +78,7 @@ namespace Migration.Utils
         /// <summary>
         /// Data Access Layer used during migration process
         /// </summary>
-        private IDal dal;
-
-        public IDal Dal
-        {
-            get => this.dal;
-            set => this.dal = value;
-        }
+        public IDal Dal { get; set; }
 
         /// <summary>
         ///  Gets or sets session of the migration source server <see cref="ISession"/>
@@ -236,6 +230,10 @@ namespace Migration.Utils
                 // Read iterations
                 foreach (var iterationSetup in modelSetup.IterationSetup)
                 {
+                    if (iterationSetup.IsDeleted || iterationSetup.FrozenOn.HasValue)
+                    {
+                        continue;
+                    }
                     var iteration = new Iteration(
                         iterationSetup.IterationIid,
                         this.SourceSession.Assembler.Cache,
@@ -371,6 +369,10 @@ namespace Migration.Utils
                 try
                 {
                     extensionFiles = new List<string> {MigrationFileName};
+                    if (System.IO.File.Exists(MigrationFileName))
+                    {
+                        System.IO.File.Delete(MigrationFileName);
+                    }
                     System.IO.File.Copy(migrationFile, MigrationFileName);
                 }
                 catch (Exception ex)
@@ -394,20 +396,20 @@ namespace Migration.Utils
                 var operation = new Operation(null, dto, OperationKind.Create);
                 operationContainer.AddOperation(operation);
                 operationContainers.Add(operationContainer);
+            }
 
-                try
-                {
-                    await this.Dal.Write(operationContainers, extensionFiles);
-                }
-                catch (Exception ex)
-                {
-                    this.NotifyMessage("Could not pack data", LogVerbosity.Error, ex);
-                    success = false;
-                }
-                finally
-                {
-                    await this.SourceSession.Close();
-                }
+            try
+            {
+                await this.Dal.Write(operationContainers, extensionFiles);
+            }
+            catch (Exception ex)
+            {
+                this.NotifyMessage("Could not pack data", LogVerbosity.Error, ex);
+                success = false;
+            }
+            finally
+            {
+                await this.SourceSession.Close();
             }
 
             this.NotifyStep(MigrationStep.PackEnd);

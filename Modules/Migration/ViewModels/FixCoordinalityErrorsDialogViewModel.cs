@@ -23,6 +23,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using CDP4Common.Types;
+
 namespace Migration.ViewModels
 {
     using System;
@@ -149,7 +151,7 @@ namespace Migration.ViewModels
         /// Gets the list of <see cref="PocoErrorRowViewModel" />
         /// </summary>
         /// <returns>A list of rows containing all errors in cache.</returns>
-        private async Task<List<PocoErrorRowViewModel>> GetErrorRows()
+        private List<PocoErrorRowViewModel> GetErrorRows()
         {
             var result = new List<PocoErrorRowViewModel>();
 
@@ -174,52 +176,76 @@ namespace Migration.ViewModels
 
             foreach (var rowError in this.Errors)
             {
-                if (rowError.Error.Contains("ShortName"))
+                switch (rowError.Thing)
                 {
-                    if (rowError.Thing is IShortNamedThing shortNamedThing)
-                    {
-                        shortNamedThing.ShortName = "UndefinedShortName";
-                    }
-                }
-                else if (rowError.Error.Contains("Name"))
-                {
-                    if (rowError.Thing is INamedThing namedThing)
-                    {
-                        namedThing.Name = "Undefined Name";
-                    }
-                }
-                else if (rowError.Error.Contains("Content"))
-                {
-                    if (rowError.Thing is Definition contentThing)
-                    {
-                        contentThing.Content = "No Content";
-                    }
-                }
-                else if (rowError.Error.Contains("Extension"))
-                {
-                    if (rowError.Thing is FileType fileThing)
-                    {
-                        fileThing.Extension = "UnknownExtension";
-                    }
-                }
-                else if (rowError.Error.Contains("Description"))
-                {
-                    if (rowError.Thing is IterationSetup iterationSetupThing)
-                    {
-                        iterationSetupThing.Description = "No Description";
-                    }
-                }
-                else if (rowError.Error.Contains("Source is null"))
-                {
-                    // broken citations are a result of 10-25 paradox thus shall be removed
-                    if (rowError.Thing is Citation citationThing)
-                    {
+                    case FileType fileThing:
+                        if (rowError.Error.Contains("Extension"))
+                        {
+                            fileThing.Extension = "UnknownExtension";
+                        }
+                        break;
+                    case ScaleValueDefinition scaleValueThing:
+                        if (rowError.Error.Contains("ShortName"))
+                        {
+                            scaleValueThing.ShortName = "UndefinedShortName";
+                        }
+                        if (rowError.Error.Contains("Name"))
+                        {
+                            scaleValueThing.Name = "Undefined Name";
+                        }
+                        break;
+                    case TelephoneNumber telephoneThing:
+                        if (rowError.Error.Contains("Value"))
+                        {
+                            telephoneThing.Value = "No Value";
+                        }
+                        break;
+                    case UserPreference userPreferenceThing:
+                        if (rowError.Error.Contains("Value"))
+                        {
+                            userPreferenceThing.Value = "No Value";
+                        }
+                        break;
+                    case Citation citationThing:
+                        // broken citations are a result of 10-25 paradox thus shall be removed
                         if (citationThing.Container is Definition container)
                         {
                             container.Citation.Remove(citationThing);
                             container.Cache.TryRemove(citationThing.CacheKey, out _);
                         }
-                    }
+                        break;
+                    case Participant participantThing:
+                        var topContainer = participantThing.TopContainer as SiteDirectory;
+                        if (participantThing.Container is EngineeringModelSetup modelSetup)
+                        {
+                            modelSetup.Participant.Remove(participantThing);
+                            modelSetup.Cache.TryRemove(participantThing.CacheKey, out _);
+                        }
+                        break;
+                    case IShortNamedThing shortNamedThing:
+                        if (rowError.Error.Contains("ShortName"))
+                        {
+                            shortNamedThing.ShortName = "UndefinedShortName";
+                        }
+                        break;
+                    case INamedThing namedThing:
+                        if (rowError.Error.Contains("Name"))
+                        {
+                            namedThing.Name = "Undefined Name";
+                        }
+                        break;
+                    case Definition contentThing:
+                        if (rowError.Error.Contains("Content"))
+                        {
+                            contentThing.Content = "No Content";
+                        }
+                        break;
+                    case IterationSetup iterationSetupThing:
+                        if (rowError.Error.Contains("Description"))
+                        {
+                            iterationSetupThing.Description = "No Description";
+                        }
+                        break;
                 }
 
                 rowError.Thing.ValidatePoco();
