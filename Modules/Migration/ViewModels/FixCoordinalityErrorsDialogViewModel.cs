@@ -23,8 +23,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using CDP4Common.Types;
-
 namespace Migration.ViewModels
 {
     using System;
@@ -215,7 +213,6 @@ namespace Migration.ViewModels
                         }
                         break;
                     case Participant participantThing:
-                        var topContainer = participantThing.TopContainer as SiteDirectory;
                         if (participantThing.Container is EngineeringModelSetup modelSetup)
                         {
                             modelSetup.Participant.Remove(participantThing);

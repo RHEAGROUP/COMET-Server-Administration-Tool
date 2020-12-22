@@ -23,6 +23,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using DevExpress.Xpf.Core;
+
 namespace Migration.ViewModels
 {
     using System;
@@ -35,6 +37,36 @@ namespace Migration.ViewModels
     using ReactiveUI;
     using Common.ViewModels;
     using Views;
+
+    public interface IMigrationServiceDialog
+    {
+        OpenFileDialog OpenFileWindowDialog { get; set; }
+
+        bool? OpenMigrationFileDialog(string defaultPath, string filter);
+
+        bool? OpenFixWindowDialog(ThemedWindow window);
+    }
+
+    public class MigrationServiceDialog : IMigrationServiceDialog
+    {
+        public OpenFileDialog OpenFileWindowDialog { get; set; }
+
+        public bool? OpenMigrationFileDialog(string initialDirectory, string filter)
+        {
+            this.OpenFileWindowDialog = new OpenFileDialog()
+            {
+                InitialDirectory = initialDirectory,
+                Filter = filter
+            };
+
+            return this.OpenFileWindowDialog.ShowDialog();
+        }
+
+        public bool? OpenFixWindowDialog(ThemedWindow window)
+        {
+            return window.ShowDialog();
+        }
+    }
 
     /// <summary>
     /// The view-model for the Migration that lets users to migrate models between different data servers
@@ -97,6 +129,8 @@ namespace Migration.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.loginTargetViewModel, value);
         }
 
+        public IFixCoordinalityErrorsDialogViewModel FixCardinalityErrorsViewModel { get; set; }
+
         /// <summary>
         /// Backing field for the the output messages <see cref="Output"/>
         /// </summary>
@@ -135,14 +169,6 @@ namespace Migration.ViewModels
         /// </summary>
         public bool CanMigrate => this.canMigrate.Value;
 
-        private IFixCoordinalityErrorsDialog fixDialog;
-
-        public IFixCoordinalityErrorsDialog FixDialog
-        {
-            get => this.fixDialog;
-            set => this.fixDialog = value;
-        }
-
         /// <summary>
         /// Add subscription to the login view models
         /// </summary>
@@ -159,6 +185,8 @@ namespace Migration.ViewModels
                 .Subscribe(_ =>
             {
                 this.MigrationFactory.SourceSession = this.SourceViewModel.ServerSession;
+                this.FixCardinalityErrorsViewModel =
+                    new FixCoordinalityErrorsDialogViewModel(this.MigrationFactory.SourceSession);
             });
 
             this.WhenAnyValue(
@@ -181,6 +209,8 @@ namespace Migration.ViewModels
         /// Gets the server migrate command
         /// </summary>
         public ReactiveCommand<Unit> MigrateCommand { get; private set; }
+
+        public IMigrationServiceDialog MigrationServiceDialog;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MigrationViewModel"/> class
@@ -207,6 +237,8 @@ namespace Migration.ViewModels
 
             this.MigrateCommand = ReactiveCommand.CreateAsyncTask(canExecuteMigrate,
                 x => this.ExecuteMigration(), RxApp.MainThreadScheduler);
+
+            this.MigrationServiceDialog = new MigrationServiceDialog();
         }
 
         /// <summary>
@@ -214,17 +246,19 @@ namespace Migration.ViewModels
         /// </summary>
         private void ExecuteLoadMigrationFile()
         {
-            var openFileDialog = new OpenFileDialog()
-            {
-                InitialDirectory = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\",
-                Filter = "Json files (*.json)|*.json"
-            };
+            var dialogResult = MigrationServiceDialog.OpenMigrationFileDialog($"{AppDomain.CurrentDomain.BaseDirectory}Import\\",
+                "Json files (*.json)|*.json");
+            //var openFileDialog = new OpenMigrationFileDialog()
+            //{
+            //    InitialDirectory = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\",
+            //    Filter = "Json files (*.json)|*.json"
+            //};
 
-            var dialogResult = openFileDialog.ShowDialog();
+            //var dialogResult = openFileDialog.ShowDialog();
 
-            if (dialogResult.HasValue && dialogResult.Value && openFileDialog.FileNames.Length == 1)
+            if (dialogResult.HasValue && dialogResult.Value/* && openFileDialog.FileNames.Length == 1*/)
             {
-                this.MigrationFile = openFileDialog.FileNames[0];
+                //this.MigrationFile = openFileDialog.FileNames[0];
             }
         }
 
@@ -242,17 +276,13 @@ namespace Migration.ViewModels
                 return;
             }
 
-            // pop a wizard with POCO errors for whole session
-            var vm = new FixCoordinalityErrorsDialogViewModel(this.MigrationFactory.SourceSession);
-
-            this.FixDialog = new FixCoordinalityErrorsDialog
+            // Pop a wizard with POCO errors for whole session
+            var dialogResult = this.MigrationServiceDialog.OpenFixWindowDialog(new FixCoordinalityErrorsDialog
             {
-                DataContext = vm
-            };
+                DataContext = this.FixCardinalityErrorsViewModel
+            });
 
-            var fixResult = fixDialog.ShowDialog();
-
-            if (fixResult != true)
+            if (dialogResult != true)
             {
                 this.OperationMessageHandler("Migration canceled");
                 return;

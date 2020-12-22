@@ -21,6 +21,8 @@ namespace Migration.Tests
     using Common.Settings;
     using Common.ViewModels;
     using Common.ViewModels.PlainObjects;
+    using DevExpress.Mvvm.Native;
+    using DevExpress.Xpf.Core;
     using Views;
     using Moq;
     using NUnit.Framework;
@@ -44,7 +46,7 @@ namespace Migration.Tests
         private Mock<ILoginViewModel> targetViewModel;
         private Assembler assembler;
         private MigrationViewModel migrationViewModel;
-        private Mock<IFixCoordinalityErrorsDialog> viewDialog;
+        private Mock<IMigrationServiceDialog> serviceDialog;
 
         private EngineeringModelSetup engineeringModelSetup;
         private SiteDirectory siteDirectory;
@@ -68,8 +70,6 @@ namespace Migration.Tests
             this.jsonFileDal.Setup(x => x.DalVersion).Returns(new Version("1.0.0"));
             this.dal.SetupProperty(d => d.Session);
             this.assembler = new Assembler(this.credentials.Uri);
-            this.viewDialog = new Mock<IFixCoordinalityErrorsDialog>();
-            this.viewDialog.Setup(x => x.ShowDialog()).Returns(true);
 
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.Dal).Returns(this.dal.Object);
@@ -82,8 +82,13 @@ namespace Migration.Tests
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDirectory);
 
+            this.serviceDialog = new Mock<IMigrationServiceDialog>();
+            this.serviceDialog.Setup(x => x.OpenFixWindowDialog(It.IsAny<ThemedWindow>())).Returns(true);
+            this.serviceDialog.Setup(x => x.OpenMigrationFileDialog(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+
             this.migrationViewModel = new MigrationViewModel();
             this.migrationViewModel.AddSubscriptions();
+            this.migrationViewModel.MigrationServiceDialog = serviceDialog.Object;
 
             this.sourceViewModel = new Mock<ILoginViewModel>();
             this.sourceViewModel.Setup(x => x.SelectedDataSource).Returns(DataSource.CDP4);
@@ -110,21 +115,7 @@ namespace Migration.Tests
         [Test, Apartment(ApartmentState.STA)]
         public void VerifyIfMigrationStartWithSourceAndTargetSessionSet()
         {
-            this.assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
-            this.session.Setup(x => x.ActivePerson).Returns(this.person);
-            this.session.Setup(x => x.OpenIterations).Returns(
-                new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-                {
-                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
-                });
-
-            this.sourceViewModel.Setup(x => x.LoginSuccessfully).Returns(true);
-            this.migrationViewModel.SourceViewModel = this.sourceViewModel.Object;
-
-            this.targetViewModel.Setup(x => x.LoginSuccessfully).Returns(true);
-            this.migrationViewModel.TargetViewModel = this.targetViewModel.Object;
-
-            this.migrationViewModel.MigrationFactory.Dal = this.jsonFileDal.Object;
+            this.InitSourceAndTargetViewModels();
 
             Assert.IsTrue(this.migrationViewModel.CanMigrate);
 
@@ -137,10 +128,19 @@ namespace Migration.Tests
 
             this.sourceViewModel.Setup(x => x.EngineeringModels).Returns(selectedEngineeringModels);
 
-            this.migrationViewModel.FixDialog = this.viewDialog.Object;
+            //this.migrationViewModel.FixDialog = this.viewDialog.Object;
 
-            Assert.DoesNotThrowAsync(async () =>
-                await this.migrationViewModel.MigrateCommand.ExecuteAsyncTask());
+            Assert.DoesNotThrow(() => Task.Run(() => this.migrationViewModel.MigrateCommand.ExecuteAsyncTask()));
+        }
+
+        [Test]
+        public void VerifyIfExecuteCommandsWorks()
+        {
+            this.InitSourceAndTargetViewModels();
+
+            Assert.DoesNotThrow(() => this.migrationViewModel.LoadMigrationFile.Execute(null));
+
+            Assert.DoesNotThrow(() => Task.Run(() => this.migrationViewModel.MigrateCommand.ExecuteAsyncTask()));
         }
 
         [Test]
@@ -245,6 +245,25 @@ namespace Migration.Tests
             this.jsonFileDal.Setup(x => x.Write(It.IsAny<OperationContainer>(), It.IsAny<IEnumerable<string>>()))
                 .Returns<OperationContainer, IEnumerable<string>>((operationContainer, files) =>
                     Task.FromResult((IEnumerable<CDP4Common.DTO.Thing>) new List<CDP4Common.DTO.Thing>()));
+        }
+
+        private void InitSourceAndTargetViewModels()
+        {
+            this.assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            this.session.Setup(x => x.ActivePerson).Returns(this.person);
+            this.session.Setup(x => x.OpenIterations).Returns(
+                new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
+                {
+                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
+                });
+
+            this.sourceViewModel.Setup(x => x.LoginSuccessfully).Returns(true);
+            this.migrationViewModel.SourceViewModel = this.sourceViewModel.Object;
+
+            this.targetViewModel.Setup(x => x.LoginSuccessfully).Returns(true);
+            this.migrationViewModel.TargetViewModel = this.targetViewModel.Object;
+
+            this.migrationViewModel.MigrationFactory.Dal = this.jsonFileDal.Object;
         }
     }
 }
