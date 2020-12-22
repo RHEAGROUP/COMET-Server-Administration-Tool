@@ -5,8 +5,8 @@
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    WindowStartupLocation="CenterScreen"
     Title="Coordinality Errors" Height="600" Width="1000" Loaded="FixCoordinalityErrorsDialog_OnLoaded">
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="65"/>

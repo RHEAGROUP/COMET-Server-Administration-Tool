@@ -22,7 +22,7 @@
         <viewModels:MigrationViewModel />
     </dxlc:LayoutGroup.DataContext>
     <TextBlock TextWrapping="Wrap" Height="50" Background="LightYellow" Padding="5">
-        Warning: Migraiting servers is potentially very dangerous operation. The data on the Target server will be entirely erased in the process, thus it is only recommended to migrate to fresh new installations.
+        Warning: Migrating servers is potentially very dangerous operation. The data on the Target server will be entirely erased in the process, thus it is only recommended to migrate to fresh new installations.
     </TextBlock>
     <GroupBox Header="Source" Height="360">
         <StackPanel Margin="0" HorizontalAlignment="Stretch">
@@ -53,7 +53,7 @@
                             Margin="5"
                             Content="Include migration.json File" />
                         <TextBlock Grid.Row="2" TextWrapping="Wrap" Width="350" Background="LightYellow" Padding="5">
-                            Warning: Migraiting without a migration.json file will leave you potentially locked out of the target server as passwords are not preserved in standard transfer.
+                            Warning: Migrating without a migration.json file will leave you potentially locked out of the target server as passwords are not preserved in standard transfer.
                         </TextBlock>
                         <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal">
                             <GroupBox Header="migration.json">
