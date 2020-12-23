@@ -13,19 +13,18 @@ namespace Migration.Tests
     using System.Threading.Tasks;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
     using CDP4Dal;
     using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
     using Common.Settings;
     using Common.ViewModels;
     using Common.ViewModels.PlainObjects;
-    using DevExpress.Mvvm.Native;
     using DevExpress.Xpf.Core;
-    using Views;
     using Moq;
     using NUnit.Framework;
+    using Utils;
     using ViewModels;
 
     /// <summary>
@@ -127,8 +126,6 @@ namespace Migration.Tests
             if (firstSelected != null) firstSelected.IsSelected = true;
 
             this.sourceViewModel.Setup(x => x.EngineeringModels).Returns(selectedEngineeringModels);
-
-            //this.migrationViewModel.FixDialog = this.viewDialog.Object;
 
             Assert.DoesNotThrow(() => Task.Run(() => this.migrationViewModel.MigrateCommand.ExecuteAsyncTask()));
         }

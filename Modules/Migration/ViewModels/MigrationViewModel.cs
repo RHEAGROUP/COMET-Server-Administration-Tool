@@ -23,8 +23,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using DevExpress.Xpf.Core;
-
 namespace Migration.ViewModels
 {
     using System;
@@ -32,41 +30,10 @@ namespace Migration.ViewModels
     using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
-    using Microsoft.Win32;
     using Utils;
     using ReactiveUI;
     using Common.ViewModels;
     using Views;
-
-    public interface IMigrationServiceDialog
-    {
-        OpenFileDialog OpenFileWindowDialog { get; set; }
-
-        bool? OpenMigrationFileDialog(string defaultPath, string filter);
-
-        bool? OpenFixWindowDialog(ThemedWindow window);
-    }
-
-    public class MigrationServiceDialog : IMigrationServiceDialog
-    {
-        public OpenFileDialog OpenFileWindowDialog { get; set; }
-
-        public bool? OpenMigrationFileDialog(string initialDirectory, string filter)
-        {
-            this.OpenFileWindowDialog = new OpenFileDialog()
-            {
-                InitialDirectory = initialDirectory,
-                Filter = filter
-            };
-
-            return this.OpenFileWindowDialog.ShowDialog();
-        }
-
-        public bool? OpenFixWindowDialog(ThemedWindow window)
-        {
-            return window.ShowDialog();
-        }
-    }
 
     /// <summary>
     /// The view-model for the Migration that lets users to migrate models between different data servers
@@ -129,7 +96,10 @@ namespace Migration.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.loginTargetViewModel, value);
         }
 
-        public IFixCoordinalityErrorsDialogViewModel FixCardinalityErrorsViewModel { get; set; }
+        /// <summary>
+        /// Gets or sets fix cardinality view model
+        /// </summary>
+        private IFixCoordinalityErrorsDialogViewModel FixCardinalityErrorsViewModel { get; set; }
 
         /// <summary>
         /// Backing field for the the output messages <see cref="Output"/>
@@ -248,17 +218,11 @@ namespace Migration.ViewModels
         {
             var dialogResult = MigrationServiceDialog.OpenMigrationFileDialog($"{AppDomain.CurrentDomain.BaseDirectory}Import\\",
                 "Json files (*.json)|*.json");
-            //var openFileDialog = new OpenMigrationFileDialog()
-            //{
-            //    InitialDirectory = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\",
-            //    Filter = "Json files (*.json)|*.json"
-            //};
+            var dialog = MigrationServiceDialog.OpenFileWindowDialog;
 
-            //var dialogResult = openFileDialog.ShowDialog();
-
-            if (dialogResult.HasValue && dialogResult.Value/* && openFileDialog.FileNames.Length == 1*/)
+            if (dialogResult.HasValue && dialogResult.Value && dialog.FileNames.Length == 1)
             {
-                //this.MigrationFile = openFileDialog.FileNames[0];
+                this.MigrationFile = dialog.FileNames[0];
             }
         }
 
