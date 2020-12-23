@@ -174,22 +174,22 @@ namespace Migration.ViewModels
 
             foreach (var rowError in this.Errors)
             {
+                if (rowError.Thing is IShortNamedThing shortNamedThing && rowError.Error.Contains("ShortName"))
+                {
+                    shortNamedThing.ShortName = "UndefinedShortName";
+                }
+
+                if (rowError.Thing is INamedThing namedThing && rowError.Error.Contains("Name"))
+                {
+                    namedThing.Name = "Undefined Name";
+                }
+
                 switch (rowError.Thing)
                 {
                     case FileType fileThing:
                         if (rowError.Error.Contains("Extension"))
                         {
                             fileThing.Extension = "UnknownExtension";
-                        }
-                        break;
-                    case ScaleValueDefinition scaleValueThing:
-                        if (rowError.Error.Contains("ShortName"))
-                        {
-                            scaleValueThing.ShortName = "UndefinedShortName";
-                        }
-                        if (rowError.Error.Contains("Name"))
-                        {
-                            scaleValueThing.Name = "Undefined Name";
                         }
                         break;
                     case TelephoneNumber telephoneThing:
@@ -209,7 +209,7 @@ namespace Migration.ViewModels
                         if (citationThing.Container is Definition container)
                         {
                             container.Citation.Remove(citationThing);
-                            container.Cache.TryRemove(citationThing.CacheKey, out _);
+                            container.Cache?.TryRemove(citationThing.CacheKey, out _);
                         }
                         break;
                     case Participant participantThing:
@@ -217,18 +217,6 @@ namespace Migration.ViewModels
                         {
                             modelSetup.Participant.Remove(participantThing);
                             modelSetup.Cache.TryRemove(participantThing.CacheKey, out _);
-                        }
-                        break;
-                    case IShortNamedThing shortNamedThing:
-                        if (rowError.Error.Contains("ShortName"))
-                        {
-                            shortNamedThing.ShortName = "UndefinedShortName";
-                        }
-                        break;
-                    case INamedThing namedThing:
-                        if (rowError.Error.Contains("Name"))
-                        {
-                            namedThing.Name = "Undefined Name";
                         }
                         break;
                     case Definition contentThing:

@@ -157,7 +157,7 @@ namespace Migration.Tests
                 Name = "domain"
 
             };
-            siteDirectory.Domain.Add(domain);
+            this.siteDirectory.Domain.Add(domain);
 
             this.person = new Person(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri)
             {
@@ -167,11 +167,10 @@ namespace Migration.Tests
                 DefaultDomain = domain,
                 IsActive = true
             };
-            siteDirectory.Person.Add(person);
+            this.siteDirectory.Person.Add(this.person);
 
             var participant = new Participant(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri) { Person = person };
             participant.Domain.Add(domain);
-
 
             // Site Rld
             var siteReferenceDataLibrary =
@@ -192,41 +191,64 @@ namespace Migration.Tests
                 {
                     RequiredRdl = siteReferenceDataLibrary
                 };
-            siteDirectory.SiteReferenceDataLibrary.Add(siteReferenceDataLibrary);
+            this.siteDirectory.SiteReferenceDataLibrary.Add(siteReferenceDataLibrary);
 
             // Iteration
             this.iteration = new Iteration(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri);
             var iterationSetup = new IterationSetup(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri)
             {
-                IterationIid = iteration.Iid
+                IterationIid = this.iteration.Iid
             };
 
             // Engineering Model & Setup
             var engineeringModel = new EngineeringModel(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri);
-            engineeringModel.Iteration.Add(iteration);
+            engineeringModel.Iteration.Add(this.iteration);
 
             this.engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri)
             { EngineeringModelIid = engineeringModel.Iid };
-            engineeringModel.EngineeringModelSetup = engineeringModelSetup;
-            engineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
-            engineeringModelSetup.IterationSetup.Add(iterationSetup);
-            engineeringModelSetup.Participant.Add(participant);
-            siteDirectory.Model.Add(engineeringModelSetup);
+            engineeringModel.EngineeringModelSetup = this.engineeringModelSetup;
+            this.engineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
+            this.engineeringModelSetup.IterationSetup.Add(iterationSetup);
+            this.engineeringModelSetup.Participant.Add(participant);
+            this.siteDirectory.Model.Add(engineeringModelSetup);
 
             this.sessionThings = new Dictionary<Guid, CDP4Common.DTO.Thing>
             {
-                {siteDirectory.Iid, siteDirectory.ToDto()},
-                {domain.Iid, domain.ToDto()},
-                {person.Iid, person.ToDto()},
+                {this.siteDirectory.Iid, this.siteDirectory.ToDto()},
+                {this.domain.Iid, this.domain.ToDto()},
+                {this.person.Iid, this.person.ToDto()},
                 {participant.Iid, participant.ToDto()},
                 {siteReferenceDataLibrary.Iid, siteReferenceDataLibrary.ToDto()},
                 {quantityKindParamType.Iid, quantityKindParamType.ToDto()},
                 {modelReferenceDataLibrary.Iid, modelReferenceDataLibrary.ToDto()},
-                {engineeringModelSetup.Iid, engineeringModelSetup.ToDto()},
-                {iteration.Iid, iteration.ToDto()},
+                {this.engineeringModelSetup.Iid, this.engineeringModelSetup.ToDto()},
+                {this.iteration.Iid, this.iteration.ToDto()},
                 {iterationSetup.Iid, iterationSetup.ToDto()},
                 {engineeringModel.Iid, engineeringModel.ToDto()}
             };
+
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.siteDirectory.Iid, null),
+                new Lazy<Thing>(() => this.siteDirectory));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.domain.Iid, null),
+                new Lazy<Thing>(() => this.domain));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.person.Iid, null),
+                new Lazy<Thing>(() => this.person));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(participant.Iid, null),
+                new Lazy<Thing>(() => participant));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(siteReferenceDataLibrary.Iid, null),
+                new Lazy<Thing>(() => siteReferenceDataLibrary));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(quantityKindParamType.Iid, null),
+                new Lazy<Thing>(() => quantityKindParamType));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(modelReferenceDataLibrary.Iid, null),
+                new Lazy<Thing>(() => modelReferenceDataLibrary));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.engineeringModelSetup.Iid, null),
+                new Lazy<Thing>(() => this.engineeringModelSetup));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null),
+                new Lazy<Thing>(() => this.iteration));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(iterationSetup.Iid, null),
+                new Lazy<Thing>(() => iterationSetup));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(engineeringModel.Iid, null),
+                new Lazy<Thing>(() => engineeringModel));
         }
 
         private void InitDalOperations()
@@ -238,6 +260,11 @@ namespace Migration.Tests
                         var result = this.sessionThings.Values.ToList() as IEnumerable<CDP4Common.DTO.Thing>;
                         return Task.FromResult(result);
                     });
+            //this.session.Setup(x => x.Open()).Returns(() =>
+            //{
+            //    var result = this.sessionThings.Values.ToList() as IEnumerable<CDP4Common.DTO.Thing>;
+            //    return Task.FromResult(result);
+            //});
 
             this.jsonFileDal.Setup(x => x.Write(It.IsAny<OperationContainer>(), It.IsAny<IEnumerable<string>>()))
                 .Returns<OperationContainer, IEnumerable<string>>((operationContainer, files) =>
