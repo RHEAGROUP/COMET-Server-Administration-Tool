@@ -11,6 +11,7 @@ namespace Migration.Tests
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using Common.ViewModels.PlainObjects;
     using CDP4Common.Types;
     using CDP4Dal;
     using CDP4Dal.DAL;
@@ -335,6 +336,47 @@ namespace Migration.Tests
 
             Assert.AreEqual(0, this.viewModel.Errors.Count(e => e.Error.Contains("The property Name is null or empty")));
             Assert.AreEqual(0, this.viewModel.Errors.Count(e => e.Error.Contains("The property ShortName is null or empty")));
+
+            Assert.DoesNotThrowAsync(async () => await this.session.Object.Close());
+        }
+
+        [Test]
+        public void VerifyThatValidatePocoPropertiesAddsParticipantError()
+        {
+            Assert.DoesNotThrowAsync(async () => await this.session.Object.Open());
+
+            this.participant.ValidatePoco();
+
+            this.viewModel.BindPocoErrors();
+
+            Assert.IsTrue(this.viewModel.Errors.Count > 0);
+
+            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute(null));
+
+            Assert.IsTrue(this.viewModel.Errors.Count == 0);
+
+            Assert.DoesNotThrowAsync(async () => await this.session.Object.Close());
+        }
+
+        [Test]
+        public void VerifyThatSelectedErrorWorksAsExpected()
+        {
+            Assert.DoesNotThrowAsync(async () => await this.session.Object.Open());
+
+            this.iterationSetup.ValidatePoco();
+
+            this.viewModel.BindPocoErrors();
+
+            var firstError = this.viewModel.Errors.FirstOrDefault();
+
+            Assert.That(firstError != null);
+            Assert.That(this.viewModel.SelectedError == null);
+            Assert.That(this.viewModel.ErrorDetails == null);
+
+            this.viewModel.SelectedError = firstError;
+
+            Assert.That(this.viewModel.SelectedError != null);
+            Assert.That(this.viewModel.ErrorDetails != null);
 
             Assert.DoesNotThrowAsync(async () => await this.session.Object.Close());
         }

@@ -187,22 +187,19 @@ namespace Migration.ViewModels
                 switch (rowError.Thing)
                 {
                     case FileType fileThing:
-                        if (rowError.Error.Contains("Extension"))
-                        {
-                            fileThing.Extension = "UnknownExtension";
-                        }
+                        fileThing.Extension = rowError.Error.Contains("Extension")
+                            ? "UnknownExtension"
+                            : fileThing.Extension;
                         break;
                     case TelephoneNumber telephoneThing:
-                        if (rowError.Error.Contains("Value"))
-                        {
-                            telephoneThing.Value = "No Value";
-                        }
+                        telephoneThing.Value = rowError.Error.Contains("Value")
+                            ? "No Value"
+                            : telephoneThing.Value;
                         break;
                     case UserPreference userPreferenceThing:
-                        if (rowError.Error.Contains("Value"))
-                        {
-                            userPreferenceThing.Value = "No Value";
-                        }
+                        userPreferenceThing.Value = rowError.Error.Contains("Value")
+                            ? "No Value"
+                            : userPreferenceThing.Value;
                         break;
                     case Citation citationThing:
                         // broken citations are a result of 10-25 paradox thus shall be removed
@@ -220,16 +217,14 @@ namespace Migration.ViewModels
                         }
                         break;
                     case Definition contentThing:
-                        if (rowError.Error.Contains("Content"))
-                        {
-                            contentThing.Content = "No Content";
-                        }
+                        contentThing.Content = rowError.Error.Contains("Content")
+                            ? "No Value"
+                            : contentThing.Content;
                         break;
                     case IterationSetup iterationSetupThing:
-                        if (rowError.Error.Contains("Description"))
-                        {
-                            iterationSetupThing.Description = "No Description";
-                        }
+                        iterationSetupThing.Description = rowError.Error.Contains("Description")
+                            ? "No Description"
+                            : iterationSetupThing.Description;
                         break;
                 }
 

@@ -61,7 +61,22 @@ namespace Migration.Tests
         [Test]
         public void VerifyIfLoginSucceeded()
         {
-            // loginViewModel.SetupProperty(vm => vm.LoginSuccessfully, true);
+            Assert.DoesNotThrowAsync(async () => await loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
+            Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
+            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.ServerSession.Close());
+
+            this.loginViewModel = new Mock<LoginViewModel>
+            {
+                Object =
+                {
+                    SelectedDataSource = DataSource.WSP,
+                    UserName = SourceUsername,
+                    Password = SourcePassword,
+                    Uri = SourceServerUri,
+                    SavedUris = new ReactiveList<string>()
+                }
+            };
+
             Assert.DoesNotThrowAsync(async () => await loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
             Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
             Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.ServerSession.Close());
@@ -70,14 +85,17 @@ namespace Migration.Tests
         [Test]
         public void VerifyIfLoginFailed()
         {
-            this.loginViewModel.Object.UserName = "admin1";
-            this.loginViewModel.Object.Password = "pass1";
-            this.loginViewModel.Object.Uri = "https://cdp4services-public1.cdp4.org";
-
-            Assert.AreEqual(DataSource.CDP4, this.loginViewModel.Object.SelectedDataSource);
-            Assert.AreEqual("admin1", this.loginViewModel.Object.UserName);
-            Assert.AreEqual("pass1", this.loginViewModel.Object.Password);
-            Assert.AreEqual("https://cdp4services-public1.cdp4.org", this.loginViewModel.Object.Uri);
+            this.loginViewModel = new Mock<LoginViewModel>
+            {
+                Object =
+                {
+                    SelectedDataSource = DataSource.JSON,
+                    UserName = SourceUsername,
+                    Password = SourcePassword,
+                    Uri = SourceServerUri,
+                    SavedUris = new ReactiveList<string>()
+                }
+            };
 
             Assert.DoesNotThrowAsync(async () => await loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
             Assert.AreEqual(false, this.loginViewModel.Object.LoginSuccessfully);
