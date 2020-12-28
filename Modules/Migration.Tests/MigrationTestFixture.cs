@@ -17,14 +17,11 @@ namespace Migration.Tests
     using CDP4Common.Types;
     using CDP4Dal;
     using CDP4Dal.DAL;
-    using CDP4Dal.Operations;
     using Common.Settings;
     using Common.ViewModels;
     using Common.ViewModels.PlainObjects;
-    using DevExpress.Xpf.Core;
     using Moq;
     using NUnit.Framework;
-    using Utils;
     using ViewModels;
 
     /// <summary>
@@ -34,19 +31,16 @@ namespace Migration.Tests
     public class MigrationTestFixture
     {
         private readonly Credentials credentials = new Credentials(
-            "John",
-            "Doe",
+            "admin",
+            "password",
             new Uri("http://www.rheagroup.com/"));
 
         private Mock<ISession> session;
         private Mock<IDal> dal;
-        private Mock<IDal> jsonFileDal;
         private Mock<ILoginViewModel> sourceViewModel;
         private Mock<ILoginViewModel> targetViewModel;
         private Assembler assembler;
         private MigrationViewModel migrationViewModel;
-        private Mock<IMigrationServiceDialog> serviceDialog;
-
         private EngineeringModelSetup engineeringModelSetup;
         private SiteDirectory siteDirectory;
         private Dictionary<Guid, CDP4Common.DTO.Thing> sessionThings;
@@ -57,16 +51,14 @@ namespace Migration.Tests
         [SetUp]
         public void SetUp()
         {
-            //RxApp.MainThreadScheduler = Scheduler.CurrentThread;
-
             AppSettingsHandler.Settings = new AppSettings
             {
                 SavedUris = new List<string>()
             };
 
             this.dal = new Mock<IDal>();
-            this.jsonFileDal = new Mock<IDal>();
-            this.jsonFileDal.Setup(x => x.DalVersion).Returns(new Version("1.0.0"));
+            //this.jsonFileDal = new Mock<IDal>();
+            //this.jsonFileDal.Setup(x => x.DalVersion).Returns(new Version("1.0.0"));
             this.dal.SetupProperty(d => d.Session);
             this.assembler = new Assembler(this.credentials.Uri);
 
@@ -81,13 +73,8 @@ namespace Migration.Tests
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDirectory);
 
-            this.serviceDialog = new Mock<IMigrationServiceDialog>();
-            this.serviceDialog.Setup(x => x.OpenFixWindowDialog(It.IsAny<ThemedWindow>())).Returns(true);
-            this.serviceDialog.Setup(x => x.OpenMigrationFileDialog(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
-
             this.migrationViewModel = new MigrationViewModel();
             this.migrationViewModel.AddSubscriptions();
-            this.migrationViewModel.MigrationServiceDialog = serviceDialog.Object;
 
             this.sourceViewModel = new Mock<ILoginViewModel>();
             this.sourceViewModel.Setup(x => x.SelectedDataSource).Returns(DataSource.CDP4);
@@ -111,8 +98,8 @@ namespace Migration.Tests
         {
         }
 
-        [Test, Apartment(ApartmentState.STA)]
-        public void VerifyIfMigrationStartWithSourceAndTargetSessionSet()
+        [Test]
+        public async Task VerifyIfMigrationStartWithSourceAndTargetSessionSet()
         {
             this.InitSourceAndTargetViewModels();
 
@@ -127,17 +114,31 @@ namespace Migration.Tests
 
             this.sourceViewModel.Setup(x => x.EngineeringModels).Returns(selectedEngineeringModels);
 
-            Assert.DoesNotThrow(() => Task.Run(() => this.migrationViewModel.MigrateCommand.ExecuteAsyncTask()));
+            await Task.Run(() => this.migrationViewModel.MigrateCommand.Execute(null));
+
+            Assert.IsTrue(this.migrationViewModel.Output.Contains("Import operation start"));
         }
 
         [Test]
-        public void VerifyIfExecuteCommandsWorks()
+        public async Task VerifyIfExecuteCommandsWorks()
         {
             this.InitSourceAndTargetViewModels();
 
-            Assert.DoesNotThrow(() => this.migrationViewModel.LoadMigrationFile.Execute(null));
+            await Task.Run(() => this.migrationViewModel.LoadMigrationFile.Execute(null));
 
-            Assert.DoesNotThrow(() => Task.Run(() => this.migrationViewModel.MigrateCommand.ExecuteAsyncTask()));
+            await Task.Run(() => this.migrationViewModel.MigrateCommand.Execute(null));
+        }
+
+        [Test]
+        public async Task VerifyIfMigrationNotStartWithoutEngineeringModelSet()
+        {
+            this.InitSourceAndTargetViewModels();
+
+            Assert.IsTrue(this.migrationViewModel.CanMigrate);
+
+            await Task.Run(() => this.migrationViewModel.MigrateCommand.Execute(null));
+
+            Assert.IsTrue(this.migrationViewModel.Output.Contains("Please select model(s) to migrate"));
         }
 
         [Test]
@@ -195,10 +196,8 @@ namespace Migration.Tests
 
             // Iteration
             this.iteration = new Iteration(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri);
-            var iterationSetup = new IterationSetup(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri)
-            {
-                IterationIid = this.iteration.Iid
-            };
+            var iterationSetup = new IterationSetup(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri);
+            this.iteration.IterationSetup = iterationSetup;
 
             // Engineering Model & Setup
             var engineeringModel = new EngineeringModel(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri);
@@ -210,6 +209,7 @@ namespace Migration.Tests
             this.engineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
             this.engineeringModelSetup.IterationSetup.Add(iterationSetup);
             this.engineeringModelSetup.Participant.Add(participant);
+
             this.siteDirectory.Model.Add(engineeringModelSetup);
 
             this.sessionThings = new Dictionary<Guid, CDP4Common.DTO.Thing>
@@ -260,15 +260,6 @@ namespace Migration.Tests
                         var result = this.sessionThings.Values.ToList() as IEnumerable<CDP4Common.DTO.Thing>;
                         return Task.FromResult(result);
                     });
-            //this.session.Setup(x => x.Open()).Returns(() =>
-            //{
-            //    var result = this.sessionThings.Values.ToList() as IEnumerable<CDP4Common.DTO.Thing>;
-            //    return Task.FromResult(result);
-            //});
-
-            this.jsonFileDal.Setup(x => x.Write(It.IsAny<OperationContainer>(), It.IsAny<IEnumerable<string>>()))
-                .Returns<OperationContainer, IEnumerable<string>>((operationContainer, files) =>
-                    Task.FromResult((IEnumerable<CDP4Common.DTO.Thing>) new List<CDP4Common.DTO.Thing>()));
         }
 
         private void InitSourceAndTargetViewModels()
@@ -286,8 +277,6 @@ namespace Migration.Tests
 
             this.targetViewModel.Setup(x => x.LoginSuccessfully).Returns(true);
             this.migrationViewModel.TargetViewModel = this.targetViewModel.Object;
-
-            this.migrationViewModel.MigrationFactory.Dal = this.jsonFileDal.Object;
         }
     }
 }

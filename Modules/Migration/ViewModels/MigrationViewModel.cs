@@ -30,9 +30,12 @@ namespace Migration.ViewModels
     using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
-    using Utils;
-    using ReactiveUI;
+    using System.Windows;
     using Common.ViewModels;
+    using DevExpress.Xpf.Core;
+    using Microsoft.Win32;
+    using ReactiveUI;
+    using Utils;
     using Views;
 
     /// <summary>
@@ -52,7 +55,7 @@ namespace Migration.ViewModels
         /// <summary>
         /// Migration class reference
         /// </summary>
-        public Migration MigrationFactory { get; private set; }
+        private Migration MigrationFactory { get; set; }
 
         /// <summary>
         /// Backing field for <see cref="FileIsChecked"/>
@@ -95,11 +98,6 @@ namespace Migration.ViewModels
             get => this.loginTargetViewModel;
             set => this.RaiseAndSetIfChanged(ref this.loginTargetViewModel, value);
         }
-
-        /// <summary>
-        /// Gets or sets fix cardinality view model
-        /// </summary>
-        private IFixCoordinalityErrorsDialogViewModel FixCardinalityErrorsViewModel { get; set; }
 
         /// <summary>
         /// Backing field for the the output messages <see cref="Output"/>
@@ -155,8 +153,14 @@ namespace Migration.ViewModels
                 .Subscribe(_ =>
             {
                 this.MigrationFactory.SourceSession = this.SourceViewModel.ServerSession;
-                this.FixCardinalityErrorsViewModel =
-                    new FixCoordinalityErrorsDialogViewModel(this.MigrationFactory.SourceSession);
+
+                if (Application.Current != null)
+                {
+                    this.FixCardinalityDialog = new FixCoordinalityErrorsDialog
+                    {
+                        DataContext = new FixCoordinalityErrorsDialogViewModel(this.MigrationFactory.SourceSession)
+                    };
+                }
             });
 
             this.WhenAnyValue(
@@ -180,7 +184,10 @@ namespace Migration.ViewModels
         /// </summary>
         public ReactiveCommand<Unit> MigrateCommand { get; private set; }
 
-        public IMigrationServiceDialog MigrationServiceDialog;
+        /// <summary>
+        ///
+        /// </summary>
+        private ThemedWindow FixCardinalityDialog { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MigrationViewModel"/> class
@@ -207,8 +214,6 @@ namespace Migration.ViewModels
 
             this.MigrateCommand = ReactiveCommand.CreateAsyncTask(canExecuteMigrate,
                 x => this.ExecuteMigration(), RxApp.MainThreadScheduler);
-
-            this.MigrationServiceDialog = new MigrationServiceDialog();
         }
 
         /// <summary>
@@ -216,13 +221,21 @@ namespace Migration.ViewModels
         /// </summary>
         private void ExecuteLoadMigrationFile()
         {
-            var dialogResult = MigrationServiceDialog.OpenMigrationFileDialog($"{AppDomain.CurrentDomain.BaseDirectory}Import\\",
-                "Json files (*.json)|*.json");
-            var dialog = MigrationServiceDialog.OpenFileWindowDialog;
-
-            if (dialogResult.HasValue && dialogResult.Value && dialog.FileNames.Length == 1)
+            if (Application.Current == null)
             {
-                this.MigrationFile = dialog.FileNames[0];
+                return;
+            }
+
+            var openFileDialog = new OpenFileDialog()
+            {
+                InitialDirectory = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\",
+                Filter = "Json files (*.json)|*.json"
+            };
+            var dialogResult = openFileDialog.ShowDialog();
+
+            if (dialogResult.HasValue && dialogResult.Value && openFileDialog.FileNames.Length == 1)
+            {
+                this.MigrationFile = openFileDialog.FileNames[0];
             }
         }
 
@@ -241,15 +254,15 @@ namespace Migration.ViewModels
             }
 
             // Pop a wizard with POCO errors for whole session
-            var dialogResult = this.MigrationServiceDialog.OpenFixWindowDialog(new FixCoordinalityErrorsDialog
+            if (this.FixCardinalityDialog != null)
             {
-                DataContext = this.FixCardinalityErrorsViewModel
-            });
+                var dialogResult = this.FixCardinalityDialog.ShowDialog();
 
-            if (dialogResult != true)
-            {
-                this.OperationMessageHandler("Migration canceled");
-                return;
+                if (dialogResult != true)
+                {
+                    this.OperationMessageHandler("Migration canceled");
+                    return;
+                }
             }
 
             result = await this.MigrationFactory.PackData(this.MigrationFile);

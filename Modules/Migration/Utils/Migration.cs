@@ -68,17 +68,17 @@ namespace Migration.Utils
         /// <summary>
         /// Annex C3 Zip archive file name
         /// </summary>
-        private static readonly string ArchiveFileName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\Annex-C3.zip";
+        private static readonly string ArchiveFileName = $"{AppDomain.CurrentDomain.BaseDirectory}\\Import\\Annex-C3.zip";
 
         /// <summary>
         /// Annex C3 Migration file name
         /// </summary>
-        private static readonly string MigrationFileName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\migration.json";
+        private static readonly string MigrationFileName = $"{AppDomain.CurrentDomain.BaseDirectory}\\Import\\migration.json";
 
         /// <summary>
         /// Data Access Layer used during migration process
         /// </summary>
-        public IDal Dal { get; set; }
+        private IDal Dal { get; set; }
 
         /// <summary>
         ///  Gets or sets session of the migration source server <see cref="ISession"/>
