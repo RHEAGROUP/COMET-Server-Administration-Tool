@@ -20,7 +20,7 @@ namespace Migration.Tests
     using ViewModels;
 
     /// <summary>
-    /// Suite of tests for the <see cref="FixCoordinalityErrorsDialogViewModel"/>
+    /// Suite of tests for the <see cref="FixCardinalityErrorsDialogViewModel"/>
     /// </summary>
     [TestFixture]
     public class PocoCardinalityTestFixture
@@ -47,7 +47,7 @@ namespace Migration.Tests
         private EngineeringModel engineeringModel;
         private IterationSetup iterationSetup;
 
-        private FixCoordinalityErrorsDialogViewModel viewModel;
+        private FixCardinalityErrorsDialogViewModel viewModel;
 
         [SetUp]
         public void SetUp()
@@ -152,7 +152,7 @@ namespace Migration.Tests
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDirectory);
 
-            this.viewModel = new FixCoordinalityErrorsDialogViewModel(this.session.Object);
+            this.viewModel = new FixCardinalityErrorsDialogViewModel(this.session.Object);
         }
 
         [Test]

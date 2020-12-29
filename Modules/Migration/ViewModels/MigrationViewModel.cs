@@ -242,9 +242,9 @@ namespace Migration.ViewModels
             // Pop a wizard with POCO errors for whole session
             if (Application.Current != null)
             {
-                var fixCardinalityDialog = new FixCoordinalityErrorsDialog
+                var fixCardinalityDialog = new FixCardinalityErrorsDialog
                 {
-                    DataContext = new FixCoordinalityErrorsDialogViewModel(this.MigrationFactory.SourceSession)
+                    DataContext = new FixCardinalityErrorsDialogViewModel(this.MigrationFactory.SourceSession)
                 };
                 var dialogResult = fixCardinalityDialog.ShowDialog();
 
