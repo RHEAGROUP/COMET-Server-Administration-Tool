@@ -174,59 +174,9 @@ namespace Migration.ViewModels
 
             foreach (var rowError in this.Errors)
             {
-                if (rowError.Thing is IShortNamedThing shortNamedThing && rowError.Error.Contains("ShortName"))
-                {
-                    shortNamedThing.ShortName = "UndefinedShortName";
-                }
+                FixNameAndShortName(rowError);
 
-                if (rowError.Thing is INamedThing namedThing && rowError.Error.Contains("Name"))
-                {
-                    namedThing.Name = "Undefined Name";
-                }
-
-                switch (rowError.Thing)
-                {
-                    case FileType fileThing:
-                        fileThing.Extension = rowError.Error.Contains("Extension")
-                            ? "UnknownExtension"
-                            : fileThing.Extension;
-                        break;
-                    case TelephoneNumber telephoneThing:
-                        telephoneThing.Value = rowError.Error.Contains("Value")
-                            ? "No Value"
-                            : telephoneThing.Value;
-                        break;
-                    case UserPreference userPreferenceThing:
-                        userPreferenceThing.Value = rowError.Error.Contains("Value")
-                            ? "No Value"
-                            : userPreferenceThing.Value;
-                        break;
-                    case Citation citationThing:
-                        // broken citations are a result of 10-25 paradox thus shall be removed
-                        if (citationThing.Container is Definition container)
-                        {
-                            container.Citation.Remove(citationThing);
-                            container.Cache?.TryRemove(citationThing.CacheKey, out _);
-                        }
-                        break;
-                    case Participant participantThing:
-                        if (participantThing.Container is EngineeringModelSetup modelSetup)
-                        {
-                            modelSetup.Participant.Remove(participantThing);
-                            modelSetup.Cache.TryRemove(participantThing.CacheKey, out _);
-                        }
-                        break;
-                    case Definition contentThing:
-                        contentThing.Content = rowError.Error.Contains("Content")
-                            ? "No Value"
-                            : contentThing.Content;
-                        break;
-                    case IterationSetup iterationSetupThing:
-                        iterationSetupThing.Description = rowError.Error.Contains("Description")
-                            ? "No Description"
-                            : iterationSetupThing.Description;
-                        break;
-                }
+                FixSpecificError(rowError);
 
                 rowError.Thing.ValidatePoco();
             }
@@ -238,6 +188,76 @@ namespace Migration.ViewModels
             this.Errors.AddRange(d);
 
             this.IsBusy = false;
+        }
+
+        /// <summary>
+        /// Fix specific error depends on rowError.Thing class type
+        /// </summary>
+        /// <param name="rowError">Error row <see cref="PocoErrorRowViewModel"/></param>
+        private static void FixSpecificError(PocoErrorRowViewModel rowError)
+        {
+            switch (rowError.Thing)
+            {
+                case FileType fileThing:
+                    fileThing.Extension = rowError.Error.Contains("Extension")
+                        ? "UnknownExtension"
+                        : fileThing.Extension;
+                    break;
+                case TelephoneNumber telephoneThing:
+                    telephoneThing.Value = rowError.Error.Contains("Value")
+                        ? "No Value"
+                        : telephoneThing.Value;
+                    break;
+                case UserPreference userPreferenceThing:
+                    userPreferenceThing.Value = rowError.Error.Contains("Value")
+                        ? "No Value"
+                        : userPreferenceThing.Value;
+                    break;
+                case Citation citationThing:
+                    // broken citations are a result of 10-25 paradox thus shall be removed
+                    if (citationThing.Container is Definition container)
+                    {
+                        container.Citation.Remove(citationThing);
+                        container.Cache?.TryRemove(citationThing.CacheKey, out _);
+                    }
+
+                    break;
+                case Participant participantThing:
+                    if (participantThing.Container is EngineeringModelSetup modelSetup)
+                    {
+                        modelSetup.Participant.Remove(participantThing);
+                        modelSetup.Cache.TryRemove(participantThing.CacheKey, out _);
+                    }
+
+                    break;
+                case Definition contentThing:
+                    contentThing.Content = rowError.Error.Contains("Content")
+                        ? "No Value"
+                        : contentThing.Content;
+                    break;
+                case IterationSetup iterationSetupThing:
+                    iterationSetupThing.Description = rowError.Error.Contains("Description")
+                        ? "No Description"
+                        : iterationSetupThing.Description;
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Fix name/short-name errors
+        /// </summary>
+        /// <param name="rowError">Error row <see cref="PocoErrorRowViewModel"/></param>
+        private static void FixNameAndShortName(PocoErrorRowViewModel rowError)
+        {
+            if (rowError.Thing is IShortNamedThing shortNamedThing && rowError.Error.Contains("ShortName"))
+            {
+                shortNamedThing.ShortName = "UndefinedShortName";
+            }
+
+            if (rowError.Thing is INamedThing namedThing && rowError.Error.Contains("Name"))
+            {
+                namedThing.Name = "Undefined Name";
+            }
         }
     }
 }

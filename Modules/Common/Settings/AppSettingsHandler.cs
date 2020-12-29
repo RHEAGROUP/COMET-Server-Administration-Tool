@@ -39,7 +39,7 @@ namespace Common.Settings
         /// <summary>
         /// The settings.
         /// </summary>
-        public static AppSettings Settings;
+        public static AppSettings Settings { get; set; }
 
         /// <summary>
         /// The name of the settings file

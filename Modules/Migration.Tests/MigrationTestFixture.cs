@@ -57,8 +57,6 @@ namespace Migration.Tests
             };
 
             this.dal = new Mock<IDal>();
-            //this.jsonFileDal = new Mock<IDal>();
-            //this.jsonFileDal.Setup(x => x.DalVersion).Returns(new Version("1.0.0"));
             this.dal.SetupProperty(d => d.Session);
             this.assembler = new Assembler(this.credentials.Uri);
 
@@ -120,13 +118,19 @@ namespace Migration.Tests
         }
 
         [Test]
-        public async Task VerifyIfExecuteCommandsWorks()
+        public void VerifyIfExecuteMigrationCommandWorks()
         {
             this.InitSourceAndTargetViewModels();
 
-            await Task.Run(() => this.migrationViewModel.LoadMigrationFile.Execute(null));
+            Task.Run(async () => await this.migrationViewModel.MigrateCommand.ExecuteAsyncTask());
+        }
 
-            await Task.Run(() => this.migrationViewModel.MigrateCommand.Execute(null));
+        [Test]
+        public void VerifyIfLoadMigrationFileCommandWorks()
+        {
+            this.InitSourceAndTargetViewModels();
+
+            this.migrationViewModel.LoadMigrationFileCommand.Execute(null);
         }
 
         [Test]

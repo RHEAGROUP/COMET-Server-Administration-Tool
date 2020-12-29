@@ -32,7 +32,6 @@ namespace Migration.ViewModels
     using System.Threading.Tasks;
     using System.Windows;
     using Common.ViewModels;
-    using DevExpress.Xpf.Core;
     using Microsoft.Win32;
     using ReactiveUI;
     using Utils;
@@ -153,14 +152,6 @@ namespace Migration.ViewModels
                 .Subscribe(_ =>
             {
                 this.MigrationFactory.SourceSession = this.SourceViewModel.ServerSession;
-
-                if (Application.Current != null)
-                {
-                    this.FixCardinalityDialog = new FixCoordinalityErrorsDialog
-                    {
-                        DataContext = new FixCoordinalityErrorsDialogViewModel(this.MigrationFactory.SourceSession)
-                    };
-                }
             });
 
             this.WhenAnyValue(
@@ -177,17 +168,12 @@ namespace Migration.ViewModels
         /// <summary>
         /// Gets the migration file <see cref="IReactiveCommand"/>
         /// </summary>
-        public ReactiveCommand<object> LoadMigrationFile { get; private set; }
+        public ReactiveCommand<object> LoadMigrationFileCommand { get; private set; }
 
         /// <summary>
         /// Gets the server migrate command
         /// </summary>
         public ReactiveCommand<Unit> MigrateCommand { get; private set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        private ThemedWindow FixCardinalityDialog { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MigrationViewModel"/> class
@@ -209,8 +195,8 @@ namespace Migration.ViewModels
             this.MigrationFactory.OperationMessageEvent += this.OperationMessageHandler;
             this.MigrationFactory.OperationStepEvent += this.OperationStepHandler;
 
-            this.LoadMigrationFile = ReactiveCommand.Create();
-            this.LoadMigrationFile.Subscribe(_ => this.ExecuteLoadMigrationFile());
+            this.LoadMigrationFileCommand = ReactiveCommand.Create();
+            this.LoadMigrationFileCommand.Subscribe(_ => this.ExecuteLoadMigrationFile());
 
             this.MigrateCommand = ReactiveCommand.CreateAsyncTask(canExecuteMigrate,
                 x => this.ExecuteMigration(), RxApp.MainThreadScheduler);
@@ -254,9 +240,13 @@ namespace Migration.ViewModels
             }
 
             // Pop a wizard with POCO errors for whole session
-            if (this.FixCardinalityDialog != null)
+            if (Application.Current != null)
             {
-                var dialogResult = this.FixCardinalityDialog.ShowDialog();
+                var fixCardinalityDialog = new FixCoordinalityErrorsDialog
+                {
+                    DataContext = new FixCoordinalityErrorsDialogViewModel(this.MigrationFactory.SourceSession)
+                };
+                var dialogResult = fixCardinalityDialog.ShowDialog();
 
                 if (dialogResult != true)
                 {
@@ -273,11 +263,14 @@ namespace Migration.ViewModels
                 return;
             }
 
-            result = await this.MigrationFactory.ExportData();
-
-            if (!result)
+            if (Application.Current != null)
             {
-                this.OperationMessageHandler("Migration export failed");
+                result = await this.MigrationFactory.ExportData();
+
+                if (!result)
+                {
+                    this.OperationMessageHandler("Migration export failed");
+                }
             }
 
             // TODO #33 add cleanup after migration
