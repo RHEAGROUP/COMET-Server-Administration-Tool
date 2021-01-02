@@ -25,11 +25,13 @@
 
 namespace SAT.Views
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Windows.Controls;
 
     /// <summary>
     /// Interaction logic for MainView.xaml
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public partial class MainView : UserControl
     {
         /// <summary>

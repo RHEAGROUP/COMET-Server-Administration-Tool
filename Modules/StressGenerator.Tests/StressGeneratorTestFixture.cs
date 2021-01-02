@@ -47,7 +47,7 @@ namespace StressGenerator.Tests
     /// Suite of tests for the <see cref="StressGeneratorViewModel"/>
     /// </summary>
     [TestFixture]
-    public class StressGeneratorTestFixtureFixture
+    public class StressGeneratorTestFixture
     {
         private readonly Credentials credentials = new Credentials(
             "John",

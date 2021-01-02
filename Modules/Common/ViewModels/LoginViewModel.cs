@@ -28,6 +28,7 @@ namespace Common.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Reactive;
     using System.Threading.Tasks;
     using CDP4Dal;
@@ -320,6 +321,7 @@ namespace Common.ViewModels
         /// <summary>
         /// Saves the current Uri to the list
         /// </summary>
+        [ExcludeFromCodeCoverage]
         private void ExecuteSaveCurrentUri()
         {
             AppSettingsHandler.Settings.SavedUris.Add(this.Uri);
@@ -391,6 +393,7 @@ namespace Common.ViewModels
         /// <summary>
         /// Executes loading of Annex-C-3 file
         /// </summary>
+        [ExcludeFromCodeCoverage]
         private void ExecuteLoadSourceFile()
         {
             var openFileDialog = new OpenFileDialog()

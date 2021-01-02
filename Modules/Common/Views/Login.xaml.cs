@@ -26,6 +26,7 @@
 namespace Common.Views
 {
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Windows;
     using System.Windows.Controls;
     using ViewModels;
@@ -33,6 +34,7 @@ namespace Common.Views
     /// <summary>
     /// Interaction logic for Login.xaml
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public partial class Login : UserControl
     {
         /// <summary>

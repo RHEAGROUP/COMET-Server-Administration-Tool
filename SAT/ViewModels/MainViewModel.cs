@@ -25,12 +25,14 @@
 
 namespace SAT.ViewModels
 {
+    using System.Diagnostics.CodeAnalysis;
     using Common.Settings;
     using DevExpress.Mvvm;
 
     /// <summary>
     /// The view-model for the Main window
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class MainViewModel : ViewModelBase
     {
         /// <summary>

@@ -25,11 +25,13 @@
 
 namespace SAT
 {
+    using System.Diagnostics.CodeAnalysis;
     using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public partial class MainWindow : ThemedWindow
     {
         public MainWindow()
