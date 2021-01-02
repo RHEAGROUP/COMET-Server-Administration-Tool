@@ -62,6 +62,11 @@ namespace Common.ViewModels.PlainObjects
         public string TopContainerName { get; set; }
 
         /// <summary>
+        /// Gets or sets the <see cref="Thing"/>
+        /// </summary>
+        public Thing Thing { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="PocoErrorRowViewModel"/> class
         /// <param name="thing">
         /// The thing <see cref="Thing" />.
@@ -74,6 +79,7 @@ namespace Common.ViewModels.PlainObjects
         {
             this.ContainerThingClassKind = thing.ClassKind.ToString();
             this.Error = error;
+            this.Thing = thing;
             this.Id = thing.Iid.ToString();
             this.TopContainerName = thing.TopContainer is SiteDirectory
                 ? "SiteDirectory"

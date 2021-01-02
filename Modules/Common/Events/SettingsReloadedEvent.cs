@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IFixCoordinalityErrorsDialogViewModel.cs" company="RHEA System S.A.">
+// <copyright file="SettingsReloadedEvent.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 // 
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -23,13 +23,12 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Migration.ViewModels
+namespace Common.Events
 {
-    public interface IFixCoordinalityErrorsDialogViewModel
+    /// <summary>
+    /// A messagebus event to signify that settings have been reloaded
+    /// </summary>
+    public class SettingsReloadedEvent
     {
-        /// <summary>
-        ///     Apply PocoCardinality & PocoProperties to the E10-25 data set and bind errors to the reactive list
-        /// </summary>
-        void BindPocoErrors();
     }
 }

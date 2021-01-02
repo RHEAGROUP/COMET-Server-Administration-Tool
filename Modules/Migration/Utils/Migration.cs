@@ -68,17 +68,17 @@ namespace Migration.Utils
         /// <summary>
         /// Annex C3 Zip archive file name
         /// </summary>
-        private static readonly string ArchiveFileName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\Annex-C3.zip";
+        private static readonly string ArchiveFileName = $"{AppDomain.CurrentDomain.BaseDirectory}\\Import\\Annex-C3.zip";
 
         /// <summary>
         /// Annex C3 Migration file name
         /// </summary>
-        private static readonly string MigrationFileName = $"{AppDomain.CurrentDomain.BaseDirectory}Import\\migration.json";
+        private static readonly string MigrationFileName = $"{AppDomain.CurrentDomain.BaseDirectory}\\Import\\migration.json";
 
         /// <summary>
         /// Data Access Layer used during migration process
         /// </summary>
-        private readonly JsonFileDal dal;
+        private IDal Dal { get; set; }
 
         /// <summary>
         ///  Gets or sets session of the migration source server <see cref="ISession"/>
@@ -168,14 +168,14 @@ namespace Migration.Utils
         /// </summary>
         public Migration()
         {
-            this.dal = new JsonFileDal(new Version("1.0.0"));
+            this.Dal = new JsonFileDal(new Version("1.0.0"));
 
-            if (Directory.Exists("Import"))
+            if (Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\Import"))
             {
-                Directory.Delete("Import", true);
+                Directory.Delete($"{AppDomain.CurrentDomain.BaseDirectory}\\Import", true);
             }
 
-            Directory.CreateDirectory("Import");
+            Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}\\Import");
         }
 
         /// <summary>
@@ -230,6 +230,10 @@ namespace Migration.Utils
                 // Read iterations
                 foreach (var iterationSetup in modelSetup.IterationSetup)
                 {
+                    if (iterationSetup.IsDeleted || iterationSetup.FrozenOn.HasValue)
+                    {
+                        continue;
+                    }
                     var iteration = new Iteration(
                         iterationSetup.IterationIid,
                         this.SourceSession.Assembler.Cache,
@@ -350,7 +354,7 @@ namespace Migration.Utils
         {
             List<string> extensionFiles = null;
             var zipCredentials = new Credentials("admin", "pass", new Uri(ArchiveFileName));
-            var zipSession = new Session(this.dal, zipCredentials);
+            var zipSession = new Session(this.Dal, zipCredentials);
             var success = true;
 
             if (!string.IsNullOrEmpty(migrationFile))
@@ -365,6 +369,10 @@ namespace Migration.Utils
                 try
                 {
                     extensionFiles = new List<string> {MigrationFileName};
+                    if (System.IO.File.Exists(MigrationFileName))
+                    {
+                        System.IO.File.Delete(MigrationFileName);
+                    }
                     System.IO.File.Copy(migrationFile, MigrationFileName);
                 }
                 catch (Exception ex)
@@ -388,25 +396,20 @@ namespace Migration.Utils
                 var operation = new Operation(null, dto, OperationKind.Create);
                 operationContainer.AddOperation(operation);
                 operationContainers.Add(operationContainer);
+            }
 
-                try
-                {
-                    await this.dal.Write(operationContainers, extensionFiles);
-
-                    if (System.IO.File.Exists(MigrationFileName))
-                    {
-                        System.IO.File.Delete(MigrationFileName);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    this.NotifyMessage("Could not pack data", LogVerbosity.Error, ex);
-                    success = false;
-                }
-                finally
-                {
-                    await this.SourceSession.Close();
-                }
+            try
+            {
+                await this.Dal.Write(operationContainers, extensionFiles);
+            }
+            catch (Exception ex)
+            {
+                this.NotifyMessage("Could not pack data", LogVerbosity.Error, ex);
+                success = false;
+            }
+            finally
+            {
+                await this.SourceSession.Close();
             }
 
             this.NotifyStep(MigrationStep.PackEnd);

@@ -14,7 +14,7 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Views\FixCoordinalityErrorsDialog.xaml" />
+    <None Remove="Views\FixCardinalityErrorsDialog.xaml" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CDP4Common-CE" Version="6.3.0" />
@@ -79,7 +79,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\FixCoordinalityErrorsDialog.xaml">
+    <Page Include="Views\FixCardinalityErrorsDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ServerInfo.xaml">

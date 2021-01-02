@@ -75,17 +75,36 @@
             Margin="5"
             FontSize="12"
             Content="Server address" />
-
-        <dxe:TextEdit
-            Grid.Row="1"
-            Grid.Column="1"
-            Height="Auto"
-            Margin="5"
-            FontSize="12"
-            Width="250"
-            IsEnabled="{Binding Path=JsonIsSelected, Converter={StaticResource InverseBooleanConverter}}"
-            Text="{Binding Path=Uri, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+            <dxe:ComboBoxEdit
+                Height="Auto"
+                Margin="5"
+                FontSize="12"
+                Width="200"
+                AutoComplete="True"
+                AllowRejectUnknownValues="False"
+                IsEnabled="{Binding Path=JsonIsSelected, Converter={StaticResource InverseBooleanConverter}}"
+                IncrementalFiltering="True"
+                EditValue="{Binding Path=Uri, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                ItemsSource="{Binding SavedUris}">
+                <dxe:ComboBoxEdit.StyleSettings>
+                    <dxe:ComboBoxStyleSettings />
+                </dxe:ComboBoxEdit.StyleSettings>
+            </dxe:ComboBoxEdit>
+            <Button
+                MinWidth="40"
+                Height="Auto"
+                MaxWidth="40"
+                Margin="5"
+                FontSize="12"
+                HorizontalAlignment="Right"
+                IsEnabled="{Binding Path=CanSaveUri}"
+                Command="{Binding SaveCurrentUri}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="{dx:DXImage Image=Save_16x16.png}" Stretch="Uniform" />
+                </StackPanel>
+            </Button>
+        </StackPanel>
         <!-- Username -->
         <dxlc:LayoutItemLabel
             Grid.Row="2"
@@ -119,7 +138,7 @@
             FontSize="12"
             Width="250"
             Name="PasswordBoxEdit"
-            Text="{Binding Path=Password, Mode=TwoWay}" />
+            Text="{Binding Path=Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
         <!--Login -->
         <Grid Grid.Row="4" Grid.Column="1">

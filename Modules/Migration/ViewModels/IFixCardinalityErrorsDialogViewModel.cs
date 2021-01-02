@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainViewModel.cs" company="RHEA System S.A.">
+// <copyright file="IFixCardinalityErrorsDialogViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -23,22 +23,16 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace SAT.ViewModels
+namespace Migration.ViewModels
 {
-    using Common.Settings;
-    using DevExpress.Mvvm;
-
     /// <summary>
-    /// The view-model for the Main window
+    /// The interface for the view model <see cref="FixCardinalityErrorsDialogViewModel"/>
     /// </summary>
-    public class MainViewModel : ViewModelBase
+    public interface IFixCardinalityErrorsDialogViewModel
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MainViewModel"/> class.
+        /// Apply PocoCardinality & PocoProperties to the E10-25 data set and bind errors to the reactive list
         /// </summary>
-        public MainViewModel()
-        {
-            AppSettingsHandler.Load();
-        }
+        void BindPocoErrors();
     }
 }

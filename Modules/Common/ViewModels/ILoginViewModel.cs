@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainViewModel.cs" company="RHEA System S.A.">
+// <copyright file="ILoginViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -23,22 +23,49 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace SAT.ViewModels
+namespace Common.ViewModels
 {
-    using Common.Settings;
-    using DevExpress.Mvvm;
+    using System.Collections.Generic;
+    using PlainObjects;
+    using CDP4Dal;
+    using CDP4Dal.DAL;
 
     /// <summary>
-    /// The view-model for the Main window
+    /// The interface for the view model <see cref="LoginViewModel"/>
     /// </summary>
-    public class MainViewModel : ViewModelBase
+    public interface ILoginViewModel
     {
+        DataSource SelectedDataSource { get; set; }
+
+        string UserName { get; set; }
+
+        string Password { get; set; }
+
+        string Uri { get; set; }
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="MainViewModel"/> class.
+        /// Gets or sets server session
         /// </summary>
-        public MainViewModel()
-        {
-            AppSettingsHandler.Load();
-        }
+        ISession ServerSession { get; set; }
+
+        /// <summary>
+        /// Gets or sets login successfully flag
+        /// </summary>
+        bool LoginSuccessfully { get; }
+
+        /// <summary>
+        /// Gets or sets dal
+        /// </summary>
+        IDal Dal { get; }
+
+        /// <summary>
+        ///
+        /// </summary>
+        string Output { get; }
+
+        /// <summary>
+        ///
+        /// </summary>
+        List<EngineeringModelRowViewModel> EngineeringModels { get; set; }
     }
 }

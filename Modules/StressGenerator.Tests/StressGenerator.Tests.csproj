@@ -66,4 +66,10 @@
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\StressGenerator\StressGenerator.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appSettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

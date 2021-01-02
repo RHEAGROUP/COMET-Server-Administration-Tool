@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MainViewModel.cs" company="RHEA System S.A.">
+// <copyright file="FixCardinalityErrorsDialog.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -23,22 +23,33 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace SAT.ViewModels
+namespace Migration.Views
 {
-    using Common.Settings;
-    using DevExpress.Mvvm;
+    using System.Windows;
+    using DevExpress.Xpf.Core;
+    using ViewModels;
 
     /// <summary>
-    /// The view-model for the Main window
+    /// Interaction logic for FixCardinalityErrorsDialog.xaml
     /// </summary>
-    public class MainViewModel : ViewModelBase
+    public partial class FixCardinalityErrorsDialog : ThemedWindow
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MainViewModel"/> class.
+        /// Initializes a new instance of the <see cref="FixCardinalityErrorsDialog"/> class.
         /// </summary>
-        public MainViewModel()
+        public FixCardinalityErrorsDialog()
         {
-            AppSettingsHandler.Load();
+            InitializeComponent();
+        }
+
+        /// <summary>
+        /// Handling onload window event and bind poco errors
+        /// </summary>
+        /// <param name="sender">The sender control <see cref="ThemedWindow"/></param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/></param>
+        private void FixCardinalityErrorsDialog_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            ((IFixCardinalityErrorsDialogViewModel) this.DataContext).BindPocoErrors();
         }
     }
 }

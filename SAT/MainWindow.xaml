@@ -5,7 +5,7 @@
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:views="clr-namespace:SAT.Views"
     Title="CDP4 SAT"
-    Height="850"
+    Height="950"
     Width="1000"
     ResizeMode="CanMinimize"
     WindowStartupLocation="CenterScreen"
