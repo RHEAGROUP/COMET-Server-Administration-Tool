@@ -12,7 +12,7 @@ Branch | Build Status
 Master |  [![Build Status](https://ci.appveyor.com/api/projects/status/vrivbuoe4lcve4j9/branch/master?svg=true)](https://ci.appveyor.com/project/rheagroup/cdp4-server-administration-tool/branch/master)
 Development |  [![Build Status](https://ci.appveyor.com/api/projects/status/vrivbuoe4lcve4j9/branch/development?svg=true)](https://ci.appveyor.com/project/rheagroup/cdp4-server-administration-tool/branch/development)
 
-[![Build history](https://buildstats.info/appveyor/chart/rheagroup/dehp-ecosimpro)](https://ci.appveyor.com/project/rheagroup/dehp-ecosimpro/history)
+[![Build history](https://buildstats.info/appveyor/chart/rheagroup/cdp4-server-administration-tool)](https://ci.appveyor.com/project/rheagroup/cdp4-server-administration-tool/history)
 
 ## SonarQube Status:
 
