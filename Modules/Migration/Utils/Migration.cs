@@ -27,6 +27,7 @@ namespace Migration.Utils
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
     using System.Net.Http;
@@ -273,6 +274,7 @@ namespace Migration.Utils
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
+        [ExcludeFromCodeCoverage]
         public async Task<bool> ExportData()
         {
             var success = true;
