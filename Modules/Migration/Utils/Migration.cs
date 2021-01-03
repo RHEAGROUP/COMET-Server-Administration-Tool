@@ -352,6 +352,7 @@ namespace Migration.Utils
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
+        [ExcludeFromCodeCoverage]
         public async Task<bool> PackData(string migrationFile)
         {
             List<string> extensionFiles = null;

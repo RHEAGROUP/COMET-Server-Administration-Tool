@@ -26,6 +26,7 @@
 namespace Common.Settings
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using CDP4Dal;
     using Events;
@@ -49,6 +50,7 @@ namespace Common.Settings
         /// <summary>
         /// Loads the settings from file
         /// </summary>
+        [ExcludeFromCodeCoverage]
         public static void Load()
         {
             var json = File.ReadAllText(SettingsFileName);
@@ -61,6 +63,7 @@ namespace Common.Settings
         /// <summary>
         /// Saves the settings to file
         /// </summary>
+        [ExcludeFromCodeCoverage]
         public static void Save()
         {
             var json = JsonConvert.SerializeObject(Settings);
@@ -68,6 +71,5 @@ namespace Common.Settings
 
             Load();
         }
-
     }
 }
