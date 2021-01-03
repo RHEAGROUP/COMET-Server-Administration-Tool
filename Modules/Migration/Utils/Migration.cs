@@ -429,6 +429,7 @@ namespace Migration.Utils
         /// <returns>
         /// An instance of <see cref="HttpClient"/>
         /// </returns>
+        [ExcludeFromCodeCoverage]
         private HttpClient CreateHttpClient(Credentials credentials)
         {
             var client = new HttpClient
@@ -453,6 +454,7 @@ namespace Migration.Utils
         /// <returns>
         /// An instance of <see cref="MultipartContent"/>
         /// </returns>
+        [ExcludeFromCodeCoverage]
         private MultipartContent CreateMultipartContent()
         {
             var fileName = Path.GetFileName(ArchiveFileName);

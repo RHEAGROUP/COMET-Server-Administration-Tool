@@ -238,6 +238,15 @@ namespace StressGenerator.Tests
             };
             this.engineeringModel.Iteration.Add(this.iteration);
 
+            var ed1 = new ElementDefinition(Guid.NewGuid(), null,null);
+            var param1 = new Parameter(Guid.NewGuid(), null, null)
+            {
+                ParameterType = this.quantityKindParamType
+            };
+
+            ed1.Parameter.Add(param1);
+            this.iteration.Element.Add(ed1);
+
             this.engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri)
             { EngineeringModelIid = this.engineeringModel.Iid };
             this.engineeringModelSetup.RequiredRdl.Add(this.modelReferenceDataLibrary);

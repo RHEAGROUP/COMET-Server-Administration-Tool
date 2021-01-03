@@ -27,6 +27,7 @@ namespace StressGenerator.Utils
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Text.RegularExpressions;
@@ -409,6 +410,7 @@ namespace StressGenerator.Utils
         /// <returns>
         /// The <see cref="Task"/>
         /// </returns>
+        [ExcludeFromCodeCoverage]
         private async Task WriteParametersValueSets(Parameter parameter, int elementIndex)
         {
             var valueConfigPair =
