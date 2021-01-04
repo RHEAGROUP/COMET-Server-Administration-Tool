@@ -36,7 +36,7 @@ namespace StressGenerator.Utils
     /// <summary>
     /// Helper class for creating parameters for stress test purposes
     /// </summary>
-    internal static class ParameterGenerator
+    public static class ParameterGenerator
     {
         /// <summary>
         /// Create a new instance of <see cref="ParameterGenerator" />

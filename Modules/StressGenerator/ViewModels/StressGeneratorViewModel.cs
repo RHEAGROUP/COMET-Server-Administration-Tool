@@ -49,12 +49,12 @@ namespace StressGenerator.ViewModels
         /// <summary>
         /// Backing field for the source view model <see cref="LoginViewModel"/>
         /// </summary>
-        private LoginViewModel sourceViewModel;
+        private ILoginViewModel sourceViewModel;
 
         /// <summary>
         /// Gets or sets the source view model
         /// </summary>
-        public LoginViewModel SourceViewModel
+        public ILoginViewModel SourceViewModel
         {
             get => this.sourceViewModel;
             set => this.RaiseAndSetIfChanged(ref this.sourceViewModel, value);

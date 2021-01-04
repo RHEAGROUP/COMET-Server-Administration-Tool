@@ -1,0 +1,62 @@
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="RuleCheckerErrorModelTestFixture.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2021 RHEA System S.A.
+// 
+//    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
+// 
+//    This file is part of CDP4-Server-Administration-Tool.
+//    The CDP4-Server-Administration-Tool is an ECSS-E-TM-10-25 Compliant tool
+//    for advanced server administration.
+// 
+//    The CDP4-Server-Administration-Tool is free software; you can redistribute it and/or modify
+//    it under the terms of the GNU Affero General Public License as
+//    published by the Free Software Foundation; either version 3 of the
+//    License, or (at your option) any later version.
+// 
+//    The CDP4-Server-Administration-Tool is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Affero General Public License for more details.
+// 
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace Migration.Tests
+{
+    using System;
+    using System.Collections.Generic;
+    using CDP4Common.EngineeringModelData;
+    using CDP4Dal;
+    using CDP4Dal.DAL;
+    using CDP4Rules.Common;
+    using Common.Settings;
+    using Common.ViewModels;
+    using Common.ViewModels.PlainObjects;
+    using Moq;
+    using NUnit.Framework;
+
+    [TestFixture]
+    public class RuleCheckerErrorModelTestFixture
+    {
+        [Test]
+        public void VerifyRuleCheckerErrorRowViewModelCanBeCreated()
+        {
+            var thing = new ElementDefinition(Guid.NewGuid(), null, null);
+            var container = new EngineeringModel(Guid.NewGuid(), null, null);
+
+
+            var iteration = new Iteration(Guid.NewGuid(), null, null);
+            container.Iteration.Add(iteration);
+            iteration.Element.Add(thing);
+
+            Assert.IsNotNull(thing.TopContainer);
+
+            var vm = new RuleCheckerErrorRowViewModel(thing, thing.Iid.ToString(), "description", SeverityKind.Error);
+
+            Assert.IsNotNull(vm.ToString());
+            Assert.IsTrue(vm.ToString().Contains($"({thing.Iid})"));
+        }
+    }
+}

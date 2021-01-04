@@ -39,7 +39,7 @@ namespace Common.ViewModels.PlainObjects
         /// <summary>
         /// Gets or sets the <see cref="ClassKind"/> of the <see cref="Thing"/> that contains the error.
         /// </summary>
-        public string ContainerThingClassKind { get; private set; }
+        public string ThingClassKind { get; private set; }
 
         /// <summary>
         /// Gets or sets the identifier or code of the Rule that may have been broken
@@ -78,7 +78,7 @@ namespace Common.ViewModels.PlainObjects
         /// </param>
         public RuleCheckerErrorRowViewModel(Thing thing, string id, string description, SeverityKind severity)
         {
-            this.ContainerThingClassKind = thing.ClassKind.ToString();
+            this.ThingClassKind = thing.ClassKind.ToString();
             this.Id = id;
             this.Description = description;
             this.Severity = severity;
@@ -94,7 +94,7 @@ namespace Common.ViewModels.PlainObjects
         public override string ToString()
         {
             return
-                $"{this.ContainerThingClassKind}({this.Id}) " +
+                $"{this.ThingClassKind}({this.Id}) " +
                 $"Top container: {this.TopContainerName}{Environment.NewLine}{this.Description}{Environment.NewLine}" +
                 $"Severity: {this.Severity}";
         }
