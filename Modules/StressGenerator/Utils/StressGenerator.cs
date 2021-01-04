@@ -140,6 +140,7 @@ namespace StressGenerator.Utils
         /// Generate test objects in the engineering model with the given short name.
         /// </summary>
         /// <param name="engineeringModelSetup">The engineering model</param>
+        [ExcludeFromCodeCoverage]
         public async Task GenerateTestObjects(EngineeringModelSetup engineeringModelSetup)
         {
             if (this.configuration == null)
@@ -334,6 +335,7 @@ namespace StressGenerator.Utils
         /// <summary>Find highest number in the name or short name of the element definitions.</summary>
         /// <param name="iteration">The last iteration from the model <see cref="Iteration"/></param>
         /// <returns>The highest number that was found, or zero if no matching element definitions were found.</returns>
+        [ExcludeFromCodeCoverage]
         private int FindHighestNumberOnElementDefinitions(Iteration iteration)
         {
             var regexName = new Regex($@"^{this.configuration.ElementName}\s*#(\d+)$", RegexOptions.IgnoreCase);

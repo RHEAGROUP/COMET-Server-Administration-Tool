@@ -305,27 +305,7 @@ namespace Migration.Utils
                     {
                         await httpClient.PostAsync(targetUrl, multipartContent).ContinueWith((t) =>
                         {
-                           if (t.IsFaulted)
-                           {
-                               if (t.Exception?.InnerException != null)
-                               {
-                                   throw t.Exception?.InnerException;
-                               }
-
-                               throw new Exception("Unknown inner exception");
-                           }
-
-                           Logger.Info($"Server status response {t.Result.StatusCode}");
-                           success = t.Result.IsSuccessStatusCode;
-
-                           if (success)
-                           {
-                               Logger.Info("Finished pushing data");
-                           }
-                           else
-                           {
-                               Logger.Error("Unable to push data. Server returned error. Please check server logs.");
-                           }
+                            success = this.ProcessPost(t);
                         });
                     }
                 }
@@ -341,6 +321,40 @@ namespace Migration.Utils
             }
 
             this.NotifyStep(MigrationStep.ExportEnd);
+
+            return success;
+        }
+
+        /// <summary>
+        /// Process the success POST message
+        /// </summary>
+        /// <param name="task">The <see cref="Task"/> containing the <see cref="HttpResponseMessage"/></param>
+        /// <returns>True if processed succesfully.</returns>
+        [ExcludeFromCodeCoverage]
+        private bool ProcessPost(Task<HttpResponseMessage> task)
+        {
+            bool success;
+            if (task.IsFaulted)
+            {
+                if (task.Exception?.InnerException != null)
+                {
+                    throw task.Exception?.InnerException;
+                }
+
+                throw new Exception("Unknown inner exception");
+            }
+
+            Logger.Info($"Server status response {task.Result.StatusCode}");
+            success = task.Result.IsSuccessStatusCode;
+
+            if (success)
+            {
+                Logger.Info("Finished pushing data");
+            }
+            else
+            {
+                Logger.Error("Unable to push data. Server returned error. Please check server logs.");
+            }
 
             return success;
         }
