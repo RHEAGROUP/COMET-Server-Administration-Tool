@@ -370,7 +370,7 @@ namespace Migration.Utils
         public async Task<bool> PackData(string migrationFile)
         {
             List<string> extensionFiles = null;
-            var zipCredentials = new Credentials("admin", "pass", new Uri(ArchiveFileName));
+            var zipCredentials = new Credentials(this.SourceSession.Credentials.UserName, this.SourceSession.Credentials.Password, new Uri(ArchiveFileName));
             var zipSession = new Session(this.Dal, zipCredentials);
             var success = true;
 
