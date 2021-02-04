@@ -231,10 +231,11 @@ namespace Migration.Utils
                 // Read iterations
                 foreach (var iterationSetup in modelSetup.IterationSetup)
                 {
-                    if (iterationSetup.IsDeleted || iterationSetup.FrozenOn.HasValue)
+                    if (iterationSetup.IsDeleted)
                     {
                         continue;
                     }
+
                     var iteration = new Iteration(
                         iterationSetup.IterationIid,
                         this.SourceSession.Assembler.Cache,
