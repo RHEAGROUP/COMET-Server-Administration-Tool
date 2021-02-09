@@ -126,9 +126,15 @@ namespace Migration.Utils
         /// <summary>
         /// Invoke OperationMessageEvent and optionally log
         /// </summary>
-        /// <param name="message">progress message</param>
-        /// <param name="logLevel">Log verbosity level(optional) <see cref="LogVerbosity"/></param>
-        /// <param name="ex">Exception(optional) <see cref="Exception"/></param>
+        /// <param name="message">
+        /// progress message
+        /// </param>
+        /// <param name="logLevel">
+        /// Log verbosity level(optional) <see cref="LogVerbosity"/>
+        /// </param>
+        /// <param name="ex">
+        /// Exception(optional) <see cref="Exception"/>
+        /// </param>
         private void NotifyMessage(string message, LogVerbosity? logLevel = null, Exception ex = null)
         {
             OperationMessageEvent?.Invoke(message);
@@ -328,8 +334,12 @@ namespace Migration.Utils
         /// <summary>
         /// Process the success POST message
         /// </summary>
-        /// <param name="task">The <see cref="Task"/> containing the <see cref="HttpResponseMessage"/></param>
-        /// <returns>True if processed succesfully.</returns>
+        /// <param name="task">
+        /// The <see cref="Task"/> containing the <see cref="HttpResponseMessage"/>
+        /// </param>
+        /// <returns>
+        /// True if processed successfully
+        /// </returns>
         [ExcludeFromCodeCoverage]
         private bool ProcessPost(Task<HttpResponseMessage> task)
         {
@@ -362,9 +372,11 @@ namespace Migration.Utils
         /// <summary>
         /// Implement pack(zip) data operation
         /// </summary>
-        /// <param name="migrationFile">Migration file</param>
+        /// <param name="migrationFile">
+        /// Migration file
+        /// </param>
         /// <returns>
-        /// The <see cref="Task"/>.
+        /// The <see cref="Task"/>
         /// </returns>
         [ExcludeFromCodeCoverage]
         public async Task<bool> PackData(string migrationFile)
