@@ -382,7 +382,7 @@ namespace Migration.Utils
         public async Task<bool> PackData(string migrationFile)
         {
             List<string> extensionFiles = null;
-            var zipCredentials = new Credentials(this.SourceSession.Credentials.UserName, this.SourceSession.Credentials.Password, new Uri(ArchiveFileName));
+            var zipCredentials = new Credentials(this.SourceSession.Credentials.UserName, this.TargetSession.Credentials.Password, new Uri(ArchiveFileName));
             var zipSession = new Session(this.Dal, zipCredentials);
             var success = true;
 
@@ -503,7 +503,7 @@ namespace Migration.Utils
                 multipartContent.Add(streamContent, "file");
             }
 
-            multipartContent.Add(new StringContent("pass", Encoding.UTF8), "password");
+            multipartContent.Add(new StringContent(this.TargetSession.Credentials.Password, Encoding.UTF8), "password");
 
             return multipartContent;
         }
