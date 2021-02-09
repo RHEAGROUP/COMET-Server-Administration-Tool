@@ -14,13 +14,13 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="7.2.0" />
-    <PackageReference Include="CDP4Dal-CE" Version="7.2.0" />
-    <PackageReference Include="CDP4JsonFileDal-CE" Version="7.2.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="7.2.0" />
-    <PackageReference Include="CDP4Rules-CE" Version="7.2.0" />
-    <PackageReference Include="CDP4ServicesDal-CE" Version="7.2.1" />
-    <PackageReference Include="CDP4WspDal-CE" Version="7.2.0" />
+    <PackageReference Include="CDP4Common-CE" Version="7.3.0" />
+    <PackageReference Include="CDP4Dal-CE" Version="7.3.0" />
+    <PackageReference Include="CDP4JsonFileDal-CE" Version="7.3.0" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="7.3.0" />
+    <PackageReference Include="CDP4Rules-CE" Version="7.3.0" />
+    <PackageReference Include="CDP4ServicesDal-CE" Version="7.3.0" />
+    <PackageReference Include="CDP4WspDal-CE" Version="7.3.0" />
     <PackageReference Include="DevExpress.CodeParser" Version="20.1.8" />
     <PackageReference Include="DevExpress.Data" Version="20.1.8" />
     <PackageReference Include="DevExpress.Data.Desktop" Version="20.1.8" />
