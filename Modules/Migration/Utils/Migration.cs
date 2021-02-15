@@ -237,7 +237,7 @@ namespace Migration.Utils
                 // Read iterations
                 foreach (var iterationSetup in modelSetup.IterationSetup)
                 {
-                    if (iterationSetup.IsDeleted || iterationSetup.FrozenOn.HasValue)
+                    if (iterationSetup.IsDeleted)
                     {
                         continue;
                     }
@@ -318,7 +318,7 @@ namespace Migration.Utils
             }
             catch (Exception ex)
             {
-                this.NotifyMessage($"Could not push data.", LogVerbosity.Error, ex);
+                this.NotifyMessage("Could not push data.", LogVerbosity.Error, ex);
                 success = false;
             }
             finally
@@ -343,7 +343,6 @@ namespace Migration.Utils
         [ExcludeFromCodeCoverage]
         private bool ProcessPost(Task<HttpResponseMessage> task)
         {
-            bool success;
             if (task.IsFaulted)
             {
                 if (task.Exception?.InnerException != null)
@@ -355,7 +354,7 @@ namespace Migration.Utils
             }
 
             Logger.Info($"Server status response {task.Result.StatusCode}");
-            success = task.Result.IsSuccessStatusCode;
+            var success = task.Result.IsSuccessStatusCode;
 
             if (success)
             {
