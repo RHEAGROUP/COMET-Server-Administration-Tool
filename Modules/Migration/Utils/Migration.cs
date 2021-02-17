@@ -198,13 +198,13 @@ namespace Migration.Utils
         {
             if (this.SourceSession is null)
             {
-                this.NotifyMessage("Please select source session");
+                this.NotifyMessage("Please select source session.");
                 return false;
             }
 
             if (selectedModels is null || selectedModels.Count == 0)
             {
-                this.NotifyMessage("Please select model(s) to migrate");
+                this.NotifyMessage("Please select model(s) to migrate.");
                 return false;
             }
 
@@ -241,6 +241,7 @@ namespace Migration.Utils
                     {
                         continue;
                     }
+
                     var iteration = new Iteration(
                         iterationSetup.IterationIid,
                         this.SourceSession.Assembler.Cache,
@@ -254,7 +255,10 @@ namespace Migration.Utils
 
                             if (t.IsFaulted && t.Exception != null)
                             {
-                                this.NotifyMessage($"Reading iteration {iterationDescription} failed. Exception: {t.Exception.Message}.", LogVerbosity.Warn);
+                                this.NotifyMessage($"Reading iteration {iterationDescription} failed.\n" +
+                                                   $"   Exception: {t.Exception.Message}\n" +
+                                                   $"   Inner exception: {t.Exception.InnerException?.Message}\n" +
+                                                   $"{t.Exception.InnerException?.StackTrace}", LogVerbosity.Warn);
                                 return;
                             }
 
@@ -287,7 +291,7 @@ namespace Migration.Utils
 
             if (this.TargetSession is null)
             {
-                this.NotifyMessage("Please select the target session");
+                this.NotifyMessage("Please select the target session.");
 
                 return false;
             }
@@ -301,7 +305,7 @@ namespace Migration.Utils
 
             var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
 
-            this.NotifyMessage($"Pushing data to {targetUrl}", LogVerbosity.Info);
+            this.NotifyMessage($"Pushing data to {targetUrl}.", LogVerbosity.Info);
 
             try
             {
@@ -389,7 +393,7 @@ namespace Migration.Utils
             {
                 if (!System.IO.File.Exists(migrationFile))
                 {
-                    this.NotifyMessage("Unable to find selected migration file", LogVerbosity.Warn);
+                    this.NotifyMessage("Unable to find selected migration file.", LogVerbosity.Warn);
 
                     return false;
                 }
@@ -405,7 +409,7 @@ namespace Migration.Utils
                 }
                 catch (Exception ex)
                 {
-                    this.NotifyMessage("Could not add migration.json file", LogVerbosity.Error, ex);
+                    this.NotifyMessage("Could not add migration.json file.", LogVerbosity.Error, ex);
 
                     return false;
                 }
@@ -432,7 +436,7 @@ namespace Migration.Utils
             }
             catch (Exception ex)
             {
-                this.NotifyMessage("Could not pack data", LogVerbosity.Error, ex);
+                this.NotifyMessage("Could not pack data.", LogVerbosity.Error, ex);
                 success = false;
             }
             finally
