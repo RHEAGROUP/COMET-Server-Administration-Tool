@@ -195,19 +195,15 @@ namespace StressGenerator.Utils
 
             try
             {
-                this.NotifyMessage(
-                    $"Loading last iteration from EngineeringModel {engineeringModelSetup.ShortName}...");
+                this.NotifyMessage($"Loading last iteration from EngineeringModel {engineeringModelSetup.ShortName}...");
 
                 iteration = await IterationGenerator.Create(this.configuration.Session, engineeringModelSetup);
 
-                this.NotifyMessage(
-                    $"Successfully loaded EngineeringModel {engineeringModelSetup.ShortName} (Iteration {iteration.IterationSetup.IterationNumber}).");
+                this.NotifyMessage($"Successfully loaded EngineeringModel {engineeringModelSetup.ShortName} (Iteration {iteration.IterationSetup.IterationNumber}).");
             }
             catch (Exception ex)
             {
-                this.NotifyMessage(
-                    $"Invalid iteration. Engineering model {engineeringModelSetup.ShortName} must contain at least one active iteration. Exception: {ex.Message}.",
-                    LogVerbosity.Error);
+                this.NotifyMessage($"Invalid iteration. Engineering model {engineeringModelSetup.ShortName} must contain at least one active iteration. Exception: {ex.Message}", LogVerbosity.Error);
 
                 return null;
             }
@@ -217,9 +213,7 @@ namespace StressGenerator.Utils
                 return iteration;
             }
 
-            this.NotifyMessage(
-                $"Invalid RDL chain. Engineering model {(iteration.Container as EngineeringModel)?.EngineeringModelSetup.ShortName} must reference Site RDL \"{StressGeneratorConfiguration.GenericRdlShortName}\".",
-                LogVerbosity.Error);
+            this.NotifyMessage($"Invalid RDL chain. Engineering model {(iteration.Container as EngineeringModel)?.EngineeringModelSetup.ShortName} must reference Site RDL \"{StressGeneratorConfiguration.GenericRdlShortName}\".", LogVerbosity.Error);
 
             return null;
         }
@@ -392,15 +386,11 @@ namespace StressGenerator.Utils
 
                 await this.configuration.Session.Dal.Write(operationContainer);
 
-                this.NotifyMessage(
-                    $"Successfully generated ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName}).",
-                    LogVerbosity.Info);
+                this.NotifyMessage($"Successfully generated ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName}).", LogVerbosity.Info);
             }
             catch (Exception ex)
             {
-                this.NotifyMessage(
-                    $"Cannot generate ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName}). Exception: {ex.Message}.",
-                    LogVerbosity.Error);
+                this.NotifyMessage($"Cannot generate ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName}). Exception: {ex.Message}", LogVerbosity.Error);
             }
         }
 
@@ -432,13 +422,11 @@ namespace StressGenerator.Utils
                 var operationContainer = transaction.FinalizeTransaction();
                 await this.configuration.Session.Write(operationContainer);
 
-                this.NotifyMessage(
-                    $"Successfully generated ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName}).");
+                this.NotifyMessage($"Successfully generated ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName}).");
             }
             catch (Exception ex)
             {
-                this.NotifyMessage(
-                    $"Cannot update ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName}). Exception: {ex.Message}.");
+                this.NotifyMessage($"Cannot update ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName}). Exception: {ex.Message}");
             }
         }
     }
