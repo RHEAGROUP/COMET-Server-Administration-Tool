@@ -1,18 +1,20 @@
-# CDP4-Server-Administration-Tool
+<img src="https://github.com/RHEAGROUP/COMET-IME-Community-Edition/raw/development/COMET-Community-Edition.png" width="250">
 
-The Concurrent Design Platform Server Administration Tool is compliant with ECSS-E-TM-10-25A Annex A and Annex C, and is a powerful user interface to perform Web Server Migration, RDL synchronization and stress testing.
+# COMET-Server-Administration-Tool
+
+The COMET Server Administration Tool is compliant with ECSS-E-TM-10-25A Annex A and Annex C, and is a powerful user interface to perform Web Server Migration, RDL synchronization and stress testing.
 
 ## Installation
 
-The tool does not require an installer. Simply unpack `CDP4-Server-Administration-Tool_x.y.z` in to a folder on the hard drive and run `SAT.exe`.
+The tool does not require an installer. Simply unpack `COMET-Server-Administration-Tool_x.y.z` in to a folder on the hard drive and run `SAT.exe`.
 
 ## Usage
 
-Refer to [SAT Wiki](https://github.com/RHEAGROUP/CDP4-Server-Administration-Tool/wiki) for usage of the tool.
+Refer to [SAT Wiki](https://github.com/RHEAGROUP/COMET-Server-Administration-Tool/wiki) for usage of the tool.
 
 ## Build status
 
-AppVeyor is used to build and test the CDP4-SAT
+AppVeyor is used to build and test the COMET-SAT
 
 
 Branch | Build Status
@@ -39,7 +41,7 @@ Development |  [![Build Status](https://ci.appveyor.com/api/projects/status/vriv
 
 # License
 
-The libraries contained in the CDP4 Server Administration Tool are provided to the community under the GNU Affero General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+The libraries contained in the COMET Server Administration Tool are provided to the community under the GNU Affero General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
 
 # Contributions
 
