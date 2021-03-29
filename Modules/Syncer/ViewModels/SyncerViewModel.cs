@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SyncerViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
+//    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev, Sam Gerené
 //
-//    This file is part of CDP4-Server-Administration-Tool.
-//    The CDP4-Server-Administration-Tool is an ECSS-E-TM-10-25 Compliant tool
+//    This file is part of COMET-Server-Administration-Tool.
+//    The COMET-Server-Administration-Tool is an ECSS-E-TM-10-25 Compliant tool
 //    for advanced server administration.
 //
-//    The CDP4-Server-Administration-Tool is free software; you can redistribute it and/or modify
+//    The COMET-Server-Administration-Tool is free software; you can redistribute it and/or modify
 //    it under the terms of the GNU Affero General Public License as
 //    published by the Free Software Foundation; either version 3 of the
 //    License, or (at your option) any later version.
 //
-//    The CDP4-Server-Administration-Tool is distributed in the hope that it will be useful,
+//    The COMET-Server-Administration-Tool is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //    Affero General Public License for more details.
@@ -25,7 +25,6 @@
 
 namespace Syncer.ViewModels
 {
-    using CDP4Common.CommonData;
     using Common.ViewModels;
     using ReactiveUI;
     using Utils;
@@ -223,6 +222,9 @@ namespace Syncer.ViewModels
         /// <returns>
         /// The <see cref="Task"/>
         /// </returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the SelectedThingType has an invalid value
+        /// </exception>
         private async Task ExecuteSync()
         {
             var syncer = syncerFactory.CreateSyncer(
@@ -244,7 +246,7 @@ namespace Syncer.ViewModels
                         .Select(r => r.Thing.Iid);
                     break;
                 default:
-                    throw new ArgumentException("Invalid value", nameof(this.SelectedThingType));
+                    throw new InvalidOperationException($"The SelectedThingType has an invalid value");
             }
 
             try
