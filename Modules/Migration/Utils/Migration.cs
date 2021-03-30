@@ -222,7 +222,7 @@ namespace Migration.Utils
 
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
-                if (!selectedModels.ToList().Any(em => em.Iid == modelSetup.Iid && em.IsSelected)) continue;
+                if (!selectedModels.Any(em => em.Iid == modelSetup.Iid && em.IsSelected)) continue;
 
                 var model = new EngineeringModel(
                     modelSetup.EngineeringModelIid,
