@@ -25,6 +25,10 @@
 
 namespace Migration.Views
 {
+    using System;
+
+    using DevExpress.Xpf.Editors;
+
     /// <summary>
     /// Interaction logic for Layout.xaml.cs
     /// </summary>
@@ -36,6 +40,17 @@ namespace Migration.Views
         public Layout()
         {
             InitializeComponent();
+        }
+
+        private void BaseEdit_OnEditValueChanged(object sender, EditValueChangedEventArgs e)
+        {
+            if (!(sender is TextEdit textEdit))
+            {
+                return;
+            }
+
+            textEdit.Focus();
+            Dispatcher.BeginInvoke(new Action(() => textEdit.SelectionStart = textEdit.Text.Length));
         }
     }
 }
