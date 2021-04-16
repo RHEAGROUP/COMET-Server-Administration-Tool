@@ -137,6 +137,22 @@ namespace Migration.Utils
         /// </param>
         private void NotifyMessage(string message, LogVerbosity? logLevel = null, Exception ex = null)
         {
+            if (ex != null)
+            {
+                message += $"\n\tException: {ex.Message}";
+
+                if (ex.InnerException != null)
+                {
+                    message += $"\n\tInner exception: {ex.InnerException.Message}";
+
+                    message += $"\n{ex.InnerException.StackTrace}";
+                }
+                else
+                {
+                    message += $"\n{ex.StackTrace}";
+                }
+            }
+
             OperationMessageEvent?.Invoke(message);
 
             switch (logLevel)
@@ -151,7 +167,7 @@ namespace Migration.Utils
                     Logger.Debug(message);
                     break;
                 case LogVerbosity.Error:
-                    Logger.Error(ex?.Message != null ? message + ex.Message : message);
+                    Logger.Error(message);
                     break;
                 default:
                     Logger.Trace(message);
@@ -249,21 +265,18 @@ namespace Migration.Utils
 
                         model.Iteration.Add(iteration);
                         tasks.Add(this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain)
-                        .ContinueWith(t =>
-                        {
-                            var iterationDescription = $"'{modelSetup.Name}'.'{iterationSetup.IterationIid}'";
-
-                            if (t.IsFaulted && t.Exception != null)
+                            .ContinueWith(t =>
                             {
-                                this.NotifyMessage($"Reading iteration {iterationDescription} failed.\n" +
-                                                   $"   Exception: {t.Exception.Message}\n" +
-                                                   $"   Inner exception: {t.Exception.InnerException?.Message}\n" +
-                                                   $"{t.Exception.InnerException?.StackTrace}", LogVerbosity.Warn);
-                                return;
-                            }
+                                var iterationDescription = $"'{modelSetup.Name}'.'{iterationSetup.IterationIid}'";
 
-                            this.NotifyMessage($"Read iteration {iterationDescription} successfully.", LogVerbosity.Info);
-                        }));
+                                if (t.IsFaulted && t.Exception != null)
+                                {
+                                    this.NotifyMessage($"Reading iteration {iterationDescription} failed.", LogVerbosity.Error, t.Exception);
+                                    return;
+                                }
+
+                                this.NotifyMessage($"Read iteration {iterationDescription} successfully.", LogVerbosity.Info);
+                            }));
                 }
 
                 while (tasks.Count > 0)
