@@ -236,6 +236,9 @@ namespace Migration.Utils
                 siteDirectory = this.SourceSession.RetrieveSiteDirectory();
             }
 
+            var totalIterationSetups = siteDirectory.Model.Sum(ems => ems.IterationSetup.Count(its => !its.IsDeleted));
+            var finishedIterationSetups = 0;
+
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
                 if (!selectedModels.Any(em => em.Iid == modelSetup.Iid && em.IsSelected)) continue;
@@ -263,20 +266,23 @@ namespace Migration.Utils
                         this.SourceSession.Assembler.Cache,
                         this.SourceSession.Credentials.Uri);
 
-                        model.Iteration.Add(iteration);
-                        tasks.Add(this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain)
-                            .ContinueWith(t =>
+                    model.Iteration.Add(iteration);
+                    tasks.Add(this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain)
+                        .ContinueWith(t =>
+                        {
+                            finishedIterationSetups++;
+
+                            var iterationCount = $"{finishedIterationSetups}/{totalIterationSetups}";
+                            var iterationDescription = $"'{modelSetup.Name}'.'{iterationSetup.IterationIid}'";
+
+                            if (t.IsFaulted && t.Exception != null)
                             {
-                                var iterationDescription = $"'{modelSetup.Name}'.'{iterationSetup.IterationIid}'";
+                                this.NotifyMessage($"Read iteration {iterationCount} failed: {iterationDescription}", LogVerbosity.Error, t.Exception);
+                                return;
+                            }
 
-                                if (t.IsFaulted && t.Exception != null)
-                                {
-                                    this.NotifyMessage($"Reading iteration {iterationDescription} failed.", LogVerbosity.Error, t.Exception);
-                                    return;
-                                }
-
-                                this.NotifyMessage($"Read iteration {iterationDescription} successfully.", LogVerbosity.Info);
-                            }));
+                            this.NotifyMessage($"Read iteration {iterationCount} success: {iterationDescription}", LogVerbosity.Info);
+                        }));
                 }
 
                 while (tasks.Count > 0)
