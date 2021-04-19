@@ -38,6 +38,7 @@ namespace Common.ViewModels
     using CDP4WspDal;
     using Events;
     using Microsoft.Win32;
+    using NLog;
     using PlainObjects;
     using ReactiveUI;
     using Settings;
@@ -57,6 +58,8 @@ namespace Common.ViewModels
     /// </summary>
     public class LoginViewModel : ReactiveObject, ILoginViewModel
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// Gets data source server type
         /// </summary>
@@ -384,7 +387,7 @@ namespace Common.ViewModels
             }
             catch (Exception ex)
             {
-                LogMessage(ex.Message);
+                LogMessage(ex.Message, ex);
 
                 this.LoginFailed = true;
             }
@@ -413,11 +416,22 @@ namespace Common.ViewModels
         /// <summary>
         /// Log message to console/output panel
         /// </summary>
-        /// <param name="message"></param>
-        private void LogMessage(string message)
+        /// <param name="message">Message that will be logged</param>
+        /// <param name="ex">Exeption that will be logged</param>
+        private void LogMessage(string message, Exception ex = null)
         {
-            Debug.WriteLine(message);
-            this.Output = message;
+            var logMessage = ex?.Message != null ? message + ex.Message : message;
+
+            if (ex is null)
+            {
+                Logger.Info(logMessage);
+            }
+            else
+            {
+                Logger.Error(logMessage);
+            }
+
+            this.Output = logMessage;
         }
 
         /// <summary>
