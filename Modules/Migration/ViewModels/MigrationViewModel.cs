@@ -32,8 +32,11 @@ namespace Migration.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+    using CDP4Dal;
+    using Common.Events;
     using Common.ViewModels;
     using Microsoft.Win32;
+    using NLog;
     using ReactiveUI;
     using Utils;
     using Views;
@@ -43,6 +46,11 @@ namespace Migration.ViewModels
     /// </summary>
     public class MigrationViewModel : ReactiveObject
     {
+        /// <summary>
+        /// The NLog logger
+        /// </summary>
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// Gets data source server type
         /// </summary>
@@ -163,6 +171,28 @@ namespace Migration.ViewModels
                 .Subscribe(_ =>
             {
                 this.MigrationFactory.TargetSession = this.TargetViewModel.ServerSession;
+            });
+
+            CDPMessageBus.Current.Listen<LogEvent>().Subscribe((operationEvent) => {
+                var message = operationEvent.Message;
+                var exception = operationEvent.Exception;
+
+                if (operationEvent.Exception != null)
+                {
+                    message += $"\n\tException: {exception.Message}";
+
+                    if (exception.InnerException != null)
+                    {
+                        message += $"\n\tInner exception: {exception.InnerException.Message}";
+                        message += $"\n{exception.InnerException.StackTrace}";
+                    }
+                    else
+                    {
+                        message += $"\n{exception.StackTrace}";
+                    }
+                }
+
+                this.OperationMessageHandler(message);
             });
         }
 
@@ -319,6 +349,8 @@ namespace Migration.ViewModels
             if (string.IsNullOrEmpty(message)) return;
 
             this.Output += $"{DateTime.Now:HH:mm:ss} {message}{Environment.NewLine}";
+
+            Logger.Debug(message);
         }
     }
 }

@@ -33,6 +33,7 @@ namespace Migration.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
+    using Common.Events;
     using Common.ViewModels.PlainObjects;
     using ReactiveUI;
 
@@ -134,6 +135,10 @@ namespace Migration.ViewModels
         {
             if (this.migrationSourceSession is null)
             {
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "The source session is not defined"
+                });
                 return;
             }
 
@@ -151,6 +156,8 @@ namespace Migration.ViewModels
         /// <returns>A list of rows containing all errors in cache.</returns>
         private List<PocoErrorRowViewModel> GetErrorRows()
         {
+            CDPMessageBus.Current.SendMessage(new LogEvent { Message = "Get the cardinality errors list for the selected models" });
+
             var result = new List<PocoErrorRowViewModel>();
 
             foreach (var thing in this.migrationSourceSession.Assembler.Cache.Select(item => item.Value.Value)
@@ -172,6 +179,8 @@ namespace Migration.ViewModels
         {
             this.IsBusy = true;
 
+            CDPMessageBus.Current.SendMessage(new LogEvent { Message = "Fix the cardinality errors list for the selected models" });
+
             foreach (var rowError in this.Errors)
             {
                 FixNameAndShortName(rowError);
@@ -186,6 +195,15 @@ namespace Migration.ViewModels
             var d = Task.Run(this.GetErrorRows).Result;
 
             this.Errors.AddRange(d);
+
+            if (this.Errors.Count == 0)
+            {
+                CDPMessageBus.Current.SendMessage(new LogEvent { Message = "The cardinality errors list has been succesfully fixed" });
+            }
+            else
+            {
+                CDPMessageBus.Current.SendMessage(new LogEvent { Message = "The cardinality errors list has not been fixed" });
+            }
 
             this.IsBusy = false;
         }
