@@ -236,7 +236,9 @@ namespace Migration.Utils
                 siteDirectory = this.SourceSession.RetrieveSiteDirectory();
             }
 
-            var totalIterationSetups = siteDirectory.Model.Sum(ems => ems.IterationSetup.Count(its => !its.IsDeleted));
+            var totalIterationSetups = siteDirectory.Model
+                .Where(ems => selectedModels.Select(m => m.Iid).Contains(ems.Iid))
+                .Sum(ems => ems.IterationSetup.Count(its => !its.IsDeleted));
             var finishedIterationSetups = 0;
 
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
