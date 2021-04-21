@@ -137,6 +137,22 @@ namespace Migration.Utils
         /// </param>
         private void NotifyMessage(string message, LogVerbosity? logLevel = null, Exception ex = null)
         {
+            if (ex != null)
+            {
+                message += $"\n\tException: {ex.Message}";
+
+                if (ex.InnerException != null)
+                {
+                    message += $"\n\tInner exception: {ex.InnerException.Message}";
+
+                    message += $"\n{ex.InnerException.StackTrace}";
+                }
+                else
+                {
+                    message += $"\n{ex.StackTrace}";
+                }
+            }
+
             OperationMessageEvent?.Invoke(message);
 
             switch (logLevel)
@@ -151,7 +167,7 @@ namespace Migration.Utils
                     Logger.Debug(message);
                     break;
                 case LogVerbosity.Error:
-                    Logger.Error(ex?.Message != null ? message + ex.Message : message);
+                    Logger.Error(message);
                     break;
                 default:
                     Logger.Trace(message);
@@ -220,6 +236,9 @@ namespace Migration.Utils
                 siteDirectory = this.SourceSession.RetrieveSiteDirectory();
             }
 
+            var totalIterationSetups = siteDirectory.Model.Sum(ems => ems.IterationSetup.Count(its => !its.IsDeleted));
+            var finishedIterationSetups = 0;
+
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
                 if (!selectedModels.Any(em => em.Iid == modelSetup.Iid && em.IsSelected)) continue;
@@ -247,22 +266,22 @@ namespace Migration.Utils
                         this.SourceSession.Assembler.Cache,
                         this.SourceSession.Credentials.Uri);
 
-                        model.Iteration.Add(iteration);
-                        tasks.Add(this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain)
+                    model.Iteration.Add(iteration);
+                    tasks.Add(this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain)
                         .ContinueWith(t =>
                         {
+                            finishedIterationSetups++;
+
+                            var iterationCount = $"{finishedIterationSetups}/{totalIterationSetups}";
                             var iterationDescription = $"'{modelSetup.Name}'.'{iterationSetup.IterationIid}'";
 
                             if (t.IsFaulted && t.Exception != null)
                             {
-                                this.NotifyMessage($"Reading iteration {iterationDescription} failed.\n" +
-                                                   $"   Exception: {t.Exception.Message}\n" +
-                                                   $"   Inner exception: {t.Exception.InnerException?.Message}\n" +
-                                                   $"{t.Exception.InnerException?.StackTrace}", LogVerbosity.Warn);
+                                this.NotifyMessage($"Read iteration {iterationCount} failed: {iterationDescription}", LogVerbosity.Error, t.Exception);
                                 return;
                             }
 
-                            this.NotifyMessage($"Read iteration {iterationDescription} successfully.", LogVerbosity.Info);
+                            this.NotifyMessage($"Read iteration {iterationCount} success: {iterationDescription}", LogVerbosity.Info);
                         }));
                 }
 
@@ -385,6 +404,8 @@ namespace Migration.Utils
         public async Task<bool> PackData(string migrationFile)
         {
             List<string> extensionFiles = null;
+            var zipCredentials = new Credentials(this.SourceSession.Credentials.UserName, this.TargetSession.Credentials.Password, new Uri(ArchiveFileName));
+            var zipSession = new Session(this.Dal, zipCredentials);
             var success = true;
 
             if (!string.IsNullOrEmpty(migrationFile))

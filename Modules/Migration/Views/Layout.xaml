@@ -154,7 +154,9 @@
             VerticalContentAlignment="Top"
             VerticalScrollBarVisibility="Visible"
             IsReadOnly="True"
-            Text="{Binding Path=Output, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            Text="{Binding Path=Output, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            EditValueChanged="BaseEdit_OnEditValueChanged"
+        />
     </GroupBox>
     <dxmvvm:Interaction.Behaviors>
         <behaviors:MigrationBehavior />
