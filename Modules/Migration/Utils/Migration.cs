@@ -40,6 +40,7 @@ namespace Migration.Utils
     using CDP4Dal.DAL;
     using CDP4Dal.Operations;
     using CDP4JsonFileDal;
+    using Common.Events;
     using Common.ViewModels.PlainObjects;
     using NLog;
 
@@ -348,6 +349,8 @@ namespace Migration.Utils
             }
             finally
             {
+                this.NotifyMessage("Connection to the target server closed.");
+                CDPMessageBus.Current.SendMessage(new LogoutEvent { CurrentSession = this.TargetSession });
                 await this.TargetSession.Close();
             }
 
@@ -462,6 +465,8 @@ namespace Migration.Utils
             }
             finally
             {
+                this.NotifyMessage("Connection to the source server closed.");
+                CDPMessageBus.Current.SendMessage(new LogoutEvent { CurrentSession = this.SourceSession });
                 await this.SourceSession.Close();
             }
 
