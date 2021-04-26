@@ -300,8 +300,15 @@ namespace Common.ViewModels
             this.GetSavedUris();
 
             CDPMessageBus.Current.Listen<SettingsReloadedEvent>().Subscribe(_ => this.GetSavedUris());
-            CDPMessageBus.Current.Listen<LogoutEvent>().Subscribe(async (logoutEvent) => {
-                await ExecuteLogout(logoutEvent.CurrentSession);
+            CDPMessageBus.Current.Listen<LogoutAndLoginEvent>().Subscribe(async (serverEvent) => {
+                if (serverEvent.CurrentSession != this.ServerSession)
+                {
+                    return;
+                }
+
+                await ExecuteLogout(serverEvent.CurrentSession);
+
+                await ExecuteLogin();
             });
 
             this.LoginCommand =
@@ -396,15 +403,17 @@ namespace Common.ViewModels
             }
         }
 
-        [ExcludeFromCodeCoverage]
+        /// <summary>
+        /// Executes login command
+        /// </summary>
+        /// <param name="currentSession"></param>
+        /// <returns>The <see cref="Task"/></returns>
+        [ExcludeFromCodeCoverage]      
         private async Task ExecuteLogout(ISession currentSession)
         {
-            if (currentSession != this.ServerSession)
-            {
-                return;
-            }
+            this.LogMessage($"Successfully logged out from {currentSession.DataSourceUri} data-source");
 
-            //await this.ServerSession.Close();
+            await currentSession.Close();
 
             this.LoginSuccessfully = false;
             this.LoginFailed = false;

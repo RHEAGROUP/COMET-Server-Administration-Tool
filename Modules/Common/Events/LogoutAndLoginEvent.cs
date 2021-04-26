@@ -28,9 +28,9 @@ using CDP4Dal;
 namespace Common.Events
 {
     /// <summary>
-    /// A messagebus event to signify that data source will be disconnected
+    /// A messagebus event used to signify that data source will be disconnected and reconnected
     /// </summary>
-    public class LogoutEvent
+    public class LogoutAndLoginEvent
     {
         public ISession CurrentSession { get; set; }
     }

@@ -349,9 +349,8 @@ namespace Migration.Utils
             }
             finally
             {
-                this.NotifyMessage("Connection to the target server closed.");
-                CDPMessageBus.Current.SendMessage(new LogoutEvent { CurrentSession = this.TargetSession });
-                await this.TargetSession.Close();
+                this.NotifyMessage("Disconnecting the target server...");
+                CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent { CurrentSession = this.TargetSession });
             }
 
             this.NotifyStep(MigrationStep.ExportEnd);
@@ -465,9 +464,8 @@ namespace Migration.Utils
             }
             finally
             {
-                this.NotifyMessage("Connection to the source server closed.");
-                CDPMessageBus.Current.SendMessage(new LogoutEvent { CurrentSession = this.SourceSession });
-                await this.SourceSession.Close();
+                this.NotifyMessage("Disconnecting the source server...");
+                CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent { CurrentSession = this.SourceSession });
             }
 
             this.NotifyStep(MigrationStep.PackEnd);
