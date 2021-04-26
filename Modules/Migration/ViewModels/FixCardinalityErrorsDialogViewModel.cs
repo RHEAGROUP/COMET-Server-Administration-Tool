@@ -156,8 +156,6 @@ namespace Migration.ViewModels
         /// <returns>A list of rows containing all errors in cache.</returns>
         private List<PocoErrorRowViewModel> GetErrorRows()
         {
-            CDPMessageBus.Current.SendMessage(new LogEvent { Message = "Get the cardinality errors list for the selected models" });
-
             var result = new List<PocoErrorRowViewModel>();
 
             foreach (var thing in this.migrationSourceSession.Assembler.Cache.Select(item => item.Value.Value)
