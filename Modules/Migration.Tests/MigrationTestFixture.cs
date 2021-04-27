@@ -91,11 +91,6 @@ namespace Migration.Tests
             this.targetViewModel.Setup(x => x.ServerSession).Returns(this.session.Object);
         }
 
-        [TearDown]
-        public void TearDown()
-        {
-        }
-
         [Test]
         public async Task VerifyIfMigrationStartWithSourceAndTargetSessionSet()
         {
@@ -122,7 +117,9 @@ namespace Migration.Tests
         public void VerifyIfLoadMigrationFileCommandWorks()
         {
             this.InitSourceAndTargetViewModels();
+            Assert.IsFalse(this.migrationViewModel.FileIsChecked);
             this.migrationViewModel.FileIsChecked = true;
+            Assert.IsTrue(this.migrationViewModel.FileIsChecked);
 
             this.migrationViewModel.LoadMigrationFileCommand.Execute(null);
         }
