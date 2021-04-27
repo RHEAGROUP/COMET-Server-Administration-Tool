@@ -162,6 +162,13 @@ namespace Migration.Tests
         }
 
         [Test]
+        public void VerifyThatValidatePocoNotStartWithoutSourceSession()
+        {
+            this.viewModel = new FixCardinalityErrorsDialogViewModel(null);
+            Assert.DoesNotThrow(() => this.viewModel.BindPocoErrors());
+        }
+
+        [Test]
         public void VerifyThatValidatePocoPropertiesAddsFileTypeError()
         {
             Assert.DoesNotThrowAsync(async () => await this.session.Object.Open());

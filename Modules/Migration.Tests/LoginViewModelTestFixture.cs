@@ -72,6 +72,9 @@ namespace Migration.Tests
         public void VerifyGetterSetters()
         {
             Assert.AreEqual(DataSource.CDP4, this.loginViewModel.Object.SelectedDataSource);
+            Assert.IsFalse(this.loginViewModel.Object.JsonIsSelected);
+            Assert.IsTrue(this.loginViewModel.Object.CanSaveUri);
+            Assert.IsNull(this.loginViewModel.Object.EngineeringModels);
             Assert.AreEqual(SourceUsername, this.loginViewModel.Object.UserName);
             Assert.AreEqual(SourcePassword, this.loginViewModel.Object.Password);
             Assert.AreEqual(SourceServerUri, this.loginViewModel.Object.Uri);
