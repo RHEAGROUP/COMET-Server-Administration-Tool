@@ -42,6 +42,11 @@ namespace Migration.Views
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Scroll output text window
+        /// </summary>
+        /// <param name="sender">The sender control <see cref="TextEdit" /></param>
+        /// <param name="e">The <see cref="EditValueChangedEventArgs" /></param>
         private void BaseEdit_OnEditValueChanged(object sender, EditValueChangedEventArgs e)
         {
             if (!(sender is TextEdit textEdit))

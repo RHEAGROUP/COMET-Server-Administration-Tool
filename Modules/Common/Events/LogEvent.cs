@@ -28,7 +28,7 @@ using System;
 namespace Common.Events
 {
     /// <summary>
-    /// A messagebus event to signify that message should be logged
+    /// A message bus event to signify that message should be logged
     /// </summary>
     public class LogEvent
     {

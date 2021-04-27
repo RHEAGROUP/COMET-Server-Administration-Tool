@@ -194,14 +194,9 @@ namespace Migration.ViewModels
 
             this.Errors.AddRange(d);
 
-            if (this.Errors.Count == 0)
-            {
-                CDPMessageBus.Current.SendMessage(new LogEvent { Message = "The cardinality errors list has been succesfully fixed" });
-            }
-            else
-            {
-                CDPMessageBus.Current.SendMessage(new LogEvent { Message = "The cardinality errors list has not been fixed" });
-            }
+            CDPMessageBus.Current.SendMessage(this.Errors.Count == 0
+                ? new LogEvent {Message = "The cardinality errors list has been successfully fixed"}
+                : new LogEvent {Message = "The cardinality errors list has not been fixed"});
 
             this.IsBusy = false;
         }

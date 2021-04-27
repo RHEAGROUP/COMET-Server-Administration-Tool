@@ -11,7 +11,6 @@ namespace Migration.Tests
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    using Common.ViewModels.PlainObjects;
     using CDP4Common.Types;
     using CDP4Dal;
     using CDP4Dal.DAL;
@@ -159,6 +158,13 @@ namespace Migration.Tests
         public void VerifyIfExecuteCommandsWorks()
         {
             Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute(null));
+        }
+
+        [Test]
+        public void VerifyThatValidateNotStartsIfSessionIsNull()
+        {
+            this.viewModel = new FixCardinalityErrorsDialogViewModel(null);
+            this.viewModel.BindPocoErrors();
         }
 
         [Test]
