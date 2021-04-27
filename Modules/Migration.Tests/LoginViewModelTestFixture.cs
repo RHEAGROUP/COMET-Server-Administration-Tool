@@ -75,6 +75,7 @@ namespace Migration.Tests
             Assert.IsFalse(this.loginViewModel.Object.JsonIsSelected);
             Assert.IsTrue(this.loginViewModel.Object.CanSaveUri);
             Assert.IsNull(this.loginViewModel.Object.EngineeringModels);
+            Assert.IsTrue(string.IsNullOrEmpty(this.loginViewModel.Object.Output));
             Assert.AreEqual(SourceUsername, this.loginViewModel.Object.UserName);
             Assert.AreEqual(SourcePassword, this.loginViewModel.Object.Password);
             Assert.AreEqual(SourceServerUri, this.loginViewModel.Object.Uri);
@@ -85,6 +86,12 @@ namespace Migration.Tests
         {
             Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
             Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
+            Assert.IsTrue(this.loginViewModel.Object.Output.Contains("Successfully logged in"));
+
+            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
+            Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
+            Assert.IsTrue(this.loginViewModel.Object.Output.Contains("Successfully logged in"));
+
             Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.ServerSession.Close());
         }
 

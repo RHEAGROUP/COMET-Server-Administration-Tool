@@ -137,10 +137,14 @@ namespace Migration.Tests
         }
 
         [Test]
-        public void VerifyIfMigrationNotStartWithoutSourceAndTargetSessionSet()
+        public async Task VerifyIfMigrationNotStartWithoutSourceAndTargetSessionSet()
         {
             Assert.IsNull(this.migrationViewModel.SourceViewModel);
             Assert.IsNull(this.migrationViewModel.TargetViewModel);
+
+            await Task.Run(() => this.migrationViewModel.MigrateCommand.Execute(null));
+
+            Assert.IsFalse(this.migrationViewModel.CanMigrate);
         }
 
         private void InitSessionThings()
