@@ -239,6 +239,11 @@ namespace Migration.ViewModels
         [ExcludeFromCodeCoverage]
         private void ExecuteLoadMigrationFile()
         {
+            if (!this.FileIsChecked)
+            {
+                return;
+            }
+
             if (Application.Current == null)
             {
                 return;

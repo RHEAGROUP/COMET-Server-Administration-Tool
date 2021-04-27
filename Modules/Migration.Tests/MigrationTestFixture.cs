@@ -101,7 +101,8 @@ namespace Migration.Tests
         {
             this.InitSourceAndTargetViewModels();
 
-            Assert.IsTrue(this.migrationViewModel.CanMigrate);
+            Assert.IsTrue(this.migrationViewModel.CanMigrate); 
+            Assert.IsTrue(MigrationViewModel.MigrationTargetServerTypes[this.migrationViewModel.TargetViewModel.SelectedDataSource] == "CDP4 WebServices");
 
             var selectedEngineeringModels = new List<EngineeringModelRowViewModel>
             {
@@ -118,17 +119,10 @@ namespace Migration.Tests
         }
 
         [Test]
-        public void VerifyIfExecuteMigrationCommandWorks()
-        {
-            this.InitSourceAndTargetViewModels();
-
-            Task.Run(async () => await this.migrationViewModel.MigrateCommand.ExecuteAsyncTask());
-        }
-
-        [Test]
         public void VerifyIfLoadMigrationFileCommandWorks()
         {
             this.InitSourceAndTargetViewModels();
+            this.migrationViewModel.FileIsChecked = true;
 
             this.migrationViewModel.LoadMigrationFileCommand.Execute(null);
         }
