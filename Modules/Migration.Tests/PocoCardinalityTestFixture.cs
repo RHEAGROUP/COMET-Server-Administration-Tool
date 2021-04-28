@@ -11,7 +11,6 @@ namespace Migration.Tests
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    using Common.ViewModels.PlainObjects;
     using CDP4Common.Types;
     using CDP4Dal;
     using CDP4Dal.DAL;
@@ -162,7 +161,7 @@ namespace Migration.Tests
         }
 
         [Test]
-        public void VerifyThatValidatePocoNotStartWithoutSourceSession()
+        public void VerifyThatValidateNotStartsIfSessionIsNull()
         {
             this.viewModel = new FixCardinalityErrorsDialogViewModel(null);
             Assert.DoesNotThrow(() => this.viewModel.BindPocoErrors());

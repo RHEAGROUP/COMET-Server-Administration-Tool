@@ -27,7 +27,6 @@ namespace Common.ViewModels
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Reactive;
     using System.Threading.Tasks;
@@ -443,7 +442,7 @@ namespace Common.ViewModels
         /// Log message to console/output panel
         /// </summary>
         /// <param name="message">Message that will be logged</param>
-        /// <param name="ex">Exeption that will be logged</param>
+        /// <param name="ex">Exception that will be logged</param>
         private void LogMessage(string message, Exception ex = null)
         {
             var logMessage = ex?.Message != null ? message + ex.Message : message;

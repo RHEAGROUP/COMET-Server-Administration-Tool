@@ -135,10 +135,7 @@ namespace Migration.ViewModels
         {
             if (this.migrationSourceSession is null)
             {
-                CDPMessageBus.Current.SendMessage(new LogEvent
-                {
-                    Message = "The source session is not defined"
-                });
+                CDPMessageBus.Current.SendMessage(new LogEvent { Message = "The source session is not defined" });
                 return;
             }
 
@@ -156,17 +153,13 @@ namespace Migration.ViewModels
         /// <returns>A list of rows containing all errors in cache.</returns>
         private List<PocoErrorRowViewModel> GetErrorRows()
         {
-            CDPMessageBus.Current.SendMessage(new LogEvent { Message = "Get the cardinality errors list for the selected models" });
-
             var result = new List<PocoErrorRowViewModel>();
 
-            foreach (var thing in this.migrationSourceSession.Assembler.Cache.Select(item => item.Value.Value)
+            foreach (var thing in this.migrationSourceSession.Assembler.Cache
+                .Select(item => item.Value.Value)
                 .Where(t => t.ValidationErrors.Any()))
             {
-                foreach (var error in thing.ValidationErrors)
-                {
-                    result.Add(new PocoErrorRowViewModel(thing, error));
-                }
+                result.AddRange(thing.ValidationErrors.Select(error => new PocoErrorRowViewModel(thing, error)));
             }
 
             return result;
@@ -179,7 +172,7 @@ namespace Migration.ViewModels
         {
             this.IsBusy = true;
 
-            CDPMessageBus.Current.SendMessage(new LogEvent { Message = "Fix the cardinality errors list for the selected models" });
+            CDPMessageBus.Current.SendMessage(new LogEvent { Message = "Fixing the cardinality errors for the selected models..." });
 
             foreach (var rowError in this.Errors)
             {
@@ -196,14 +189,9 @@ namespace Migration.ViewModels
 
             this.Errors.AddRange(d);
 
-            if (this.Errors.Count == 0)
-            {
-                CDPMessageBus.Current.SendMessage(new LogEvent { Message = "The cardinality errors list has been succesfully fixed" });
-            }
-            else
-            {
-                CDPMessageBus.Current.SendMessage(new LogEvent { Message = "The cardinality errors list has not been fixed" });
-            }
+            CDPMessageBus.Current.SendMessage(this.Errors.Count == 0
+                ? new LogEvent { Message = "The cardinality errors have been successfully fixed" }
+                : new LogEvent { Message = "The cardinality errors have not been fixed" });
 
             this.IsBusy = false;
         }
