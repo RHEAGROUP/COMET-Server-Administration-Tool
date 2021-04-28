@@ -23,12 +23,18 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.Diagnostics;
-
 namespace Migration.Utils
 {
+    using CDP4Common.EngineeringModelData;
+    using CDP4Dal;
+    using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
+    using CDP4JsonFileDal;
+    using Common.Events;
+    using Common.ViewModels.PlainObjects;
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
@@ -37,13 +43,6 @@ namespace Migration.Utils
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using CDP4Common.EngineeringModelData;
-    using CDP4Dal;
-    using CDP4Dal.DAL;
-    using CDP4Dal.Operations;
-    using CDP4JsonFileDal;
-    using Common.ViewModels.PlainObjects;
-    using Common.Events;
 
     /// <summary>
     /// Enumeration of the migration process steps
