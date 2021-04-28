@@ -42,7 +42,6 @@ namespace Migration.Utils
     using CDP4JsonFileDal;
     using Common.Events;
     using Common.ViewModels.PlainObjects;
-    using Common.Events;
 
     /// <summary>
     /// Enumeration of the migration process steps
@@ -306,7 +305,7 @@ namespace Migration.Utils
             }
             finally
             {
-                this.NotifyMessage("Disconnecting the target server...");
+                CDPMessageBus.Current.SendMessage(new LogEvent{ Message = "Disconnecting the target server..." });
                 CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent { CurrentSession = this.TargetSession });
             }
 
@@ -445,7 +444,7 @@ namespace Migration.Utils
             }
             finally
             {
-                this.NotifyMessage("Disconnecting the source server...");
+                CDPMessageBus.Current.SendMessage(new LogEvent { Message = "Disconnecting the target server..." });
                 CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent { CurrentSession = this.SourceSession });
             }
 
