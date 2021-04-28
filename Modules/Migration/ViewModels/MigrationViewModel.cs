@@ -150,8 +150,12 @@ namespace Migration.ViewModels
         /// </summary>
         public void AddSubscriptions()
         {
-            this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(OperationMessageHandler);
-            this.WhenAnyValue(vm => vm.TargetViewModel.Output).Subscribe(OperationMessageHandler);
+            this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(_ => {
+                OperationMessageHandler(this.SourceViewModel.Output);
+            });
+            this.WhenAnyValue(vm => vm.TargetViewModel.Output).Subscribe(_ => {
+                OperationMessageHandler(this.TargetViewModel.Output);
+            });
 
             this.WhenAnyValue(
                 vm => vm.SourceViewModel.LoginSuccessfully,
@@ -176,6 +180,7 @@ namespace Migration.ViewModels
             CDPMessageBus.Current.Listen<LogEvent>().Subscribe((operationEvent) => {
                 var message = operationEvent.Message;
                 var exception = operationEvent.Exception;
+                var logLevel = operationEvent.Verbosity;
 
                 if (operationEvent.Exception != null)
                 {
@@ -192,7 +197,7 @@ namespace Migration.ViewModels
                     }
                 }
 
-                this.OperationMessageHandler(message);
+                this.OperationMessageHandler(message, logLevel);
             });
         }
 
@@ -223,7 +228,6 @@ namespace Migration.ViewModels
             this.FileIsChecked = false;
 
             this.MigrationFactory = new Migration();
-            this.MigrationFactory.OperationMessageEvent += this.OperationMessageHandler;
             this.MigrationFactory.OperationStepEvent += this.OperationStepHandler;
 
             this.LoadMigrationFileCommand = ReactiveCommand.Create();
@@ -344,13 +348,31 @@ namespace Migration.ViewModels
         /// Add text message to the output panel
         /// </summary>
         /// <param name="message">The text message</param>
-        private void OperationMessageHandler(string message)
+        /// <param name="logLevel"></param>
+        private void OperationMessageHandler(string message, LogVerbosity? logLevel = null)
         {
             if (string.IsNullOrEmpty(message)) return;
 
             this.Output += $"{DateTime.Now:HH:mm:ss} {message}{Environment.NewLine}";
 
-            Logger.Debug(message);
+            switch (logLevel)
+            {
+                case LogVerbosity.Info:
+                    Logger.Info(message);
+                    break;
+                case LogVerbosity.Warn:
+                    Logger.Warn(message);
+                    break;
+                case LogVerbosity.Debug:
+                    Logger.Debug(message);
+                    break;
+                case LogVerbosity.Error:
+                    Logger.Error(message);
+                    break;
+                default:
+                    Logger.Trace(message);
+                    break;
+            }
         }
     }
 }

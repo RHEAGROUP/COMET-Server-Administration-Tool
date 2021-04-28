@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="LogEvent.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
 // 
@@ -23,17 +23,38 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System;
-
 namespace Common.Events
 {
+    using System;
+
+    /// <summary>
+    /// Log verbosity
+    /// </summary>
+    public enum LogVerbosity
+    {
+        Info,
+        Warn,
+        Debug,
+        Error
+    };
     /// <summary>
     /// A message bus event to signify that message should be logged
     /// </summary>
     public class LogEvent
     {
+        /// <summary>
+        /// Message that will be logged
+        /// </summary>
         public string Message { get; set; }
 
+        /// <summary>
+        /// NLog verbosity <see cref="LogVerbosity"/>
+        /// </summary>
+        public LogVerbosity Verbosity { get; set; }
+
+        /// <summary>
+        /// Exception that will be logged <see cref="Exception"/>
+        /// </summary>
         public Exception Exception { get; set; }
     }
 }

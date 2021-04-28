@@ -41,7 +41,7 @@ namespace Migration.Utils
     using CDP4Dal.Operations;
     using CDP4JsonFileDal;
     using Common.ViewModels.PlainObjects;
-    using NLog;
+    using Common.Events;
 
     /// <summary>
     /// Enumeration of the migration process steps
@@ -61,11 +61,6 @@ namespace Migration.Utils
     /// </summary>
     public sealed class Migration
     {
-        /// <summary>
-        /// The NLog logger
-        /// </summary>
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         /// <summary>
         /// Annex C3 Zip archive file name
         /// </summary>
@@ -103,77 +98,9 @@ namespace Migration.Utils
         public delegate void MigrationStepDelegate(MigrationStep step);
 
         /// <summary>
-        /// Associated event with the <see cref="MessageDelegate"/>
-        /// </summary>
-        public event MessageDelegate OperationMessageEvent;
-
-        /// <summary>
         /// Associated event with the <see cref="MigrationStepDelegate"/>
         /// </summary>
         public event MigrationStepDelegate OperationStepEvent;
-
-        /// <summary>
-        /// Log verbosity
-        /// </summary>
-        private enum LogVerbosity
-        {
-            Info,
-            Warn,
-            Debug,
-            Error
-        };
-
-        /// <summary>
-        /// Invoke OperationMessageEvent and optionally log
-        /// </summary>
-        /// <param name="message">
-        /// progress message
-        /// </param>
-        /// <param name="logLevel">
-        /// Log verbosity level(optional) <see cref="LogVerbosity"/>
-        /// </param>
-        /// <param name="ex">
-        /// Exception(optional) <see cref="Exception"/>
-        /// </param>
-        private void NotifyMessage(string message, LogVerbosity? logLevel = null, Exception ex = null)
-        {
-            if (ex != null)
-            {
-                message += $"\n\tException: {ex.Message}";
-
-                if (ex.InnerException != null)
-                {
-                    message += $"\n\tInner exception: {ex.InnerException.Message}";
-
-                    message += $"\n{ex.InnerException.StackTrace}";
-                }
-                else
-                {
-                    message += $"\n{ex.StackTrace}";
-                }
-            }
-
-            OperationMessageEvent?.Invoke(message);
-
-            switch (logLevel)
-            {
-                case LogVerbosity.Info:
-                    Logger.Info(message);
-                    break;
-                case LogVerbosity.Warn:
-                    Logger.Warn(message);
-                    break;
-                case LogVerbosity.Debug:
-                    Logger.Debug(message);
-                    break;
-                case LogVerbosity.Error:
-                    Logger.Error(message);
-                    break;
-                default:
-                    Logger.Trace(message);
-                    break;
-            }
-        }
 
         /// <summary>
         /// Invoke OperationStepEvent
@@ -214,19 +141,30 @@ namespace Migration.Utils
         {
             if (this.SourceSession is null)
             {
-                this.NotifyMessage("Please select source session.");
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "Please select source session."
+                });
+
                 return false;
             }
 
             if (selectedModels is null || selectedModels.Count == 0)
             {
-                this.NotifyMessage("Please select model(s) to migrate.");
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "Please select model(s) to migrate."
+                });
+
                 return false;
             }
 
             this.NotifyStep(MigrationStep.ImportStart);
 
-            this.NotifyMessage($"Retrieving SiteDirectory from {this.SourceSession.DataSourceUri}...");
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = $"Retrieving SiteDirectory from {this.SourceSession.DataSourceUri}..."
+            });
 
             var siteDirectory = this.SourceSession.RetrieveSiteDirectory();
 
@@ -279,11 +217,18 @@ namespace Migration.Utils
 
                             if (t.IsFaulted && t.Exception != null)
                             {
-                                this.NotifyMessage($"Read iteration {iterationCount} failed: {iterationDescription}", LogVerbosity.Error, t.Exception);
+                                CDPMessageBus.Current.SendMessage(new LogEvent
+                                {
+                                    Message = $"Read iteration {iterationCount} failed: {iterationDescription}",
+                                    Exception = t.Exception,
+                                    Verbosity = LogVerbosity.Error
+                                });
                                 return;
                             }
-
-                            this.NotifyMessage($"Read iteration {iterationCount} success: {iterationDescription}", LogVerbosity.Info);
+                            CDPMessageBus.Current.SendMessage(new LogEvent
+                            {
+                                Message = $"Read iteration {iterationCount} success: {iterationDescription}"
+                            });
                         }));
                 }
 
@@ -312,7 +257,10 @@ namespace Migration.Utils
 
             if (this.TargetSession is null)
             {
-                this.NotifyMessage("Please select the target session.");
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "Please select the target session."
+                });
 
                 return false;
             }
@@ -326,7 +274,11 @@ namespace Migration.Utils
 
             var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
 
-            this.NotifyMessage($"Pushing data to {targetUrl}.", LogVerbosity.Info);
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = $"Pushing data to {targetUrl}.",
+                Verbosity = LogVerbosity.Info
+            });
 
             try
             {
@@ -343,7 +295,12 @@ namespace Migration.Utils
             }
             catch (Exception ex)
             {
-                this.NotifyMessage("Could not push data.", LogVerbosity.Error, ex);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "Please select the target session.",
+                    Exception = ex,
+                    Verbosity = LogVerbosity.Error
+                });
                 success = false;
             }
             finally
@@ -378,16 +335,26 @@ namespace Migration.Utils
                 throw new Exception("Unknown inner exception");
             }
 
-            Logger.Info($"Server status response {task.Result.StatusCode}");
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = $"Server status response {task.Result.StatusCode}"
+            });
+
             var success = task.Result.IsSuccessStatusCode;
 
             if (success)
             {
-                Logger.Info("Finished pushing data");
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "Finished pushing data"
+                });
             }
             else
             {
-                Logger.Error("Unable to push data. Server returned error. Please check server logs.");
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "Unable to push data. Server returned error. Please check server logs."
+                });
             }
 
             return success;
@@ -414,7 +381,11 @@ namespace Migration.Utils
             {
                 if (!System.IO.File.Exists(migrationFile))
                 {
-                    this.NotifyMessage("Unable to find selected migration file.", LogVerbosity.Warn);
+                    CDPMessageBus.Current.SendMessage(new LogEvent
+                    {
+                        Message = "Unable to find selected migration file.",
+                        Verbosity = LogVerbosity.Warn
+                    });
 
                     return false;
                 }
@@ -430,7 +401,12 @@ namespace Migration.Utils
                 }
                 catch (Exception ex)
                 {
-                    this.NotifyMessage("Could not add migration.json file.", LogVerbosity.Error, ex);
+                    CDPMessageBus.Current.SendMessage(new LogEvent
+                    {
+                        Message = "Could not add migration.json file.",
+                        Exception = ex,
+                        Verbosity = LogVerbosity.Error
+                    });
 
                     return false;
                 }
@@ -457,7 +433,12 @@ namespace Migration.Utils
             }
             catch (Exception ex)
             {
-                this.NotifyMessage("Could not pack data.", LogVerbosity.Error, ex);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "Could not pack data.",
+                    Exception = ex,
+                    Verbosity = LogVerbosity.Error
+                });
                 success = false;
             }
             finally
