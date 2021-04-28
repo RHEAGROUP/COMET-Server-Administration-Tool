@@ -228,7 +228,6 @@ namespace Migration.ViewModels
             this.FileIsChecked = false;
 
             this.MigrationFactory = new Migration();
-            this.MigrationFactory.OperationStepEvent += this.OperationStepHandler;
 
             this.LoadMigrationFileCommand = ReactiveCommand.Create();
             this.LoadMigrationFileCommand.Subscribe(_ => this.ExecuteLoadMigrationFile());
@@ -311,37 +310,6 @@ namespace Migration.ViewModels
             }
 
             // TODO #33 add cleanup after migration
-        }
-
-        /// <summary>
-        /// Add migration log to the output panel
-        /// </summary>
-        /// <param name="step">
-        /// Migration operation step <see cref="MigrationStep"/>
-        /// </param>
-        private void OperationStepHandler(MigrationStep step)
-        {
-            switch (step)
-            {
-                case MigrationStep.ImportStart:
-                    this.OperationMessageHandler("Import operation start");
-                    break;
-                case MigrationStep.ImportEnd:
-                    this.OperationMessageHandler("Import operation end");
-                    break;
-                case MigrationStep.PackStart:
-                    this.OperationMessageHandler("Pack operation start");
-                    break;
-                case MigrationStep.PackEnd:
-                    this.OperationMessageHandler("Pack operation end");
-                    break;
-                case MigrationStep.ExportStart:
-                    this.OperationMessageHandler("Export operation start");
-                    break;
-                case MigrationStep.ExportEnd:
-                    this.OperationMessageHandler("Export operation end");
-                    break;
-            }
         }
 
         /// <summary>

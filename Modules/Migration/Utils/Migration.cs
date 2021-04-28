@@ -89,33 +89,6 @@ namespace Migration.Utils
         public ISession TargetSession { get; set; }
 
         /// <summary>
-        /// Delegate used for notifying current operation migration progress message
-        /// </summary>
-        /// <param name="message">Progress message</param>
-        public delegate void MessageDelegate(string message);
-
-        /// <summary>
-        /// Delegate used for notifying current operation migration progress step
-        /// </summary>
-        public delegate void MigrationStepDelegate(MigrationStep step);
-
-        /// <summary>
-        /// Associated event with the <see cref="MigrationStepDelegate"/>
-        /// </summary>
-        public event MigrationStepDelegate OperationStepEvent;
-
-        /// <summary>
-        /// Invoke OperationStepEvent
-        /// </summary>
-        /// <param name="step">
-        /// progress operation's step <see cref="MigrationStep"/>
-        /// </param>
-        private void NotifyStep(MigrationStep step)
-        {
-            OperationStepEvent?.Invoke(step);
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="Migration"/> class
         /// </summary>
         public Migration()
@@ -161,7 +134,10 @@ namespace Migration.Utils
                 return false;
             }
 
-            this.NotifyStep(MigrationStep.ImportStart);
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = "Import operation start"
+            });
 
             CDPMessageBus.Current.SendMessage(new LogEvent
             {
@@ -258,8 +234,10 @@ namespace Migration.Utils
                 }
             }
 
-            this.NotifyStep(MigrationStep.ImportEnd);
-
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = "Import operation end"
+            });
             return true;
         }
 
@@ -289,7 +267,10 @@ namespace Migration.Utils
                 await this.TargetSession.Open();
             }
 
-            this.NotifyStep(MigrationStep.ExportStart);
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = "Export operation start"
+            });
 
             var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
 
@@ -328,7 +309,10 @@ namespace Migration.Utils
                 await this.TargetSession.Close();
             }
 
-            this.NotifyStep(MigrationStep.ExportEnd);
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = "Export operation end"
+            });
 
             return success;
         }
@@ -432,7 +416,10 @@ namespace Migration.Utils
                 }
             }
 
-            this.NotifyStep(MigrationStep.PackStart);
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = "Pack operation start"
+            });
 
             var operationContainers = new List<OperationContainer>();
             var openIterations = this.SourceSession.OpenIterations.Select(i => i.Key);
@@ -466,7 +453,10 @@ namespace Migration.Utils
                 await this.SourceSession.Close();
             }
 
-            this.NotifyStep(MigrationStep.PackEnd);
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = "Pack operation end"
+            });
 
             return success;
         }
