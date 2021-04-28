@@ -164,7 +164,7 @@ namespace Migration.Tests
         public void VerifyThatValidateNotStartsIfSessionIsNull()
         {
             this.viewModel = new FixCardinalityErrorsDialogViewModel(null);
-            this.viewModel.BindPocoErrors();
+            Assert.DoesNotThrow(() => this.viewModel.BindPocoErrors());
         }
 
         [Test]
