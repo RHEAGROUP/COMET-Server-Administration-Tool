@@ -23,6 +23,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Diagnostics;
+
 namespace Migration.Utils
 {
     using System;
@@ -178,6 +180,8 @@ namespace Migration.Utils
                 .Where(ems => selectedModels.Select(m => m.Iid).Contains(ems.Iid))
                 .Sum(ems => ems.IterationSetup.Count(its => !its.IsDeleted));
             var finishedIterationSetups = 0;
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
 
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
@@ -223,11 +227,26 @@ namespace Migration.Utils
                                     Exception = t.Exception,
                                     Verbosity = LogVerbosity.Error
                                 });
-                                return;
                             }
+                            else
+                            {
+                                CDPMessageBus.Current.SendMessage(new LogEvent
+                                {
+                                    Message = $"Read iteration {iterationCount} success: {iterationDescription}"
+                                });
+                            }
+
+                            var elapsed = stopwatch.Elapsed;
                             CDPMessageBus.Current.SendMessage(new LogEvent
                             {
-                                Message = $"Read iteration {iterationCount} success: {iterationDescription}"
+                                Message = $"    Read {finishedIterationSetups} iterations in: {elapsed}"
+                            });
+
+                            var remainingIterationSetups = totalIterationSetups - finishedIterationSetups;
+                            var remaining = new TimeSpan(elapsed.Ticks / finishedIterationSetups * remainingIterationSetups);
+                            CDPMessageBus.Current.SendMessage(new LogEvent
+                            {
+                                Message = $"    Remaining {remainingIterationSetups} iterations read estimate: {remaining}"
                             });
                         }));
                 }
@@ -276,7 +295,8 @@ namespace Migration.Utils
 
             CDPMessageBus.Current.SendMessage(new LogEvent
             {
-                Message = $"Pushing data to {targetUrl}.",
+                Message = $"Pushing data to {targetUrl}.{Environment.NewLine}" +
+                          $"    Please note that this operation takes a long time and there is no progress user feedback.",
                 Verbosity = LogVerbosity.Info
             });
 
