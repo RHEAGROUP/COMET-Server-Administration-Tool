@@ -25,8 +25,16 @@
 
 namespace Migration.Utils
 {
+    using CDP4Common.EngineeringModelData;
+    using CDP4Dal;
+    using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
+    using CDP4JsonFileDal;
+    using Common.Events;
+    using Common.ViewModels.PlainObjects;
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
@@ -35,26 +43,6 @@ namespace Migration.Utils
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using CDP4Common.EngineeringModelData;
-    using CDP4Dal;
-    using CDP4Dal.DAL;
-    using CDP4Dal.Operations;
-    using CDP4JsonFileDal;
-    using Common.Events;
-    using Common.ViewModels.PlainObjects;
-
-    /// <summary>
-    /// Enumeration of the migration process steps
-    /// </summary>
-    public enum MigrationStep
-    {
-        ImportStart,
-        PackStart,
-        PackEnd,
-        ImportEnd,
-        ExportStart,
-        ExportEnd
-    };
 
     /// <summary>
     /// The purpose of this class is to implement migration specif operations such as: import, export, pack
@@ -85,33 +73,6 @@ namespace Migration.Utils
         /// Gets or sets session of the migration target server <see cref="ISession"/>
         /// </summary>
         public ISession TargetSession { get; set; }
-
-        /// <summary>
-        /// Delegate used for notifying current operation migration progress message
-        /// </summary>
-        /// <param name="message">Progress message</param>
-        public delegate void MessageDelegate(string message);
-
-        /// <summary>
-        /// Delegate used for notifying current operation migration progress step
-        /// </summary>
-        public delegate void MigrationStepDelegate(MigrationStep step);
-
-        /// <summary>
-        /// Associated event with the <see cref="MigrationStepDelegate"/>
-        /// </summary>
-        public event MigrationStepDelegate OperationStepEvent;
-
-        /// <summary>
-        /// Invoke OperationStepEvent
-        /// </summary>
-        /// <param name="step">
-        /// progress operation's step <see cref="MigrationStep"/>
-        /// </param>
-        private void NotifyStep(MigrationStep step)
-        {
-            OperationStepEvent?.Invoke(step);
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Migration"/> class
@@ -159,7 +120,10 @@ namespace Migration.Utils
                 return false;
             }
 
-            this.NotifyStep(MigrationStep.ImportStart);
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = "Import operation start"
+            });
 
             CDPMessageBus.Current.SendMessage(new LogEvent
             {
@@ -178,6 +142,8 @@ namespace Migration.Utils
                 .Where(ems => selectedModels.Select(m => m.Iid).Contains(ems.Iid))
                 .Sum(ems => ems.IterationSetup.Count(its => !its.IsDeleted));
             var finishedIterationSetups = 0;
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
 
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
@@ -223,11 +189,26 @@ namespace Migration.Utils
                                     Exception = t.Exception,
                                     Verbosity = LogVerbosity.Error
                                 });
-                                return;
                             }
+                            else
+                            {
+                                CDPMessageBus.Current.SendMessage(new LogEvent
+                                {
+                                    Message = $"Read iteration {iterationCount} success: {iterationDescription}"
+                                });
+                            }
+
+                            var elapsed = stopwatch.Elapsed;
                             CDPMessageBus.Current.SendMessage(new LogEvent
                             {
-                                Message = $"Read iteration {iterationCount} success: {iterationDescription}"
+                                Message = $"    Read {finishedIterationSetups} iterations in: {elapsed}"
+                            });
+
+                            var remainingIterationSetups = totalIterationSetups - finishedIterationSetups;
+                            var remaining = new TimeSpan(elapsed.Ticks / finishedIterationSetups * remainingIterationSetups);
+                            CDPMessageBus.Current.SendMessage(new LogEvent
+                            {
+                                Message = $"    Remaining {remainingIterationSetups} iterations read estimate: {remaining}"
                             });
                         }));
                 }
@@ -239,8 +220,10 @@ namespace Migration.Utils
                 }
             }
 
-            this.NotifyStep(MigrationStep.ImportEnd);
-
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = "Import operation end"
+            });
             return true;
         }
 
@@ -270,13 +253,17 @@ namespace Migration.Utils
                 await this.TargetSession.Open();
             }
 
-            this.NotifyStep(MigrationStep.ExportStart);
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = "Export operation start"
+            });
 
             var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
 
             CDPMessageBus.Current.SendMessage(new LogEvent
             {
-                Message = $"Pushing data to {targetUrl}.",
+                Message = $"Pushing data to {targetUrl}.{Environment.NewLine}" +
+                          $"    Please note that this operation takes a long time and there is no progress user feedback.",
                 Verbosity = LogVerbosity.Info
             });
 
@@ -305,11 +292,13 @@ namespace Migration.Utils
             }
             finally
             {
-                CDPMessageBus.Current.SendMessage(new LogEvent{ Message = "Disconnecting the target server..." });
-                CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent { CurrentSession = this.TargetSession });
+                CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent {CurrentSession = this.TargetSession});
             }
 
-            this.NotifyStep(MigrationStep.ExportEnd);
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = "Export operation end"
+            });
 
             return success;
         }
@@ -413,7 +402,10 @@ namespace Migration.Utils
                 }
             }
 
-            this.NotifyStep(MigrationStep.PackStart);
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = "Pack operation start"
+            });
 
             var operationContainers = new List<OperationContainer>();
             var openIterations = this.SourceSession.OpenIterations.Select(i => i.Key);
@@ -444,11 +436,13 @@ namespace Migration.Utils
             }
             finally
             {
-                CDPMessageBus.Current.SendMessage(new LogEvent { Message = "Disconnecting the target server..." });
-                CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent { CurrentSession = this.SourceSession });
+                CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent {CurrentSession = this.SourceSession});
             }
 
-            this.NotifyStep(MigrationStep.PackEnd);
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = "Pack operation end"
+            });
 
             return success;
         }

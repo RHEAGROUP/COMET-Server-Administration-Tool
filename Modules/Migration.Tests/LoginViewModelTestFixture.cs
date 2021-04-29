@@ -25,8 +25,14 @@
 
 namespace Migration.Tests
 {
+    using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using CDP4Common.DTO;
+    using CDP4Dal.DAL;
     using Common.Settings;
     using Common.ViewModels;
     using Moq;
@@ -39,10 +45,36 @@ namespace Migration.Tests
     [TestFixture]
     public class LoginViewModelTestFixture
     {
+        private Dictionary<Guid, Thing> dictionaryThings;
+        private SiteDirectory siteDirectory;
+        private Person person;
+
+        private const string ServerUrl = "https://www.rheagroup.com/";
+
+        private Mock<LoginViewModel> loginViewModel;
+
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
+            this.dictionaryThings = new Dictionary<Guid, Thing>();
+
+            this.siteDirectory = new SiteDirectory(Guid.NewGuid(), 0);
+            this.dictionaryThings.Add(this.siteDirectory.Iid, this.siteDirectory);
+
+            this.person = new Person(Guid.NewGuid(), 0)
+            {
+                ShortName = "John",
+                GivenName = "John",
+                Password = "Doe",
+                IsActive = true
+            };
+            this.siteDirectory.Person.Add(this.person.Iid);
+            this.dictionaryThings.Add(this.person.Iid, this.person);
+
+            var mockDal = new Mock<IDal>();
+            mockDal.SetupProperty(m => m.Session);
 
             AppSettingsHandler.Settings = new AppSettings
             {
@@ -54,44 +86,37 @@ namespace Migration.Tests
                 Object =
                 {
                     SelectedDataSource = DataSource.CDP4,
-                    UserName = SourceUsername,
-                    Password = SourcePassword,
-                    Uri = SourceServerUri,
+                    UserName = this.person.ShortName,
+                    Password = this.person.Password,
+                    Uri = ServerUrl,
                     SavedUris = new ReactiveList<string>()
                 }
             };
+
+            this.loginViewModel.Object.Dal = mockDal.Object;
+            mockDal.Setup(x => x.Open(It.IsAny<Credentials>(), It.IsAny<CancellationToken>())).Returns<Credentials, CancellationToken>((credentials, cancellationToken) =>
+            {
+                var result = this.dictionaryThings.Values.ToList() as IEnumerable<Thing>;
+                return Task.FromResult(result);
+            });
         }
-
-        private Mock<LoginViewModel> loginViewModel;
-
-        private const string SourceServerUri = "https://cdp4services-public.cdp4.org";
-        private const string SourceUsername = "admin";
-        private const string SourcePassword = "pass";
 
         [Test]
         public void VerifyGetterSetters()
         {
             Assert.AreEqual(DataSource.CDP4, this.loginViewModel.Object.SelectedDataSource);
-            Assert.IsFalse(this.loginViewModel.Object.JsonIsSelected);
-            Assert.IsTrue(this.loginViewModel.Object.CanSaveUri);
-            Assert.IsNull(this.loginViewModel.Object.EngineeringModels);
-            Assert.IsTrue(string.IsNullOrEmpty(this.loginViewModel.Object.Output));
-            Assert.AreEqual(SourceUsername, this.loginViewModel.Object.UserName);
-            Assert.AreEqual(SourcePassword, this.loginViewModel.Object.Password);
-            Assert.AreEqual(SourceServerUri, this.loginViewModel.Object.Uri);
+            Assert.AreEqual(this.person.ShortName, this.loginViewModel.Object.UserName);
+            Assert.AreEqual(this.person.Password, this.loginViewModel.Object.Password);
+            Assert.AreEqual(ServerUrl, this.loginViewModel.Object.Uri);
         }
 
         [Test]
-        public void VerifyIfExecuteCommandsWorks()
+        public void VerifyIfLoginSucceeded()
         {
             Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
+            
             Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
-            Assert.IsTrue(this.loginViewModel.Object.Output.Contains("Successfully logged in"));
-
-            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
-            Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
-            Assert.IsTrue(this.loginViewModel.Object.Output.Contains("Successfully logged in"));
-
+            
             Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.ServerSession.Close());
         }
 
@@ -103,44 +128,15 @@ namespace Migration.Tests
                 Object =
                 {
                     SelectedDataSource = DataSource.JSON,
-                    UserName = SourceUsername,
-                    Password = SourcePassword,
-                    Uri = SourceServerUri,
+                    UserName = this.person.ShortName,
+                    Password = this.person.Password,
+                    Uri = ServerUrl,
                     SavedUris = new ReactiveList<string>()
                 }
             };
 
             Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
             Assert.AreEqual(false, this.loginViewModel.Object.LoginSuccessfully);
-        }
-
-        [Test]
-        public void VerifyIfLoginSucceeded()
-        {
-            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
-            Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
-            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.ServerSession.Close());
-
-            this.loginViewModel = new Mock<LoginViewModel>
-            {
-                Object =
-                {
-                    SelectedDataSource = DataSource.WSP,
-                    UserName = SourceUsername,
-                    Password = SourcePassword,
-                    Uri = SourceServerUri,
-                    SavedUris = new ReactiveList<string>()
-                }
-            };
-
-            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
-            Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
-
-            // relogin
-
-            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
-            Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
-            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.ServerSession.Close());
         }
     }
 }
