@@ -385,19 +385,6 @@ namespace Common.ViewModels
                     await this.ServerSession.Close();
                 }
 
-                //switch (this.SelectedDataSource)
-                //{
-                //    case DataSource.CDP4:
-                //        this.Dal = new CdpServicesDal();
-                //        break;
-                //    case DataSource.WSP:
-                //        this.Dal = new WspDal();
-                //        break;
-                //    case DataSource.JSON:
-                //        this.Dal = new JsonFileDal(new Version("1.0.0"));
-                //        break;
-                //}
-
                 // when no trailing slash is provided it can lead to loss of nested paths
                 // see https://stackoverflow.com/questions/22543723/create-new-uri-from-base-uri-and-relative-path-slash-makes-a-difference
                 // for consistency, all URIs are now appended, cannot rely on user getting it right.
