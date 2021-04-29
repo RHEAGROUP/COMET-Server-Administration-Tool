@@ -121,6 +121,20 @@ namespace Migration.Tests
         }
 
         [Test]
+        public void VerifyIfLoginAfterLoginSucceeded()
+        {
+            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
+
+            Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
+
+            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
+
+            Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
+
+            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.ServerSession.Close());
+        }
+
+        [Test]
         public void VerifyIfLoginFailed()
         {
             this.loginViewModel = new Mock<LoginViewModel>
