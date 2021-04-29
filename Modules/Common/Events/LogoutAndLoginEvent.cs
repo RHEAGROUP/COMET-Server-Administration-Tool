@@ -23,15 +23,18 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using CDP4Dal;
-
 namespace Common.Events
 {
+    using CDP4Dal;
+
     /// <summary>
     /// A message bus event used to signify that data source will be disconnected and reconnected
     /// </summary>
     public class LogoutAndLoginEvent
     {
+        /// <summary>
+        /// Current session that will be logout/login <see cref="ISession"/>
+        /// </summary>
         public ISession CurrentSession { get; set; }
     }
 }

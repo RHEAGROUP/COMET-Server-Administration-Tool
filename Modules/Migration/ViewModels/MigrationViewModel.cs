@@ -238,7 +238,6 @@ namespace Migration.ViewModels
         /// <summary>
         /// Trigger loading of the person migration.json file to the application
         /// </summary>
-
         private void ExecuteLoadMigrationFile()
         {
             if (!this.FileIsChecked)

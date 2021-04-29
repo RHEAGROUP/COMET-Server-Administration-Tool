@@ -293,7 +293,7 @@ namespace Migration.Utils
             }
             finally
             {
-                CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent {CurrentSession = this.TargetSession});
+                CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent { CurrentSession = this.TargetSession });
             }
 
             CDPMessageBus.Current.SendMessage(new LogEvent
@@ -437,7 +437,7 @@ namespace Migration.Utils
             }
             finally
             {
-                CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent {CurrentSession = this.SourceSession});
+                CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent { CurrentSession = this.SourceSession });
             }
 
             CDPMessageBus.Current.SendMessage(new LogEvent

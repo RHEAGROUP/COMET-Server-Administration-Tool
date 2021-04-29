@@ -417,7 +417,7 @@ namespace Common.ViewModels
         /// <summary>
         /// Executes login command
         /// </summary>
-        /// <param name="currentSession"></param>
+        /// <param name="currentSession">Current user session<see cref="ISession"/></param>
         /// <returns>The <see cref="Task"/></returns>
         [ExcludeFromCodeCoverage]      
         private async Task ExecuteLogout(ISession currentSession)
