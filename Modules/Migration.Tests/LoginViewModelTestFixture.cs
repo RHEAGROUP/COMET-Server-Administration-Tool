@@ -23,6 +23,9 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using CDP4Dal;
+using Common.Events;
+
 namespace Migration.Tests
 {
     using System;
@@ -120,7 +123,10 @@ namespace Migration.Tests
             Assert.AreEqual(ServerUrl, this.loginViewModel.Object.Uri);
 
             Assert.AreEqual(false, this.loginViewModel.Object.JsonIsSelected);
+
             Assert.IsNull(this.loginViewModel.Object.Output);
+
+            Assert.IsTrue(this.loginViewModel.Object.CanSaveUri);
 
             this.loginViewModel.Object.EngineeringModels = new List<EngineeringModelRowViewModel>();
             Assert.IsEmpty(this.loginViewModel.Object.EngineeringModels);
@@ -146,6 +152,36 @@ namespace Migration.Tests
             Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
 
             Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
+
+            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.ServerSession.Close());
+        }
+
+        [Test]
+        public void VerifyIfLogoutAndLoginSucceeded()
+        {
+            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
+
+            Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
+
+            CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent
+            {
+                CurrentSession = this.loginViewModel.Object.ServerSession
+            });
+
+            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.ServerSession.Close());
+        }
+
+        [Test]
+        public void VerifyIfLogoutAndLoginWithInvalidSession()
+        {
+            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
+
+            Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
+
+            CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent
+            {
+                CurrentSession = null
+            });
 
             Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.ServerSession.Close());
         }
