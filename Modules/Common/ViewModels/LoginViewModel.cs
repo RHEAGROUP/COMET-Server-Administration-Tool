@@ -453,8 +453,6 @@ namespace Common.ViewModels
             }
         }
 
-        
-
         /// <summary>
         /// Check if a session is already open on the passed data source
         /// </summary>
