@@ -237,6 +237,7 @@ namespace Migration.Utils
             {
                 Message = "Import operation end"
             });
+
             return true;
         }
 
