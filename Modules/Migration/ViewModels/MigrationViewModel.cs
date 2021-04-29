@@ -32,8 +32,11 @@ namespace Migration.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+    using CDP4Dal;
+    using Common.Events;
     using Common.ViewModels;
     using Microsoft.Win32;
+    using NLog;
     using ReactiveUI;
     using Utils;
     using Views;
@@ -43,6 +46,11 @@ namespace Migration.ViewModels
     /// </summary>
     public class MigrationViewModel : ReactiveObject
     {
+        /// <summary>
+        /// The NLog logger
+        /// </summary>
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// Gets data source server type
         /// </summary>
@@ -142,8 +150,12 @@ namespace Migration.ViewModels
         /// </summary>
         public void AddSubscriptions()
         {
-            this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(OperationMessageHandler);
-            this.WhenAnyValue(vm => vm.TargetViewModel.Output).Subscribe(OperationMessageHandler);
+            this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(_ => {
+                OperationMessageHandler(this.SourceViewModel.Output);
+            });
+            this.WhenAnyValue(vm => vm.TargetViewModel.Output).Subscribe(_ => {
+                OperationMessageHandler(this.TargetViewModel.Output);
+            });
 
             this.WhenAnyValue(
                 vm => vm.SourceViewModel.LoginSuccessfully,
@@ -163,6 +175,29 @@ namespace Migration.ViewModels
                 .Subscribe(_ =>
             {
                 this.MigrationFactory.TargetSession = this.TargetViewModel.ServerSession;
+            });
+
+            CDPMessageBus.Current.Listen<LogEvent>().Subscribe((operationEvent) => {
+                var message = operationEvent.Message;
+                var exception = operationEvent.Exception;
+                var logLevel = operationEvent.Verbosity;
+
+                if (operationEvent.Exception != null)
+                {
+                    message += $"\n\tException: {exception.Message}";
+
+                    if (exception.InnerException != null)
+                    {
+                        message += $"\n\tInner exception: {exception.InnerException.Message}";
+                        message += $"\n{exception.InnerException.StackTrace}";
+                    }
+                    else
+                    {
+                        message += $"\n{exception.StackTrace}";
+                    }
+                }
+
+                this.OperationMessageHandler(message, logLevel);
             });
         }
 
@@ -193,8 +228,6 @@ namespace Migration.ViewModels
             this.FileIsChecked = false;
 
             this.MigrationFactory = new Migration();
-            this.MigrationFactory.OperationMessageEvent += this.OperationMessageHandler;
-            this.MigrationFactory.OperationStepEvent += this.OperationStepHandler;
 
             this.LoadMigrationFileCommand = ReactiveCommand.Create();
             this.LoadMigrationFileCommand.Subscribe(_ => this.ExecuteLoadMigrationFile());
@@ -280,45 +313,34 @@ namespace Migration.ViewModels
         }
 
         /// <summary>
-        /// Add migration log to the output panel
-        /// </summary>
-        /// <param name="step">
-        /// Migration operation step <see cref="MigrationStep"/>
-        /// </param>
-        private void OperationStepHandler(MigrationStep step)
-        {
-            switch (step)
-            {
-                case MigrationStep.ImportStart:
-                    this.OperationMessageHandler("Import operation start");
-                    break;
-                case MigrationStep.ImportEnd:
-                    this.OperationMessageHandler("Import operation end");
-                    break;
-                case MigrationStep.PackStart:
-                    this.OperationMessageHandler("Pack operation start");
-                    break;
-                case MigrationStep.PackEnd:
-                    this.OperationMessageHandler("Pack operation end");
-                    break;
-                case MigrationStep.ExportStart:
-                    this.OperationMessageHandler("Export operation start");
-                    break;
-                case MigrationStep.ExportEnd:
-                    this.OperationMessageHandler("Export operation end");
-                    break;
-            }
-        }
-
-        /// <summary>
         /// Add text message to the output panel
         /// </summary>
         /// <param name="message">The text message</param>
-        private void OperationMessageHandler(string message)
+        /// <param name="logLevel"></param>
+        private void OperationMessageHandler(string message, LogVerbosity? logLevel = null)
         {
             if (string.IsNullOrEmpty(message)) return;
 
             this.Output += $"{DateTime.Now:HH:mm:ss} {message}{Environment.NewLine}";
+
+            switch (logLevel)
+            {
+                case LogVerbosity.Info:
+                    Logger.Info(message);
+                    break;
+                case LogVerbosity.Warn:
+                    Logger.Warn(message);
+                    break;
+                case LogVerbosity.Debug:
+                    Logger.Debug(message);
+                    break;
+                case LogVerbosity.Error:
+                    Logger.Error(message);
+                    break;
+                default:
+                    Logger.Trace(message);
+                    break;
+            }
         }
     }
 }

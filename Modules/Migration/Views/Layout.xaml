@@ -47,7 +47,8 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <common:Login Grid.Row="0" Grid.Column="0" x:Name="LoginSource" />
+                        <common:Login Grid.Row="0" Grid.Column="0"
+                                      x:Name="LoginSource" />
                         <CheckBox Grid.Row="1" Grid.Column="0"
                             IsChecked="{Binding Path=FileIsChecked}"
                             Margin="5"
@@ -112,8 +113,10 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Row="0" Grid.Column="0">
-                    <common:Login x:Name="LoginTarget" ServerTypes="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dxlc:LayoutGroup}},
-                                                        Path=DataContext.MigrationTargetServerTypes}" />
+                    <common:Login
+                        x:Name="LoginTarget"
+                        ServerTypes="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dxlc:LayoutGroup}},
+                                              Path=DataContext.MigrationTargetServerTypes}" />
                 </StackPanel>
                 <StackPanel Grid.Row="0" Grid.Column="1">
                     <views:ServerInfo
@@ -154,7 +157,9 @@
             VerticalContentAlignment="Top"
             VerticalScrollBarVisibility="Visible"
             IsReadOnly="True"
-            Text="{Binding Path=Output, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            Text="{Binding Path=Output, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            EditValueChanged="BaseEdit_OnEditValueChanged"
+        />
     </GroupBox>
     <dxmvvm:Interaction.Behaviors>
         <behaviors:MigrationBehavior />

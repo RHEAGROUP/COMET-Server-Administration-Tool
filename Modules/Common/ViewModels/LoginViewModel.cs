@@ -27,7 +27,6 @@ namespace Common.ViewModels
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Reactive;
     using System.Threading.Tasks;
@@ -135,7 +134,7 @@ namespace Common.ViewModels
         public IDal Dal
         {
             get => this.dal;
-            private set => this.RaiseAndSetIfChanged(ref this.dal, value);
+            set => this.RaiseAndSetIfChanged(ref this.dal, value);
         }
 
         /// <summary>
@@ -276,14 +275,20 @@ namespace Common.ViewModels
             {
                 if (!loginFailed) return;
 
-                LogMessage($"Cannot log in to {this.Uri} ({ServerTypes[SelectedDataSource]}) data-source");
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = $"Cannot log in to {this.Uri} ({ServerTypes[SelectedDataSource]}) data-source"
+                });
             });
 
             this.WhenAnyValue(vm => vm.LoginSuccessfully).Subscribe(loginSuccessfully =>
             {
                 if (!loginSuccessfully) return;
 
-                LogMessage($"Successfully logged in to {this.Uri} ({ServerTypes[SelectedDataSource]}) data-source");
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = $"Successfully logged in to {this.Uri} ({ServerTypes[SelectedDataSource]}) data-source"
+                });
             });
 
             this.WhenAnyValue(vm => vm.SelectedDataSource).Subscribe(_ =>
@@ -293,7 +298,21 @@ namespace Common.ViewModels
 
             this.WhenAnyValue(vm => vm.Uri).Subscribe(_ => { this.ComputeCanSaveUri(); });
             this.WhenAnyValue(vm => vm.SavedUris).Subscribe(_ => { this.ComputeCanSaveUri(); });
-
+            this.WhenAnyValue(vm => vm.SelectedDataSource).Subscribe(_ =>
+            {
+                switch (this.SelectedDataSource)
+                {
+                    case DataSource.CDP4:
+                        this.Dal = new CdpServicesDal();
+                        break;
+                    case DataSource.WSP:
+                        this.Dal = new WspDal();
+                        break;
+                    case DataSource.JSON:
+                        this.Dal = new JsonFileDal(new Version("1.0.0"));
+                        break;
+                }
+            });
             this.GetSavedUris();
 
             CDPMessageBus.Current.Listen<SettingsReloadedEvent>().Subscribe(_ => this.GetSavedUris());
@@ -349,21 +368,11 @@ namespace Common.ViewModels
             {
                 if (this.IsSessionOpen(this.Uri, this.UserName, this.Password))
                 {
-                    LogMessage("The user is already logged on this server. Closing the session.");
+                    CDPMessageBus.Current.SendMessage(new LogEvent
+                    {
+                        Message = "The user is already logged on this server. Closing the session."
+                    });
                     await this.ServerSession.Close();
-                }
-
-                switch (this.SelectedDataSource)
-                {
-                    case DataSource.CDP4:
-                        this.Dal = new CdpServicesDal();
-                        break;
-                    case DataSource.WSP:
-                        this.Dal = new WspDal();
-                        break;
-                    case DataSource.JSON:
-                        this.Dal = new JsonFileDal(new Version("1.0.0"));
-                        break;
                 }
 
                 // when no trailing slash is provided it can lead to loss of nested paths
@@ -384,7 +393,12 @@ namespace Common.ViewModels
             }
             catch (Exception ex)
             {
-                LogMessage(ex.Message);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "Cannot execute login. Exception occurs.",
+                    Exception = ex,
+                    Verbosity = LogVerbosity.Error
+                });
 
                 this.LoginFailed = true;
             }
@@ -408,16 +422,6 @@ namespace Common.ViewModels
             {
                 this.Uri = openFileDialog.FileNames[0];
             }
-        }
-
-        /// <summary>
-        /// Log message to console/output panel
-        /// </summary>
-        /// <param name="message"></param>
-        private void LogMessage(string message)
-        {
-            Debug.WriteLine(message);
-            this.Output = message;
         }
 
         /// <summary>
