@@ -23,9 +23,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using CDP4Dal;
-using Common.Events;
-
 namespace Migration.Tests
 {
     using System;
@@ -35,7 +32,9 @@ namespace Migration.Tests
     using System.Threading;
     using System.Threading.Tasks;
     using CDP4Common.DTO;
+    using CDP4Dal;
     using CDP4Dal.DAL;
+    using Common.Events;
     using Common.Settings;
     using Common.ViewModels;
     using Common.ViewModels.PlainObjects;
