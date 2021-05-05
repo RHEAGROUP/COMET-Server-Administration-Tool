@@ -417,9 +417,9 @@ namespace Common.ViewModels
         /// <summary>
         /// Executes login command
         /// </summary>
-        /// <param name="currentSession">Current user session<see cref="ISession"/></param>
+        /// <param name="currentSession">Current user <see cref="ISession"/></param>
         /// <returns>The <see cref="Task"/></returns>
-        [ExcludeFromCodeCoverage]      
+        [ExcludeFromCodeCoverage]
         private async Task ExecuteLogout(ISession currentSession)
         {
             CDPMessageBus.Current.SendMessage(new LogEvent
