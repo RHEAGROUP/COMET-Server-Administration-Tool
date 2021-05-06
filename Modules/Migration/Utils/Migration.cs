@@ -160,7 +160,10 @@ namespace Migration.Utils
 
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
-                if (!selectedModels.Any(em => em.Iid == modelSetup.Iid && em.IsSelected)) continue;
+                if (!selectedModels.Any(em => em.Iid == modelSetup.Iid && em.IsSelected))
+                {
+                    continue;
+                }
 
                 var model = new EngineeringModel(
                     modelSetup.EngineeringModelIid,
@@ -173,7 +176,7 @@ namespace Migration.Utils
                 var tasks = new List<Task>();
 
                 // Read iterations
-                foreach (var iterationSetup in modelSetup.IterationSetup)
+                foreach (var iterationSetup in modelSetup.IterationSetup.ToList())
                 {
                     if (iterationSetup.IsDeleted)
                     {
@@ -186,6 +189,7 @@ namespace Migration.Utils
                         this.SourceSession.Credentials.Uri);
 
                     model.Iteration.Add(iteration);
+
                     tasks.Add(this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain)
                         .ContinueWith(t =>
                         {
