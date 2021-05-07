@@ -27,7 +27,6 @@ namespace Migration.ViewModels
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
@@ -239,9 +238,13 @@ namespace Migration.ViewModels
         /// <summary>
         /// Trigger loading of the person migration.json file to the application
         /// </summary>
-        [ExcludeFromCodeCoverage]
         private void ExecuteLoadMigrationFile()
         {
+            if (!this.FileIsChecked)
+            {
+                return;
+            }
+
             if (Application.Current == null)
             {
                 return;
@@ -264,10 +267,9 @@ namespace Migration.ViewModels
         /// Executes migration command
         /// </summary>
         /// <returns>The <see cref="Task"/></returns>
-        [ExcludeFromCodeCoverage]
         private async Task ExecuteMigration()
         {
-            var result = await this.MigrationFactory.ImportData(this.SourceViewModel.EngineeringModels);
+            var result = await this.MigrationFactory.ImportData(this.SourceViewModel?.EngineeringModels);
 
             if (!result)
             {

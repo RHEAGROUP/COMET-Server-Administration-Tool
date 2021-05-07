@@ -45,19 +45,6 @@ namespace Migration.Utils
     using System.Threading.Tasks;
 
     /// <summary>
-    /// Enumeration of the migration process steps
-    /// </summary>
-    public enum MigrationStep
-    {
-        ImportStart,
-        PackStart,
-        PackEnd,
-        ImportEnd,
-        ExportStart,
-        ExportEnd
-    };
-
-    /// <summary>
     /// The purpose of this class is to implement migration specif operations such as: import, export, pack
     /// </summary>
     public sealed class Migration
@@ -306,7 +293,7 @@ namespace Migration.Utils
             }
             finally
             {
-                await this.TargetSession.Close();
+                CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent { CurrentSession = this.TargetSession });
             }
 
             CDPMessageBus.Current.SendMessage(new LogEvent
@@ -450,7 +437,7 @@ namespace Migration.Utils
             }
             finally
             {
-                await this.SourceSession.Close();
+                CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent { CurrentSession = this.SourceSession });
             }
 
             CDPMessageBus.Current.SendMessage(new LogEvent

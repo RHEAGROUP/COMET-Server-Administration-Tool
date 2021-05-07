@@ -316,6 +316,16 @@ namespace Common.ViewModels
             this.GetSavedUris();
 
             CDPMessageBus.Current.Listen<SettingsReloadedEvent>().Subscribe(_ => this.GetSavedUris());
+            CDPMessageBus.Current.Listen<LogoutAndLoginEvent>().Subscribe(async (serverEvent) => {
+                if (serverEvent.CurrentSession != this.ServerSession)
+                {
+                    return;
+                }
+
+                await ExecuteLogout(serverEvent.CurrentSession);
+
+                await ExecuteLogin();
+            });
 
             this.LoginCommand =
                 ReactiveCommand.CreateAsyncTask(canLogin, x => this.ExecuteLogin(), RxApp.MainThreadScheduler);
@@ -402,6 +412,25 @@ namespace Common.ViewModels
 
                 this.LoginFailed = true;
             }
+        }
+
+        /// <summary>
+        /// Executes login command
+        /// </summary>
+        /// <param name="currentSession">Current user <see cref="ISession"/></param>
+        /// <returns>The <see cref="Task"/></returns>
+        [ExcludeFromCodeCoverage]
+        private async Task ExecuteLogout(ISession currentSession)
+        {
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = $"Successfully logged out from {currentSession.DataSourceUri} data-source"
+            });
+
+            await currentSession.Close();
+
+            this.LoginSuccessfully = false;
+            this.LoginFailed = false;
         }
 
         /// <summary>
