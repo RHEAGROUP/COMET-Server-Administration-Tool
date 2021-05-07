@@ -60,11 +60,6 @@ namespace Migration.Utils
         private static readonly string MigrationFileName = $"{AppDomain.CurrentDomain.BaseDirectory}\\Import\\migration.json";
 
         /// <summary>
-        /// Data Access Layer used during migration process
-        /// </summary>
-        private IDal Dal { get; set; }
-
-        /// <summary>
         ///  Gets or sets session of the migration source server <see cref="ISession"/>
         /// </summary>
         public ISession SourceSession { get; set; }
@@ -79,8 +74,6 @@ namespace Migration.Utils
         /// </summary>
         public Migration()
         {
-            this.Dal = new JsonFileDal(new Version("1.0.0"));
-
             if (Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\Import"))
             {
                 Directory.Delete($"{AppDomain.CurrentDomain.BaseDirectory}\\Import", true);
@@ -363,10 +356,8 @@ namespace Migration.Utils
         [ExcludeFromCodeCoverage]
         public async Task<bool> PackData(string migrationFile)
         {
-            List<string> extensionFiles = null;
-            var zipCredentials = new Credentials(this.SourceSession.Credentials.UserName, this.TargetSession.Credentials.Password, new Uri(ArchiveFileName));
-            var zipSession = new Session(this.Dal, zipCredentials);
             var success = true;
+            List<string> extensionFiles = null;
 
             if (!string.IsNullOrEmpty(migrationFile))
             {
@@ -383,7 +374,7 @@ namespace Migration.Utils
 
                 try
                 {
-                    extensionFiles = new List<string> {MigrationFileName};
+                    extensionFiles = new List<string> { MigrationFileName };
                     if (System.IO.File.Exists(MigrationFileName))
                     {
                         System.IO.File.Delete(MigrationFileName);
@@ -421,9 +412,14 @@ namespace Migration.Utils
                 operationContainers.Add(operationContainer);
             }
 
+            var zipDal = new JsonFileDal(new Version("1.0.0"));
+            var zipCredentials = new Credentials(this.SourceSession.Credentials.UserName, this.TargetSession.Credentials.Password, new Uri(ArchiveFileName));
+            // NOTE zipSession needed because JsonFileDal.Write uses the credentials from the Session
+            var zipSession = new Session(zipDal, zipCredentials);
+
             try
             {
-                await this.Dal.Write(operationContainers, extensionFiles);
+                await zipDal.Write(operationContainers, extensionFiles);
             }
             catch (Exception ex)
             {
