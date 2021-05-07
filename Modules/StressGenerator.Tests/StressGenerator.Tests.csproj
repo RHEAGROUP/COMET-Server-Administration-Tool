@@ -3,6 +3,7 @@
     <RootNamespace>StressGenerator.Tests</RootNamespace>
     <AssemblyName>StressGenerator.Tests</AssemblyName>
     <TargetFramework>net452</TargetFramework>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
