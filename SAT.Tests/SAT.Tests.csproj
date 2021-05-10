@@ -3,6 +3,7 @@
     <RootNamespace>SAT.Tests</RootNamespace>
     <AssemblyName>SAT.Tests</AssemblyName>
     <TargetFramework>net452</TargetFramework>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
