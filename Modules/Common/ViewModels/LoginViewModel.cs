@@ -324,6 +324,11 @@ namespace Common.ViewModels
 
                 await ExecuteLogout(serverEvent.CurrentSession);
 
+                if (!string.IsNullOrEmpty(serverEvent.NewPassword))
+                {
+                    this.Password = serverEvent.NewPassword;
+                }
+
                 await ExecuteLogin();
             });
 
