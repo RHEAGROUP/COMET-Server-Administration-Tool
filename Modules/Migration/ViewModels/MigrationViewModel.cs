@@ -224,6 +224,14 @@ namespace Migration.ViewModels
                     sourceLoginSuccessfully && sourceSession != null && targetLoginSuccessfully && targetSession != null);
             canExecuteMigrate.ToProperty(this, vm => vm.CanMigrate, out this.canMigrate);
 
+            this.WhenAnyValue(vm => vm.FileIsChecked).Subscribe(_ =>
+            {
+                if (!this.FileIsChecked && !string.IsNullOrEmpty(this.MigrationFile))
+                {
+                    this.MigrationFile = null;
+                }
+            });
+
             this.FileIsChecked = false;
 
             this.MigrationFactory = new Migration();

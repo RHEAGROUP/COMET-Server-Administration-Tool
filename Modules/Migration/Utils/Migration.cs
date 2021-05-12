@@ -286,7 +286,11 @@ namespace Migration.Utils
             }
             finally
             {
-                CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent { CurrentSession = this.TargetSession });
+                CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent
+                {
+                    CurrentSession = this.TargetSession,
+                    NewPassword = System.IO.File.Exists(MigrationFileName) ? this.SourceSession.Credentials.Password : string.Empty
+                });
             }
 
             CDPMessageBus.Current.SendMessage(new LogEvent

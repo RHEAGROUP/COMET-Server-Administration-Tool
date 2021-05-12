@@ -36,5 +36,10 @@ namespace Common.Events
         /// Current session that will be logout/login <see cref="ISession"/>
         /// </summary>
         public ISession CurrentSession { get; set; }
+
+        /// <summary>
+        /// The new (target) password that will be used for the login
+        /// </summary>
+        public string NewPassword { get; set; }
     }
 }

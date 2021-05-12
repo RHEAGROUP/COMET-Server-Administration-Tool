@@ -164,7 +164,8 @@ namespace Migration.Tests
 
             CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent
             {
-                CurrentSession = this.loginViewModel.Object.ServerSession
+                CurrentSession = this.loginViewModel.Object.ServerSession,
+                NewPassword = "Doe"
             });
 
             Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.ServerSession.Close());
@@ -179,7 +180,8 @@ namespace Migration.Tests
 
             CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent
             {
-                CurrentSession = null
+                CurrentSession = null,
+                NewPassword = null
             });
 
             Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.ServerSession.Close());
