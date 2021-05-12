@@ -292,7 +292,7 @@ namespace Migration.Utils
                     NewPassword = System.IO.File.Exists(MigrationFileName) ? this.SourceSession.Credentials.Password : string.Empty
                 });
             }
-            
+
             CDPMessageBus.Current.SendMessage(new LogEvent
             {
                 Message = "Export operation end"
