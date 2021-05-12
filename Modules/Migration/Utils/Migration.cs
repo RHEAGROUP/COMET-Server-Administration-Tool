@@ -298,6 +298,23 @@ namespace Migration.Utils
         }
 
         /// <summary>
+        /// Cleanup Annex C3 files that have been sent to the target server
+        /// </summary>
+        public void Cleanup()
+        {
+            if (System.IO.File.Exists(MigrationFileName))
+            {
+                System.IO.File.Delete(MigrationFileName);
+            }
+
+            if (System.IO.File.Exists(ArchiveFileName))
+            {
+                System.IO.File.Delete(ArchiveFileName);
+            }
+            
+        }
+
+        /// <summary>
         /// Process the success POST message
         /// </summary>
         /// <param name="task">

@@ -311,7 +311,7 @@ namespace Migration.ViewModels
                 }
             }
 
-            // TODO #33 add cleanup after migration
+            this.MigrationFactory.Cleanup();
         }
 
         /// <summary>
