@@ -204,47 +204,50 @@ namespace Migration.ViewModels
         {
             switch (rowError.Thing)
             {
-                case FileType fileThing:
-                    fileThing.Extension = rowError.Error.Contains("Extension")
-                        ? "Unknown Extension"
-                        : fileThing.Extension;
+                case FileType file:
+                    if (rowError.Error.Contains("Extension"))
+                    {
+                        file.Extension = "Unknown Extension";
+                    }
                     break;
-                case TelephoneNumber telephoneThing:
-                    telephoneThing.Value = rowError.Error.Contains("Value")
-                        ? "No Value"
-                        : telephoneThing.Value;
+                case TelephoneNumber telephoneNumber:
+                    if (rowError.Error.Contains("Value"))
+                    {
+                        telephoneNumber.Value = "No Value";
+                    }
                     break;
-                case UserPreference userPreferenceThing:
-                    userPreferenceThing.Value = rowError.Error.Contains("Value")
-                        ? "No Value"
-                        : userPreferenceThing.Value;
+                case UserPreference userPreference:
+                    if (rowError.Error.Contains("Value"))
+                    {
+                        userPreference.Value = "No Value";
+                    }
                     break;
-                case Citation citationThing:
+                case Citation citation:
                     // broken citations are a result of 10-25 paradox thus shall be removed
-                    if (citationThing.Container is Definition container)
+                    if (citation.Container is Definition container)
                     {
-                        container.Citation.Remove(citationThing);
-                        container.Cache?.TryRemove(citationThing.CacheKey, out _);
+                        container.Citation.Remove(citation);
+                        container.Cache?.TryRemove(citation.CacheKey, out _);
                     }
-
                     break;
-                case Participant participantThing:
-                    if (participantThing.Container is EngineeringModelSetup modelSetup)
+                case Participant participant:
+                    if (participant.Container is EngineeringModelSetup modelSetup)
                     {
-                        modelSetup.Participant.Remove(participantThing);
-                        modelSetup.Cache.TryRemove(participantThing.CacheKey, out _);
+                        modelSetup.Participant.Remove(participant);
+                        modelSetup.Cache.TryRemove(participant.CacheKey, out _);
                     }
-
                     break;
-                case Definition contentThing:
-                    contentThing.Content = rowError.Error.Contains("Content")
-                        ? "No Content"
-                        : contentThing.Content;
+                case Definition definition:
+                    if (rowError.Error.Contains("Content"))
+                    {
+                        definition.Content = "No Content";
+                    }
                     break;
-                case IterationSetup iterationSetupThing:
-                    iterationSetupThing.Description = rowError.Error.Contains("Description")
-                        ? "No Description"
-                        : iterationSetupThing.Description;
+                case IterationSetup iterationSetup:
+                    if (rowError.Error.Contains("Description"))
+                    {
+                        iterationSetup.Description = "No Description";
+                    }
                     break;
             }
         }
