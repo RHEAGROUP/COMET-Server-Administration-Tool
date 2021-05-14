@@ -206,7 +206,7 @@ namespace Migration.ViewModels
             {
                 case FileType fileThing:
                     fileThing.Extension = rowError.Error.Contains("Extension")
-                        ? "UnknownExtension"
+                        ? "Unknown Extension"
                         : fileThing.Extension;
                     break;
                 case TelephoneNumber telephoneThing:
@@ -238,7 +238,7 @@ namespace Migration.ViewModels
                     break;
                 case Definition contentThing:
                     contentThing.Content = rowError.Error.Contains("Content")
-                        ? "No Value"
+                        ? "No Content"
                         : contentThing.Content;
                     break;
                 case IterationSetup iterationSetupThing:
@@ -257,7 +257,7 @@ namespace Migration.ViewModels
         {
             if (rowError.Thing is IShortNamedThing shortNamedThing && rowError.Error.Contains("ShortName"))
             {
-                shortNamedThing.ShortName = "UndefinedShortName";
+                shortNamedThing.ShortName = "Undefined ShortName";
             }
 
             if (rowError.Thing is INamedThing namedThing && rowError.Error.Contains("Name"))
