@@ -25,13 +25,6 @@
 
 namespace Migration.Utils
 {
-    using CDP4Common.EngineeringModelData;
-    using CDP4Dal;
-    using CDP4Dal.DAL;
-    using CDP4Dal.Operations;
-    using CDP4JsonFileDal;
-    using Common.Events;
-    using Common.ViewModels.PlainObjects;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -43,6 +36,13 @@ namespace Migration.Utils
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using CDP4Common.EngineeringModelData;
+    using CDP4Dal;
+    using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
+    using CDP4JsonFileDal;
+    using Common.Events;
+    using Common.ViewModels.PlainObjects;
 
     /// <summary>
     /// The purpose of this class is to implement migration specif operations such as: import, export, pack
@@ -315,7 +315,7 @@ namespace Migration.Utils
             {
                 System.IO.File.Delete(ArchiveFileName);
             }
-            
+
         }
 
         /// <summary>

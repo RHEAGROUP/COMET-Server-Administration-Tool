@@ -25,6 +25,11 @@
 
 namespace Migration.ViewModels
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -33,11 +38,6 @@ namespace Migration.ViewModels
     using Common.Events;
     using Common.ViewModels.PlainObjects;
     using ReactiveUI;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reactive.Linq;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// The viewmodel of the migration cardinality fix wizard.
@@ -259,36 +259,7 @@ namespace Migration.ViewModels
                     }
                     break;
                 case Parameter parameter:
-                    var valueSets = new Dictionary<string, Dictionary<string, List<ParameterValueSet>>>();
-
-                    foreach (var valueSet in parameter.ValueSet)
-                    {
-                        var optionIid = valueSet.ActualOption?.Iid.ToString() ?? "";
-                        if (!valueSets.ContainsKey(optionIid))
-                        {
-                            valueSets[optionIid] = new Dictionary<string, List<ParameterValueSet>>();
-                        }
-
-                        var stateIid = valueSet.ActualState?.Iid.ToString() ?? "";
-                        if (!valueSets[optionIid].ContainsKey(stateIid))
-                        {
-                            valueSets[optionIid][stateIid] = new List<ParameterValueSet>();
-                        }
-
-                        valueSets[optionIid][stateIid].Add(valueSet);
-                    }
-
-                    // no better way to determine which of the ValueSets to keep
-                    foreach (var dictionary in valueSets.Values)
-                    {
-                        foreach (var list in dictionary.Values)
-                        {
-                            for (var i = 1; i < list.Count; ++i)
-                            {
-                                parameter.ValueSet.Remove(list[i]);
-                            }
-                        }
-                    }
+                    FixValueSets(parameter);
                     break;
                 case ParameterValueSet parameterValueSet:
                     parameterValueSet.Manual = FixValueArray(parameterValueSet.Manual, parameterValueSet);
@@ -296,6 +267,47 @@ namespace Migration.ViewModels
                     parameterValueSet.Published = FixValueArray(parameterValueSet.Published, parameterValueSet);
                     parameterValueSet.Reference = FixValueArray(parameterValueSet.Reference, parameterValueSet);
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Generate a new <see cref="Dictionary{TKey,TValue}"/> with the correct values, for each option and state
+        /// </summary>
+        /// <param name="parameter">
+        /// See <see cref="Parameter"/>
+        /// </param>
+        private static void FixValueSets(Parameter parameter)
+        {
+            var valueSets = new Dictionary<string, Dictionary<string, List<ParameterValueSet>>>();
+
+            foreach (var valueSet in parameter.ValueSet)
+            {
+                var optionIid = valueSet.ActualOption?.Iid.ToString() ?? "";
+                var stateIid = valueSet.ActualState?.Iid.ToString() ?? "";
+
+                if (!valueSets.ContainsKey(optionIid))
+                {
+                    valueSets[optionIid] = new Dictionary<string, List<ParameterValueSet>>();
+                }
+
+                if (!valueSets[optionIid].ContainsKey(stateIid))
+                {
+                    valueSets[optionIid][stateIid] = new List<ParameterValueSet>();
+                }
+
+                valueSets[optionIid][stateIid].Add(valueSet);
+            }
+
+            // no better way to determine which of the ValueSets to keep
+            foreach (var dictionary in valueSets.Values)
+            {
+                foreach (var list in dictionary.Values)
+                {
+                    for (var i = 1; i < list.Count; ++i)
+                    {
+                        parameter.ValueSet.Remove(list[i]);
+                    }
+                }
             }
         }
 
