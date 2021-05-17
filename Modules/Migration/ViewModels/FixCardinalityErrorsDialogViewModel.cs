@@ -25,17 +25,19 @@
 
 namespace Migration.ViewModels
 {
+    using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
+    using CDP4Dal;
+    using Common.Events;
+    using Common.ViewModels.PlainObjects;
+    using ReactiveUI;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
-    using CDP4Common.CommonData;
-    using CDP4Common.SiteDirectoryData;
-    using CDP4Dal;
-    using Common.Events;
-    using Common.ViewModels.PlainObjects;
-    using ReactiveUI;
 
     /// <summary>
     /// The viewmodel of the migration cardinality fix wizard.
@@ -174,7 +176,8 @@ namespace Migration.ViewModels
 
             CDPMessageBus.Current.SendMessage(new LogEvent { Message = "Fixing the cardinality errors for the selected models..." });
 
-            foreach (var rowError in this.Errors)
+            // these should be traversed in bottom-up containment order, but for now reverse also works
+            foreach (var rowError in this.Errors.OrderBy(e => e.Thing.ClassKind.ToString()).Reverse())
             {
                 FixNameAndShortName(rowError);
 
@@ -249,7 +252,81 @@ namespace Migration.ViewModels
                         iterationSetup.Description = "No Description";
                     }
                     break;
+                case ScalarParameterType scalarParameterType:
+                    if (rowError.Error.Contains("Symbol"))
+                    {
+                        scalarParameterType.Symbol = "No Symbol";
+                    }
+                    break;
+                case Parameter parameter:
+                    var valueSets = new Dictionary<string, Dictionary<string, List<ParameterValueSet>>>();
+
+                    foreach (var valueSet in parameter.ValueSet)
+                    {
+                        var optionIid = valueSet.ActualOption?.Iid.ToString() ?? "";
+                        if (!valueSets.ContainsKey(optionIid))
+                        {
+                            valueSets[optionIid] = new Dictionary<string, List<ParameterValueSet>>();
+                        }
+
+                        var stateIid = valueSet.ActualState?.Iid.ToString() ?? "";
+                        if (!valueSets[optionIid].ContainsKey(stateIid))
+                        {
+                            valueSets[optionIid][stateIid] = new List<ParameterValueSet>();
+                        }
+
+                        valueSets[optionIid][stateIid].Add(valueSet);
+                    }
+
+                    // no better way to determine which of the ValueSets to keep
+                    foreach (var dictionary in valueSets.Values)
+                    {
+                        foreach (var list in dictionary.Values)
+                        {
+                            for (var i = 1; i < list.Count; ++i)
+                            {
+                                parameter.ValueSet.Remove(list[i]);
+                            }
+                        }
+                    }
+                    break;
+                case ParameterValueSet parameterValueSet:
+                    parameterValueSet.Manual = FixValueArray(parameterValueSet.Manual, parameterValueSet);
+                    parameterValueSet.Formula = FixValueArray(parameterValueSet.Formula, parameterValueSet);
+                    parameterValueSet.Published = FixValueArray(parameterValueSet.Published, parameterValueSet);
+                    parameterValueSet.Reference = FixValueArray(parameterValueSet.Reference, parameterValueSet);
+                    break;
             }
+        }
+
+        /// <summary>
+        /// Generate a new <see cref="ValueArray{T}"/> with the correct number of values, containing the values
+        /// in <paramref name="oldValues"/>.
+        /// </summary>
+        /// <param name="oldValues">
+        /// The values in the old <see cref="ValueArray{T}"/>.
+        /// </param>
+        /// <param name="parameterValueSet">
+        /// The containing <see cref="ParameterValueSet"/>.
+        /// </param>
+        /// <returns>
+        /// The new <see cref="ValueArray{T}"/>.
+        /// </returns>
+        private static ValueArray<string> FixValueArray(ValueArray<string> oldValues, ParameterValueSet parameterValueSet)
+        {
+            var newValues = new List<string>();
+
+            foreach (var oldValue in oldValues)
+            {
+                newValues.Add(oldValue);
+            }
+
+            for (var i = newValues.Count; i < parameterValueSet.QueryParameterType().NumberOfValues; ++i)
+            {
+                newValues.Add("-");
+            }
+
+            return new ValueArray<string>(newValues, parameterValueSet);
         }
 
         /// <summary>
