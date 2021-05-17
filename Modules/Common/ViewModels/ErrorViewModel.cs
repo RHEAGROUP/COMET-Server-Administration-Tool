@@ -25,10 +25,10 @@
 
 namespace Common.ViewModels
 {
-    using CDP4Dal;
-    using CDP4Rules;
     using System;
     using System.Linq;
+    using CDP4Dal;
+    using CDP4Rules;
     using PlainObjects;
     using ReactiveUI;
 

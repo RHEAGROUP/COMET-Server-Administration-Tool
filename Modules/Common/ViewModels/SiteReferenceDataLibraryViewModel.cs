@@ -25,12 +25,12 @@
 
 namespace Common.ViewModels
 {
+    using System;
+    using System.Linq;
     using CDP4Dal;
     using DevExpress.Mvvm.Native;
     using PlainObjects;
     using ReactiveUI;
-    using System;
-    using System.Linq;
 
     /// <summary>
     /// The view-model for the Source and target server that is responsible for getting referenced data libraries

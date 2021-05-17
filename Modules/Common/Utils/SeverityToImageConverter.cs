@@ -25,11 +25,11 @@
 
 namespace Common.Utils
 {
-    using DevExpress.Xpf.Core;
-    using DevExpress.Xpf.Core.Native;
     using System;
     using System.Globalization;
     using System.Windows.Data;
+    using DevExpress.Xpf.Core;
+    using DevExpress.Xpf.Core.Native;
 
     /// <summary>
     /// The purpose of the <see cref="SeverityToImageConverter"/> is to return the severity values as images
