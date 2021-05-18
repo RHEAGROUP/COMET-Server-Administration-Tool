@@ -315,7 +315,6 @@ namespace Migration.Utils
             {
                 System.IO.File.Delete(ArchiveFileName);
             }
-
         }
 
         /// <summary>

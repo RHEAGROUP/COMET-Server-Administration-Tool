@@ -7,7 +7,6 @@
 namespace Migration.Tests
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -393,20 +392,9 @@ namespace Migration.Tests
         {
             Assert.DoesNotThrowAsync(async () => await this.session.Object.Open());
 
-            //var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.session.Object.Assembler.Cache,
-            //    this.session.Object.Credentials.Uri);
-            //var definition = new Definition(Guid.NewGuid(), this.session.Object.Assembler.Cache,
-            //    this.session.Object.Credentials.Uri);
             var scalarParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.session.Object.Assembler.Cache,
                 this.session.Object.Credentials.Uri) as ScalarParameterType;
             this.siteReferenceDataLibrary.ParameterType.Add(scalarParameterType);
-            //var scalarParameter = new Parameter(Guid.NewGuid(), this.session.Object.Assembler.Cache,
-            //    this.session.Object.Credentials.Uri) { Owner = this.domain };
-            //scalarParameter.ParameterType = scalarParameterType;
-            //elementDefinition.Parameter.Add(scalarParameter);
-
-            //this.iteration.Element.Add(elementDefinition);
-            //elementDefinition.Definition.Add(definition);
 
             scalarParameterType.ValidatePoco();
 
@@ -433,23 +421,23 @@ namespace Migration.Tests
                 this.session.Object.Credentials.Uri);
             var parameter = new Parameter(Guid.NewGuid(), this.session.Object.Assembler.Cache,
                 this.session.Object.Credentials.Uri){ Owner = this.domain };
-            var valueset = new ParameterValueSet(Guid.NewGuid(), this.session.Object.Assembler.Cache,
+            var valueSet = new ParameterValueSet(Guid.NewGuid(), this.session.Object.Assembler.Cache,
                 this.session.Object.Credentials.Uri);
 
-            parameter.ValueSet.Add(valueset);
+            parameter.ValueSet.Add(valueSet);
 
             elementDefinition.Parameter.Add(parameter);
 
             this.iteration.Element.Add(elementDefinition);
             elementDefinition.Definition.Add(definition);
 
-            valueset.ValidatePoco();
+            valueSet.ValidatePoco();
             parameter.ValidatePoco();
 
             this.session.Object.Assembler.Cache.TryAdd(new CacheKey(parameter.Iid, null),
                 new Lazy<Thing>(() => parameter));
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(valueset.Iid, null),
-                new Lazy<Thing>(() => valueset));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(valueSet.Iid, null),
+                new Lazy<Thing>(() => valueSet));
 
             this.viewModel.BindPocoErrors();
 
