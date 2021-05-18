@@ -386,5 +386,72 @@ namespace Migration.Tests
 
             Assert.DoesNotThrowAsync(async () => await this.session.Object.Close());
         }
+
+        [Test]
+        public void VerifyThatValidatePocoPropertiesAddsScalarParameterTypeError()
+        {
+            Assert.DoesNotThrowAsync(async () => await this.session.Object.Open());
+
+            var scalarParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.session.Object.Assembler.Cache,
+                this.session.Object.Credentials.Uri) as ScalarParameterType;
+            this.siteReferenceDataLibrary.ParameterType.Add(scalarParameterType);
+
+            scalarParameterType.ValidatePoco();
+
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(scalarParameterType.Iid, null),
+                new Lazy<Thing>(() => scalarParameterType));
+
+            this.viewModel.BindPocoErrors();
+
+            Assert.That(this.viewModel.Errors.Any(e => e.Error.Contains("The property Symbol is null")));
+
+            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute(null));
+
+            Assert.DoesNotThrowAsync(async () => await this.session.Object.Close());
+        }
+
+        [Test]
+        public void VerifyThatValidatePocoPropertiesFixValueSets()
+        {
+            Assert.DoesNotThrowAsync(async () => await this.session.Object.Open());
+
+            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.session.Object.Assembler.Cache,
+                this.session.Object.Credentials.Uri);
+            var definition = new Definition(Guid.NewGuid(), this.session.Object.Assembler.Cache,
+                this.session.Object.Credentials.Uri);
+            var parameter = new Parameter(Guid.NewGuid(), this.session.Object.Assembler.Cache,
+                this.session.Object.Credentials.Uri){ Owner = this.domain };
+            var valueSet = new ParameterValueSet(Guid.NewGuid(), this.session.Object.Assembler.Cache,
+                this.session.Object.Credentials.Uri);
+
+            parameter.ValueSet.Add(valueSet);
+
+            elementDefinition.Parameter.Add(parameter);
+
+            this.iteration.Element.Add(elementDefinition);
+            elementDefinition.Definition.Add(definition);
+
+            valueSet.ValidatePoco();
+            parameter.ValidatePoco();
+
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(parameter.Iid, null),
+                new Lazy<Thing>(() => parameter));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(valueSet.Iid, null),
+                new Lazy<Thing>(() => valueSet));
+
+            this.viewModel.BindPocoErrors();
+
+            Assert.That(this.viewModel.Errors.Any(e => e.ContainerThingClassKind == ClassKind.ParameterValueSet.ToString() && e.Error.Contains("The number of elements in the property Formula is wrong. It should be at least 1")));
+
+            Assert.That(this.viewModel.Errors.Any(e => e.ContainerThingClassKind == ClassKind.ParameterValueSet.ToString() && e.Error.Contains("The number of elements in the property Manual is wrong. It should be at least 1.")));
+
+            Assert.That(this.viewModel.Errors.Any(e => e.ContainerThingClassKind == ClassKind.ParameterValueSet.ToString() && e.Error.Contains("The number of elements in the property Published is wrong. It should be at least 1.")));
+
+            Assert.That(this.viewModel.Errors.Any(e => e.ContainerThingClassKind == ClassKind.ParameterValueSet.ToString() && e.Error.Contains("The number of elements in the property Reference is wrong. It should be at least 1.")));
+
+            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute(null));
+
+            Assert.DoesNotThrowAsync(async () => await this.session.Object.Close());
+        }
     }
 }

@@ -31,7 +31,9 @@ namespace Migration.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Dal;
     using Common.Events;
     using Common.ViewModels.PlainObjects;
@@ -174,7 +176,8 @@ namespace Migration.ViewModels
 
             CDPMessageBus.Current.SendMessage(new LogEvent { Message = "Fixing the cardinality errors for the selected models..." });
 
-            foreach (var rowError in this.Errors)
+            // these should be traversed in bottom-up containment order, but for now reverse also works
+            foreach (var rowError in this.Errors.OrderBy(e => e.Thing.ClassKind.ToString()).Reverse())
             {
                 FixNameAndShortName(rowError);
 
@@ -204,49 +207,138 @@ namespace Migration.ViewModels
         {
             switch (rowError.Thing)
             {
-                case FileType fileThing:
-                    fileThing.Extension = rowError.Error.Contains("Extension")
-                        ? "UnknownExtension"
-                        : fileThing.Extension;
+                case FileType file:
+                    if (rowError.Error.Contains("Extension"))
+                    {
+                        file.Extension = "Unknown Extension";
+                    }
                     break;
-                case TelephoneNumber telephoneThing:
-                    telephoneThing.Value = rowError.Error.Contains("Value")
-                        ? "No Value"
-                        : telephoneThing.Value;
+                case TelephoneNumber telephoneNumber:
+                    if (rowError.Error.Contains("Value"))
+                    {
+                        telephoneNumber.Value = "No Value";
+                    }
                     break;
-                case UserPreference userPreferenceThing:
-                    userPreferenceThing.Value = rowError.Error.Contains("Value")
-                        ? "No Value"
-                        : userPreferenceThing.Value;
+                case UserPreference userPreference:
+                    if (rowError.Error.Contains("Value"))
+                    {
+                        userPreference.Value = "No Value";
+                    }
                     break;
-                case Citation citationThing:
+                case Citation citation:
                     // broken citations are a result of 10-25 paradox thus shall be removed
-                    if (citationThing.Container is Definition container)
+                    if (citation.Container is Definition container)
                     {
-                        container.Citation.Remove(citationThing);
-                        container.Cache?.TryRemove(citationThing.CacheKey, out _);
+                        container.Citation.Remove(citation);
+                        container.Cache?.TryRemove(citation.CacheKey, out _);
                     }
-
                     break;
-                case Participant participantThing:
-                    if (participantThing.Container is EngineeringModelSetup modelSetup)
+                case Participant participant:
+                    if (participant.Container is EngineeringModelSetup modelSetup)
                     {
-                        modelSetup.Participant.Remove(participantThing);
-                        modelSetup.Cache.TryRemove(participantThing.CacheKey, out _);
+                        modelSetup.Participant.Remove(participant);
+                        modelSetup.Cache.TryRemove(participant.CacheKey, out _);
                     }
-
                     break;
-                case Definition contentThing:
-                    contentThing.Content = rowError.Error.Contains("Content")
-                        ? "No Value"
-                        : contentThing.Content;
+                case Definition definition:
+                    if (rowError.Error.Contains("Content"))
+                    {
+                        definition.Content = "No Content";
+                    }
                     break;
-                case IterationSetup iterationSetupThing:
-                    iterationSetupThing.Description = rowError.Error.Contains("Description")
-                        ? "No Description"
-                        : iterationSetupThing.Description;
+                case IterationSetup iterationSetup:
+                    if (rowError.Error.Contains("Description"))
+                    {
+                        iterationSetup.Description = "No Description";
+                    }
+                    break;
+                case ScalarParameterType scalarParameterType:
+                    if (rowError.Error.Contains("Symbol"))
+                    {
+                        scalarParameterType.Symbol = "No Symbol";
+                    }
+                    break;
+                case Parameter parameter:
+                    FixValueSets(parameter);
+                    break;
+                case ParameterValueSet parameterValueSet:
+                    parameterValueSet.Manual = FixValueArray(parameterValueSet.Manual, parameterValueSet);
+                    parameterValueSet.Formula = FixValueArray(parameterValueSet.Formula, parameterValueSet);
+                    parameterValueSet.Published = FixValueArray(parameterValueSet.Published, parameterValueSet);
+                    parameterValueSet.Reference = FixValueArray(parameterValueSet.Reference, parameterValueSet);
                     break;
             }
+        }
+
+        /// <summary>
+        /// Generate a new <see cref="Dictionary{TKey,TValue}"/> with the correct values, for each option and state
+        /// </summary>
+        /// <param name="parameter">
+        /// See <see cref="Parameter"/>
+        /// </param>
+        private static void FixValueSets(Parameter parameter)
+        {
+            var valueSets = new Dictionary<string, Dictionary<string, List<ParameterValueSet>>>();
+
+            foreach (var valueSet in parameter.ValueSet)
+            {
+                var optionIid = valueSet.ActualOption?.Iid.ToString() ?? "";
+                var stateIid = valueSet.ActualState?.Iid.ToString() ?? "";
+
+                if (!valueSets.ContainsKey(optionIid))
+                {
+                    valueSets[optionIid] = new Dictionary<string, List<ParameterValueSet>>();
+                }
+
+                if (!valueSets[optionIid].ContainsKey(stateIid))
+                {
+                    valueSets[optionIid][stateIid] = new List<ParameterValueSet>();
+                }
+
+                valueSets[optionIid][stateIid].Add(valueSet);
+            }
+
+            // no better way to determine which of the ValueSets to keep
+            foreach (var dictionary in valueSets.Values)
+            {
+                foreach (var list in dictionary.Values)
+                {
+                    for (var i = 1; i < list.Count; ++i)
+                    {
+                        parameter.ValueSet.Remove(list[i]);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Generate a new <see cref="ValueArray{T}"/> with the correct number of values, containing the values
+        /// in <paramref name="oldValues"/>.
+        /// </summary>
+        /// <param name="oldValues">
+        /// The values in the old <see cref="ValueArray{T}"/>.
+        /// </param>
+        /// <param name="parameterValueSet">
+        /// The containing <see cref="ParameterValueSet"/>.
+        /// </param>
+        /// <returns>
+        /// The new <see cref="ValueArray{T}"/>.
+        /// </returns>
+        private static ValueArray<string> FixValueArray(ValueArray<string> oldValues, ParameterValueSet parameterValueSet)
+        {
+            var newValues = new List<string>();
+
+            foreach (var oldValue in oldValues)
+            {
+                newValues.Add(oldValue);
+            }
+
+            for (var i = newValues.Count; i < parameterValueSet.QueryParameterType().NumberOfValues; ++i)
+            {
+                newValues.Add("-");
+            }
+
+            return new ValueArray<string>(newValues, parameterValueSet);
         }
 
         /// <summary>
@@ -257,7 +349,7 @@ namespace Migration.ViewModels
         {
             if (rowError.Thing is IShortNamedThing shortNamedThing && rowError.Error.Contains("ShortName"))
             {
-                shortNamedThing.ShortName = "UndefinedShortName";
+                shortNamedThing.ShortName = "Undefined ShortName";
             }
 
             if (rowError.Thing is INamedThing namedThing && rowError.Error.Contains("Name"))
