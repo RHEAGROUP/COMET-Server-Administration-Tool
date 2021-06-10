@@ -21,9 +21,11 @@
         <viewModels:StressGeneratorViewModel />
     </dxlc:LayoutGroup.DataContext>
 
-    <GroupBox Header="Connection" Margin="0" Height="320">
+    <GroupBox Header="Connection" Margin="0" Height="340">
         <Grid HorizontalAlignment="Left">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -40,17 +42,40 @@
                 x:Name="LoginSource"
                 ServerTypes="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dxlc:LayoutGroup}},
                                                         Path=DataContext.StressGeneratorTargetServerTypes}" />
+            <!-- Mode -->
             <dxlc:LayoutItemLabel
                 Grid.Row="1"
+                Grid.Column="0"
+                Margin="5"
+                Content="Mode" />
+            <ComboBox
+                IsEnabled="{Binding Path=LoginSuccessfully}"
+                HorizontalAlignment="Left"
+                Grid.Row="1"
+                Grid.Column="1"
+                FontSize="12"
+                Name="ServerType"
+                Margin="5"
+                Width="200"
+                ItemsSource="{Binding StressGeneratorModes, Mode=OneTime}"
+                SelectedValue="{Binding Path=SelectedOperationMode, Mode=TwoWay}"
+                IsSynchronizedWithCurrentItem="True"
+                SelectedValuePath="Key"
+                DisplayMemberPath="Value" />
+            <!-- Stress model -->
+            <dxlc:LayoutItemLabel
+                Grid.Row="2"
                 Grid.Column="0"
                 Height="Auto"
                 Margin="5"
                 FontSize="12"
                 Content="Model" />
             <ComboBox
+                IsEnabled="{Binding Path=LoginSuccessfully}"
+                IsEditable="{Binding Path=ModelIsEditable}"
                 ItemsSource="{Binding Path=EngineeringModelSetupList, Mode=OneTime }"
                 SelectedValue="{Binding Path=SelectedEngineeringModelSetup, Mode=TwoWay}"
-                Grid.Row="1"
+                Grid.Row="2"
                 Grid.Column="1"
                 FontSize="12"
                 Margin="5">
@@ -60,7 +85,30 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" HorizontalAlignment="Stretch">
+            <!-- Source stress model -->
+            <dxlc:LayoutItemLabel
+                Grid.Row="3"
+                Grid.Column="0"
+                Height="Auto"
+                Margin="5"
+                FontSize="12"
+                Content="Source model" />
+            <ComboBox
+                IsEnabled="{Binding Path=SourceModelIsEnabled}"
+                ItemsSource="{Binding Path=SourceEngineeringModelSetupList, Mode=OneTime }"
+                SelectedValue="{Binding Path=SelectedSourceEngineeringModelSetup, Mode=TwoWay}"
+                Grid.Row="3"
+                Grid.Column="1"
+                FontSize="12"
+                Margin="5">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <!-- Info -->
+            <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
@@ -72,7 +120,7 @@
                 <Image Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left"
                        Source="{dx:DXImage Image=Info_16x16.png}" />
                 <TextBlock Grid.Row="0" Grid.Column="1" MaxWidth="320" HorizontalAlignment="Left" Margin="5" TextWrapping="Wrap">
-                    For safety, the short name of the engineering model must start with 'Stresser'.
+                    For safety, the short name of the engineering model must start with 'StressTester'.
                 </TextBlock>
             </Grid>
         </Grid>
@@ -80,6 +128,7 @@
     <GroupBox Header="Parameters" HorizontalAlignment="Stretch" Height="230">
         <Grid HorizontalAlignment="Left">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -170,6 +219,15 @@
                 IsChecked="{Binding Path=DeleteAllElements}"
                 Margin="5"
                 Content="Delete all elements" />
+
+            <!-- Delete model -->
+            <CheckBox
+                Grid.Row="5"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                IsChecked="{Binding Path=DeleteModel}"
+                Margin="5"
+                Content="Delete model at completion" />
         </Grid>
     </GroupBox>
     <StackPanel Margin="0" HorizontalAlignment="Left" MaxHeight="30">

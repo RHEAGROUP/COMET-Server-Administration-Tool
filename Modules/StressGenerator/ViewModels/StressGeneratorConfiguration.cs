@@ -34,6 +34,11 @@ namespace StressGenerator.ViewModels
     internal class StressGeneratorConfiguration
     {
         /// <summary>
+        /// Stress generator models prefix
+        /// </summary>
+        public const string ModelPrefix = "StressTester";
+
+        /// <summary>
         /// Generic RDL short name
         /// </summary>
         public const string GenericRdlShortName = "Generic_RDL";
@@ -91,6 +96,11 @@ namespace StressGenerator.ViewModels
         public bool DeleteAllElements { get; private set; }
 
         /// <summary>
+        /// Gets or sets a flag that trigger deleting of the engineering model.
+        /// </summary>
+        public bool DeleteModel { get; private set; }
+
+        /// <summary>
         /// Currently open server session
         /// </summary>
         public ISession Session { get; private set; }
@@ -104,8 +114,9 @@ namespace StressGenerator.ViewModels
         /// <param name="elementName">First part of generated element definition name</param>
         /// <param name="elementShortName">First part of generated element definition short name</param>
         /// <param name="deleteAllElements">Flag that trigger deleting of all elements in the engineering model</param>
+        /// <param name="deleteModel"></param>
         public StressGeneratorConfiguration(ISession session, int timeInterval, int testObjectsNumber,
-            string elementName, string elementShortName, bool deleteAllElements)
+            string elementName, string elementShortName, bool deleteAllElements, bool deleteModel)
         {
             this.Session = session;
             this.TimeInterval = timeInterval * 1000;
@@ -124,6 +135,7 @@ namespace StressGenerator.ViewModels
             this.ElementName = elementName.Trim();
             this.ElementShortName = elementShortName.Trim().Replace(" ", "_");
             this.DeleteAllElements = deleteAllElements;
+            this.DeleteModel = deleteModel;
         }
     }
 }
