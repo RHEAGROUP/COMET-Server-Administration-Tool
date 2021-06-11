@@ -198,12 +198,10 @@ namespace Migration.Utils
                             });
 
                             var remainingIterationSetups = totalIterationSetups - finishedIterationSetups;
-                            var remaining =
-                                new TimeSpan(elapsed.Ticks / finishedIterationSetups * remainingIterationSetups);
+                            var remaining = new TimeSpan(elapsed.Ticks / finishedIterationSetups * remainingIterationSetups);
                             CDPMessageBus.Current.SendMessage(new LogEvent
                             {
-                                Message =
-                                    $"    Remaining {remainingIterationSetups} iterations read estimate: {remaining}"
+                                Message = $"    Remaining {remainingIterationSetups} iterations read estimate: {remaining}"
                             });
                         }));
                 });
