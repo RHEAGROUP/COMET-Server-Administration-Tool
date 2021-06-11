@@ -135,12 +135,16 @@ namespace Migration.Utils
                 .Where(ems => selectedModels.Select(m => m.Iid).Contains(ems.Iid))
                 .Sum(ems => ems.IterationSetup.Count(its => !its.IsDeleted));
             var finishedIterationSetups = 0;
+
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
                 if (!selectedModels.Any(em => em.Iid == modelSetup.Iid && em.IsSelected)) continue;
+
+                var totalModelIterationSetups = modelSetup.IterationSetup.Count(its => !its.IsDeleted);
+                var finishedModelIterationSetups = 0;
 
                 var model = new EngineeringModel(
                     modelSetup.EngineeringModelIid,
@@ -152,13 +156,9 @@ namespace Migration.Utils
 
                 var tasks = new List<Task>();
 
-                Parallel.ForEach(modelSetup.IterationSetup, iterationSetup =>
+                // Read iterations
+                Parallel.ForEach(modelSetup.IterationSetup.Where(its => !its.IsDeleted), iterationSetup =>
                 {
-                    if (iterationSetup.IsDeleted)
-                    {
-                        return;
-                    }
-
                     var iteration = new Iteration(
                         iterationSetup.IterationIid,
                         this.SourceSession.Assembler.Cache,
@@ -169,8 +169,9 @@ namespace Migration.Utils
                         .ContinueWith(t =>
                         {
                             finishedIterationSetups++;
+                            finishedModelIterationSetups++;
 
-                            var iterationCount = $"{finishedIterationSetups}/{totalIterationSetups}";
+                            var iterationCount = $"{finishedIterationSetups}/{totalIterationSetups} ({finishedModelIterationSetups}/{totalModelIterationSetups})";
                             var iterationDescription = $"'{modelSetup.Name}'.'{iterationSetup.IterationIid}'";
 
                             if (t.IsFaulted && t.Exception != null)
