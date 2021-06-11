@@ -152,12 +152,11 @@ namespace Migration.Utils
 
                 var tasks = new List<Task>();
 
-                // Read iterations
-                foreach (var iterationSetup in modelSetup.IterationSetup)
+                Parallel.ForEach(modelSetup.IterationSetup, iterationSetup =>
                 {
                     if (iterationSetup.IsDeleted)
                     {
-                        continue;
+                        return;
                     }
 
                     var iteration = new Iteration(
@@ -198,13 +197,15 @@ namespace Migration.Utils
                             });
 
                             var remainingIterationSetups = totalIterationSetups - finishedIterationSetups;
-                            var remaining = new TimeSpan(elapsed.Ticks / finishedIterationSetups * remainingIterationSetups);
+                            var remaining =
+                                new TimeSpan(elapsed.Ticks / finishedIterationSetups * remainingIterationSetups);
                             CDPMessageBus.Current.SendMessage(new LogEvent
                             {
-                                Message = $"    Remaining {remainingIterationSetups} iterations read estimate: {remaining}"
+                                Message =
+                                    $"    Remaining {remainingIterationSetups} iterations read estimate: {remaining}"
                             });
                         }));
-                }
+                });
 
                 while (tasks.Count > 0)
                 {
@@ -252,7 +253,7 @@ namespace Migration.Utils
                 Message = "Export operation start"
             });
 
-            var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Exchange";
+            var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Import";
 
             CDPMessageBus.Current.SendMessage(new LogEvent
             {
