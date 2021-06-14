@@ -143,9 +143,7 @@ namespace Migration.Utils
             {
                 if (!selectedModels.Any(em => em.Iid == modelSetup.Iid && em.IsSelected)) continue;
 
-                // initialized outside foreach because the read somehow modifies "modelSetup.IterationSetup"
-                var availableIterationSetups = modelSetup.IterationSetup.Where(its => !its.IsDeleted).ToList();
-                var totalModelIterationSetups = availableIterationSetups.Count;
+                var totalModelIterationSetups = modelSetup.IterationSetup.Count(its => !its.IsDeleted);
                 var finishedModelIterationSetups = 0;
 
                 var model = new EngineeringModel(
@@ -156,8 +154,10 @@ namespace Migration.Utils
                     EngineeringModelSetup = modelSetup
                 };
 
+                var tasks = new List<Task>();
+
                 // Read iterations
-                foreach (var iterationSetup in availableIterationSetups)
+                foreach (var iterationSetup in modelSetup.IterationSetup.Where(its => !its.IsDeleted))
                 {
                     var iteration = new Iteration(
                         iterationSetup.IterationIid,
@@ -165,52 +165,51 @@ namespace Migration.Utils
                         this.SourceSession.Credentials.Uri);
 
                     model.Iteration.Add(iteration);
-
-                    Exception exception = null;
-                    try
-                    {
-                        await this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain);
-                    }
-                    catch (Exception e)
-                    {
-                        exception = e;
-                    }
-
-                    finishedIterationSetups++;
-                    finishedModelIterationSetups++;
-
-                    var iterationCount = $"{finishedIterationSetups}/{totalIterationSetups} ({finishedModelIterationSetups}/{totalModelIterationSetups})";
-                    var iterationDescription = $"'{modelSetup.Name}'.'{iterationSetup.IterationIid}'";
-
-                    if (exception != null)
-                    {
-                        CDPMessageBus.Current.SendMessage(new LogEvent
+                    tasks.Add(this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain)
+                        .ContinueWith(t =>
                         {
-                            Message = $"Read iteration {iterationCount} failed: {iterationDescription}",
-                            Exception = exception,
-                            Verbosity = LogVerbosity.Error
-                        });
-                    }
-                    else
-                    {
-                        CDPMessageBus.Current.SendMessage(new LogEvent
-                        {
-                            Message = $"Read iteration {iterationCount} success: {iterationDescription}"
-                        });
-                    }
+                            finishedIterationSetups++;
+                            finishedModelIterationSetups++;
 
-                    var elapsed = stopwatch.Elapsed;
-                    CDPMessageBus.Current.SendMessage(new LogEvent
-                    {
-                        Message = $"    Read {finishedIterationSetups} iterations in: {elapsed}"
-                    });
+                            var iterationCount = $"{finishedIterationSetups}/{totalIterationSetups} ({finishedModelIterationSetups}/{totalModelIterationSetups})";
+                            var iterationDescription = $"'{modelSetup.Name}'.'{iterationSetup.IterationIid}'";
 
-                    var remainingIterationSetups = totalIterationSetups - finishedIterationSetups;
-                    var remaining = new TimeSpan(elapsed.Ticks / finishedIterationSetups * remainingIterationSetups);
-                    CDPMessageBus.Current.SendMessage(new LogEvent
-                    {
-                        Message = $"    Remaining {remainingIterationSetups} iterations read estimate: {remaining}"
-                    });
+                            if (t.IsFaulted && t.Exception != null)
+                            {
+                                CDPMessageBus.Current.SendMessage(new LogEvent
+                                {
+                                    Message = $"Read iteration {iterationCount} failed: {iterationDescription}",
+                                    Exception = t.Exception,
+                                    Verbosity = LogVerbosity.Error
+                                });
+                            }
+                            else
+                            {
+                                CDPMessageBus.Current.SendMessage(new LogEvent
+                                {
+                                    Message = $"Read iteration {iterationCount} success: {iterationDescription}"
+                                });
+                            }
+
+                            var elapsed = stopwatch.Elapsed;
+                            CDPMessageBus.Current.SendMessage(new LogEvent
+                            {
+                                Message = $"    Read {finishedIterationSetups} iterations in: {elapsed}"
+                            });
+
+                            var remainingIterationSetups = totalIterationSetups - finishedIterationSetups;
+                            var remaining = new TimeSpan(elapsed.Ticks / finishedIterationSetups * remainingIterationSetups);
+                            CDPMessageBus.Current.SendMessage(new LogEvent
+                            {
+                                Message = $"    Remaining {remainingIterationSetups} iterations read estimate: {remaining}"
+                            });
+                        }));
+                }
+
+                while (tasks.Count > 0)
+                {
+                    var task = await Task.WhenAny(tasks);
+                    tasks.Remove(task);
                 }
             }
 
