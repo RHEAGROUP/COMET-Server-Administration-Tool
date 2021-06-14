@@ -157,7 +157,7 @@ namespace Migration.Utils
                 var tasks = new List<Task>();
 
                 // Read iterations
-                foreach (var iterationSetup in modelSetup.IterationSetup.Where(its => !its.IsDeleted))
+                Parallel.ForEach(modelSetup.IterationSetup.Where(its => !its.IsDeleted), iterationSetup =>
                 {
                     var iteration = new Iteration(
                         iterationSetup.IterationIid,
@@ -204,7 +204,7 @@ namespace Migration.Utils
                                 Message = $"    Remaining {remainingIterationSetups} iterations read estimate: {remaining}"
                             });
                         }));
-                }
+                });
 
                 while (tasks.Count > 0)
                 {
