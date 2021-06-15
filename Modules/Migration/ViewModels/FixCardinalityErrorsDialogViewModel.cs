@@ -267,6 +267,9 @@ namespace Migration.ViewModels
                     parameterValueSet.Published = FixValueArray(parameterValueSet.Published, parameterValueSet);
                     parameterValueSet.Reference = FixValueArray(parameterValueSet.Reference, parameterValueSet);
                     break;
+                case ParameterSubscription parameterSubscription:
+                    FixValueSetsCount(parameterSubscription);
+                    break;
             }
         }
 
@@ -307,6 +310,50 @@ namespace Migration.ViewModels
                     for (var i = 1; i < list.Count; ++i)
                     {
                         parameter.ValueSet.Remove(list[i]);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Ensure only exactly one <see cref="ParameterSubscriptionValueSet"/> exists
+        /// for each <see cref="Option"/> and <see cref="ActualFiniteState"/>.
+        /// NOTE: Duplicate code needed because <see cref="ParameterSubscriptionValueSet"/> is not 
+        /// a subclass of <see cref="ParameterValueSetBase"/>.
+        /// </summary>
+        /// <param name="parameterSubscription">
+        /// The containing <see cref="ParameterSubscription"/>.
+        /// </param>
+        private static void FixValueSetsCount(ParameterSubscription parameterSubscription)
+        {
+            var valueSets = new Dictionary<string, Dictionary<string, List<ParameterSubscriptionValueSet>>>();
+
+            foreach (var valueSet in parameterSubscription.ValueSet)
+            {
+                var optionIid = valueSet.ActualOption?.Iid.ToString() ?? "";
+                var stateIid = valueSet.ActualState?.Iid.ToString() ?? "";
+
+                if (!valueSets.ContainsKey(optionIid))
+                {
+                    valueSets[optionIid] = new Dictionary<string, List<ParameterSubscriptionValueSet>>();
+                }
+
+                if (!valueSets[optionIid].ContainsKey(stateIid))
+                {
+                    valueSets[optionIid][stateIid] = new List<ParameterSubscriptionValueSet>();
+                }
+
+                valueSets[optionIid][stateIid].Add(valueSet);
+            }
+
+            foreach (var dictionary in valueSets.Values)
+            {
+                foreach (var list in dictionary.Values)
+                {
+                    // no better way to determine which of the ValueSets to keep, so we keep the first one
+                    for (var i = 1; i < list.Count; ++i)
+                    {
+                        parameterSubscription.ValueSet.Remove(list[i]);
                     }
                 }
             }
