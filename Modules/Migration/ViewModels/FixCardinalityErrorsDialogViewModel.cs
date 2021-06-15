@@ -262,10 +262,10 @@ namespace Migration.ViewModels
                     FixValueSetsCount(parameter);
                     break;
                 case ParameterValueSet parameterValueSet:
-                    parameterValueSet.Manual = FixValueArray(parameterValueSet.Manual, parameterValueSet);
-                    parameterValueSet.Formula = FixValueArray(parameterValueSet.Formula, parameterValueSet);
-                    parameterValueSet.Published = FixValueArray(parameterValueSet.Published, parameterValueSet);
-                    parameterValueSet.Reference = FixValueArray(parameterValueSet.Reference, parameterValueSet);
+                    parameterValueSet.Manual = FixValueArray(parameterValueSet, parameterValueSet.Manual);
+                    parameterValueSet.Formula = FixValueArray(parameterValueSet, parameterValueSet.Formula);
+                    parameterValueSet.Published = FixValueArray(parameterValueSet, parameterValueSet.Published);
+                    parameterValueSet.Reference = FixValueArray(parameterValueSet, parameterValueSet.Reference);
                     break;
                 case ParameterSubscription parameterSubscription:
                     FixValueSetsCount(parameterSubscription);
@@ -363,22 +363,25 @@ namespace Migration.ViewModels
         /// Generate a new <see cref="ValueArray{T}"/> with the correct number of values, containing the values
         /// in <paramref name="oldValues"/>.
         /// </summary>
-        /// <param name="oldValues">
-        /// The values in the old <see cref="ValueArray{T}"/>.
-        /// </param>
         /// <param name="parameterValueSet">
         /// The containing <see cref="ParameterValueSet"/>.
+        /// </param>
+        /// <param name="oldValues">
+        /// The values in the old <see cref="ValueArray{T}"/>.
         /// </param>
         /// <returns>
         /// The new <see cref="ValueArray{T}"/>.
         /// </returns>
-        private static ValueArray<string> FixValueArray(ValueArray<string> oldValues, ParameterValueSet parameterValueSet)
+        private static ValueArray<string> FixValueArray(ParameterValueSet parameterValueSet, ValueArray<string> oldValues = null)
         {
             var newValues = new List<string>();
 
-            foreach (var oldValue in oldValues)
+            if (oldValues != null)
             {
-                newValues.Add(oldValue);
+                foreach (var oldValue in oldValues)
+                {
+                    newValues.Add(oldValue);
+                }
             }
 
             for (var i = newValues.Count; i < parameterValueSet.QueryParameterType().NumberOfValues; ++i)
