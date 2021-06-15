@@ -45,6 +45,11 @@ namespace Migration.ViewModels
     public class FixCardinalityErrorsDialogViewModel : ReactiveObject, IFixCardinalityErrorsDialogViewModel
     {
         /// <summary>
+        /// The default <see cref="IValueSet"/> value.
+        /// </summary>
+        private static readonly string DefaultValueSetValue = "-";
+
+        /// <summary>
         /// The migration source <see cref="ISession" />
         /// </summary>
         private readonly ISession migrationSourceSession;
@@ -386,7 +391,7 @@ namespace Migration.ViewModels
 
             for (var i = newValues.Count; i < parameterValueSet.QueryParameterType().NumberOfValues; ++i)
             {
-                newValues.Add("-");
+                newValues.Add(DefaultValueSetValue);
             }
 
             return new ValueArray<string>(newValues, parameterValueSet);
