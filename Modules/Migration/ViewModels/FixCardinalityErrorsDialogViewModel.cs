@@ -259,7 +259,7 @@ namespace Migration.ViewModels
                     }
                     break;
                 case Parameter parameter:
-                    FixValueSets(parameter);
+                    FixValueSetsCount(parameter);
                     break;
                 case ParameterValueSet parameterValueSet:
                     parameterValueSet.Manual = FixValueArray(parameterValueSet.Manual, parameterValueSet);
@@ -271,12 +271,13 @@ namespace Migration.ViewModels
         }
 
         /// <summary>
-        /// Generate a new <see cref="Dictionary{TKey,TValue}"/> with the correct values, for each option and state
+        /// Ensure only exactly one <see cref="ParameterValueSet"/> exists
+        /// for each <see cref="Option"/> and <see cref="ActualFiniteState"/>.
         /// </summary>
         /// <param name="parameter">
-        /// See <see cref="Parameter"/>
+        /// The containing <see cref="Parameter"/>.
         /// </param>
-        private static void FixValueSets(Parameter parameter)
+        private static void FixValueSetsCount(Parameter parameter)
         {
             var valueSets = new Dictionary<string, Dictionary<string, List<ParameterValueSet>>>();
 
@@ -298,11 +299,11 @@ namespace Migration.ViewModels
                 valueSets[optionIid][stateIid].Add(valueSet);
             }
 
-            // no better way to determine which of the ValueSets to keep
             foreach (var dictionary in valueSets.Values)
             {
                 foreach (var list in dictionary.Values)
                 {
+                    // no better way to determine which of the ValueSets to keep, so we keep the first one
                     for (var i = 1; i < list.Count; ++i)
                     {
                         parameter.ValueSet.Remove(list[i]);
