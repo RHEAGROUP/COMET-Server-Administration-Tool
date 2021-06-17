@@ -206,7 +206,7 @@ namespace Migration.ViewModels
             {
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
-                    Message = "Could not fix POCO error:" + Environment.NewLine + rowError.ToString()
+                    Message = $"Could not fix POCO error: {Environment.NewLine}{rowError}"
                 });
             }
 
@@ -387,6 +387,7 @@ namespace Migration.ViewModels
         {
             var parameterOrOverrideBase = parameterSubscription.Container as ParameterOrOverrideBase;
             ElementDefinition elementDefinition = null;
+
             switch (parameterOrOverrideBase)
             {
                 case Parameter parameter:
