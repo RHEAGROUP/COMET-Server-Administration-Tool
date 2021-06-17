@@ -16,7 +16,6 @@
     mc:Ignorable="d"
     VerticalAlignment="Stretch"
     HorizontalAlignment="Stretch">
-
     <dxlc:LayoutGroup.DataContext>
         <viewModels:StressGeneratorViewModel />
     </dxlc:LayoutGroup.DataContext>
@@ -54,7 +53,7 @@
                 Grid.Row="1"
                 Grid.Column="1"
                 FontSize="12"
-                Name="ServerType"
+                Name="Mode"
                 Margin="5"
                 Width="200"
                 ItemsSource="{Binding StressGeneratorModes, Mode=OneTime}"
@@ -70,21 +69,33 @@
                 Margin="5"
                 FontSize="12"
                 Content="Model" />
-            <ComboBox
-                IsEnabled="{Binding Path=LoginSuccessfully}"
-                IsEditable="{Binding Path=ModelIsEditable}"
-                ItemsSource="{Binding Path=EngineeringModelSetupList, Mode=OneTime }"
-                SelectedValue="{Binding Path=SelectedEngineeringModelSetup, Mode=TwoWay}"
-                Grid.Row="2"
-                Grid.Column="1"
-                FontSize="12"
-                Margin="5">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name}"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
+            <StackPanel Margin="0"
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        HorizontalAlignment="Left" MaxHeight="30">
+                <dxe:TextEdit
+                    IsEnabled="{Binding Path=LoginSuccessfully}"
+                    Visibility="{Binding Path=ModeCreate, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}"
+                    Text="{Binding Path=ModelName, Mode=TwoWay}"
+                    Height="Auto"
+                    Margin="5"
+                    FontSize="12"
+                    Width="250" />
+                <ComboBox
+                    IsEnabled="{Binding Path=LoginSuccessfully}"
+                    Visibility="{Binding Path=ModeOpenOrOverwrite, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}"
+                    ItemsSource="{Binding Path=EngineeringModelSetupList, Mode=OneTime }"
+                    SelectedValue="{Binding Path=SelectedEngineeringModelSetup, Mode=TwoWay}"
+                    Width="250"
+                    FontSize="12"
+                    Margin="5">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
             <!-- Source stress model -->
             <dxlc:LayoutItemLabel
                 Grid.Row="3"

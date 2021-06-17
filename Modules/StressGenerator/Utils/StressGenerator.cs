@@ -33,6 +33,7 @@ namespace StressGenerator.Utils
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal.Operations;
@@ -427,6 +428,30 @@ namespace StressGenerator.Utils
             catch (Exception ex)
             {
                 this.NotifyMessage($"Cannot update ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName}). Exception: {ex.Message}");
+            }
+        }
+
+        public async Task WriteEngineeringModelSetup(EngineeringModelSetup engineeringModelSetup, SiteDirectory siteDirectory)
+        {
+            try
+            {
+                var transactionContext = TransactionContextResolver.ResolveContext(siteDirectory);
+                var operationContainer = new OperationContainer(transactionContext.ContextRoute());
+                operationContainer.AddOperation(new Operation(siteDirectory.ToDto(), siteDirectory.ToDto(), OperationKind.Update));
+
+                foreach (var newThing in engineeringModelSetup.QueryContainedThingsDeep())
+                {
+                    operationContainer.AddOperation(new Operation(null, newThing.ToDto(),
+                        OperationKind.Create));
+                }
+
+                await this.configuration.Session.Dal.Write(operationContainer);
+
+                this.NotifyMessage($"Successfully generated EngineeringModelSetup {engineeringModelSetup.Name} ({engineeringModelSetup.ShortName}).", LogVerbosity.Info);
+            }
+            catch (Exception ex)
+            {
+                this.NotifyMessage($"Cannot generate EngineeringModelSetup {engineeringModelSetup.Name} ({engineeringModelSetup.ShortName}). Exception: {ex.Message}", LogVerbosity.Error);
             }
         }
     }
