@@ -123,7 +123,7 @@ namespace Migration.ViewModels
         {
             this.migrationSourceSession = migrationSourceSession;
 
-            this.Errors = new ReactiveList<PocoErrorRowViewModel> {ChangeTrackingEnabled = true};
+            this.Errors = new ReactiveList<PocoErrorRowViewModel> { ChangeTrackingEnabled = true };
 
             this.IsBusy = false;
 
@@ -372,6 +372,18 @@ namespace Migration.ViewModels
                 }
             }
 
+            AddMissingValueSets(parameterSubscription);
+        }
+
+        /// <summary>
+        /// Adds <see cref="ParameterSubscriptionValueSet"/>s for the missing combinations of
+        /// <see cref="Option"/> and <see cref="ActualFiniteState"/>.
+        /// </summary>
+        /// <param name="parameterSubscription">
+        /// The containing <see cref="ParameterSubscription"/>.
+        /// </param>
+        private static void AddMissingValueSets(ParameterSubscription parameterSubscription)
+        {
             var parameterOrOverrideBase = parameterSubscription.Container as ParameterOrOverrideBase;
             ElementDefinition elementDefinition = null;
             switch (parameterOrOverrideBase)
