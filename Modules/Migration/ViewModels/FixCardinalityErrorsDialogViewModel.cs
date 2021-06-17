@@ -181,7 +181,7 @@ namespace Migration.ViewModels
 
             CDPMessageBus.Current.SendMessage(new LogEvent { Message = "Fixing the cardinality errors for the selected models..." });
 
-            // these should be traversed in bottom-up containment order, but for now reverse also works
+            // these should be traversed in bottom-up containment order (?), but for now reverse also works
             foreach (var rowError in this.Errors.OrderBy(e => e.Thing.ClassKind.ToString()).Reverse())
             {
                 FixNameAndShortName(rowError);
@@ -359,6 +359,47 @@ namespace Migration.ViewModels
                     for (var i = 1; i < list.Count; ++i)
                     {
                         parameterSubscription.ValueSet.Remove(list[i]);
+                    }
+                }
+            }
+
+            var parameterOrOverrideBase = parameterSubscription.Container as ParameterOrOverrideBase;
+            ElementDefinition elementDefinition = null;
+            switch (parameterOrOverrideBase)
+            {
+                case Parameter parameter:
+                    elementDefinition = parameter.Container as ElementDefinition;
+                    break;
+                case ParameterOverride parameterOverride:
+                    elementDefinition = parameterOverride.Container.Container as ElementDefinition;
+                    break;
+            }
+
+            var iteration = elementDefinition.Container as Iteration;
+
+            // Select needed because OrderedItemList iterates to object
+            var options = parameterSubscription.IsOptionDependent
+                ? iteration.Option.Select(x => x)
+                : new List<Option> { null };
+
+            var actualFiniteStates = parameterSubscription.StateDependence != null
+                ? parameterSubscription.StateDependence.ActualState
+                : new List<ActualFiniteState> { null };
+
+            foreach (var option in options)
+            {
+                foreach (var actualFiniteState in actualFiniteStates)
+                {
+                    try
+                    {
+                        parameterSubscription.QueryParameterBaseValueSet(option, actualFiniteState);
+                    }
+                    catch
+                    {
+                        parameterSubscription.ValueSet.Add(new ParameterSubscriptionValueSet
+                        {
+                            SubscribedValueSet = parameterOrOverrideBase.QueryParameterBaseValueSet(option, actualFiniteState) as ParameterValueSetBase
+                        });
                     }
                 }
             }
