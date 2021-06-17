@@ -520,5 +520,87 @@ namespace Migration.Tests
 
             Assert.DoesNotThrowAsync(async () => await this.session.Object.Close());
         }
+
+        [Test]
+        public void VerifyThatValidatePocoPropertiesFixValueSetsSubscriptions()
+        {
+            Assert.DoesNotThrowAsync(async () => await this.session.Object.Open());
+
+            var elementDefinition = new ElementDefinition(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
+                this.session.Object.Credentials.Uri);
+            this.iteration.Element.Add(elementDefinition);
+
+            var parameter = new Parameter(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
+                this.session.Object.Credentials.Uri)
+            {
+                Owner = this.domain,
+                ParameterType = new BooleanParameterType(
+                    Guid.NewGuid(),
+                    this.session.Object.Assembler.Cache,
+                    this.session.Object.Credentials.Uri)
+            };
+            elementDefinition.Parameter.Add(parameter);
+
+            var valueSet = new ParameterValueSet(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
+                this.session.Object.Credentials.Uri);
+            parameter.ValueSet.Add(valueSet);
+
+            var parameterSubscription = new ParameterSubscription(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
+                this.session.Object.Credentials.Uri)
+            {
+                Owner = this.domain
+            };
+            parameter.ParameterSubscription.Add(parameterSubscription);
+
+            var parameterSubscriptionValueSet1 = new ParameterSubscriptionValueSet(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
+                this.session.Object.Credentials.Uri)
+            {
+                SubscribedValueSet = valueSet
+            };
+            parameterSubscription.ValueSet.Add(parameterSubscriptionValueSet1);
+
+            var parameterSubscriptionValueSet2 = new ParameterSubscriptionValueSet(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
+                this.session.Object.Credentials.Uri)
+            {
+                SubscribedValueSet = valueSet
+            };
+            parameterSubscription.ValueSet.Add(parameterSubscriptionValueSet2);
+
+            parameterSubscriptionValueSet1.ValidatePoco();
+            parameterSubscriptionValueSet2.ValidatePoco();
+            parameterSubscription.ValidatePoco();
+
+            this.session.Object.Assembler.Cache.TryAdd(
+                new CacheKey(parameterSubscription.Iid, null),
+                new Lazy<Thing>(() => parameterSubscription));
+            this.session.Object.Assembler.Cache.TryAdd(
+                new CacheKey(parameterSubscriptionValueSet1.Iid, null),
+                new Lazy<Thing>(() => parameterSubscriptionValueSet1));
+            this.session.Object.Assembler.Cache.TryAdd(
+                new CacheKey(parameterSubscriptionValueSet2.Iid, null),
+                new Lazy<Thing>(() => parameterSubscriptionValueSet2));
+
+            this.viewModel.BindPocoErrors();
+
+            Assert.That(this.viewModel.Errors.Any(e =>
+                e.ContainerThingClassKind == ClassKind.ParameterSubscription &&
+                e.Error.Contains("Duplicated value-sets were found for the")));
+
+            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute(null));
+
+            Assert.DoesNotThrowAsync(async () => await this.session.Object.Close());
+        }
     }
 }
