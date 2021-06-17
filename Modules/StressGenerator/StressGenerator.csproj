@@ -13,6 +13,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
+    <Version>1.4.2</Version>
   </PropertyGroup>
   <ItemGroup>
     <Page Include="Views\Layout.xaml">
