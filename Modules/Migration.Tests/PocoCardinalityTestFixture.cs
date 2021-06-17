@@ -172,13 +172,17 @@ namespace Migration.Tests
         {
             Assert.DoesNotThrowAsync(async () => await this.session.Object.Open());
 
-            var fileType = new FileType(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri);
+            var fileType = new FileType(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
+                this.session.Object.Credentials.Uri);
 
             this.siteReferenceDataLibrary.FileType.Add(fileType);
 
             fileType.ValidatePoco();
 
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(fileType.Iid, null),
+            this.session.Object.Assembler.Cache.TryAdd(
+                new CacheKey(fileType.Iid, null),
                 new Lazy<Thing>(() => fileType));
 
             this.viewModel.BindPocoErrors();
@@ -197,12 +201,17 @@ namespace Migration.Tests
         {
             Assert.DoesNotThrowAsync(async () => await this.session.Object.Open());
 
-            var telephoneNumber = new TelephoneNumber(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri);
+            var telephoneNumber = new TelephoneNumber(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
+                this.session.Object.Credentials.Uri);
+
             this.person.TelephoneNumber.Add(telephoneNumber);
 
             telephoneNumber.ValidatePoco();
 
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(telephoneNumber.Iid, null),
+            this.session.Object.Assembler.Cache.TryAdd(
+                new CacheKey(telephoneNumber.Iid, null),
                 new Lazy<Thing>(() => telephoneNumber));
 
             this.viewModel.BindPocoErrors();
@@ -221,12 +230,17 @@ namespace Migration.Tests
         {
             Assert.DoesNotThrowAsync(async () => await this.session.Object.Open());
 
-            var userPreference = new UserPreference(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri);
+            var userPreference = new UserPreference(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
+                this.session.Object.Credentials.Uri);
+
             this.person.UserPreference.Add(userPreference);
 
             userPreference.ValidatePoco();
 
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(userPreference.Iid, null),
+            this.session.Object.Assembler.Cache.TryAdd(
+                new CacheKey(userPreference.Iid, null),
                 new Lazy<Thing>(() => userPreference));
 
             this.viewModel.BindPocoErrors();
@@ -245,11 +259,17 @@ namespace Migration.Tests
         {
             Assert.DoesNotThrowAsync(async () => await this.session.Object.Open());
 
-            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.session.Object.Assembler.Cache,
+            var elementDefinition = new ElementDefinition(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
                 this.session.Object.Credentials.Uri);
-            var definition = new Definition(Guid.NewGuid(), this.session.Object.Assembler.Cache,
+            var definition = new Definition(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
                 this.session.Object.Credentials.Uri);
-            var citation = new Citation(Guid.NewGuid(), this.session.Object.Assembler.Cache,
+            var citation = new Citation(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
                 this.session.Object.Credentials.Uri);
             this.iteration.Element.Add(elementDefinition);
             elementDefinition.Definition.Add(definition);
@@ -257,7 +277,8 @@ namespace Migration.Tests
 
             citation.ValidatePoco();
 
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(citation.Iid, null),
+            this.session.Object.Assembler.Cache.TryAdd(
+                new CacheKey(citation.Iid, null),
                 new Lazy<Thing>(() => citation));
 
             this.viewModel.BindPocoErrors();
@@ -274,16 +295,21 @@ namespace Migration.Tests
         {
             Assert.DoesNotThrowAsync(async () => await this.session.Object.Open());
 
-            var category = new Category(Guid.NewGuid(), this.session.Object.Assembler.Cache,
+            var category = new Category(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
                 this.session.Object.Credentials.Uri);
-            var definition = new Definition(Guid.NewGuid(), this.session.Object.Assembler.Cache,
+            var definition = new Definition(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
                 this.session.Object.Credentials.Uri);
             this.siteReferenceDataLibrary.DefinedCategory.Add(category);
             category.Definition.Add(definition);
 
             definition.ValidatePoco();
 
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(definition.Iid, null),
+            this.session.Object.Assembler.Cache.TryAdd(
+                new CacheKey(definition.Iid, null),
                 new Lazy<Thing>(() => definition));
 
             this.viewModel.BindPocoErrors();
@@ -320,9 +346,13 @@ namespace Migration.Tests
         {
             Assert.DoesNotThrowAsync(async () => await this.session.Object.Open());
 
-            var ratioScale = new RatioScale(Guid.NewGuid(), this.session.Object.Assembler.Cache,
+            var ratioScale = new RatioScale(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
                 this.session.Object.Credentials.Uri);
-            var scaleValueDefinition = new ScaleValueDefinition(Guid.NewGuid(), this.session.Object.Assembler.Cache,
+            var scaleValueDefinition = new ScaleValueDefinition(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
                 this.session.Object.Credentials.Uri);
             ratioScale.ValueDefinition.Add(scaleValueDefinition);
 
@@ -330,7 +360,8 @@ namespace Migration.Tests
 
             scaleValueDefinition.ValidatePoco();
 
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(scaleValueDefinition.Iid, null),
+            this.session.Object.Assembler.Cache.TryAdd(
+                new CacheKey(scaleValueDefinition.Iid, null),
                 new Lazy<Thing>(() => scaleValueDefinition));
 
             this.viewModel.BindPocoErrors();
@@ -392,13 +423,16 @@ namespace Migration.Tests
         {
             Assert.DoesNotThrowAsync(async () => await this.session.Object.Open());
 
-            var scalarParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.session.Object.Assembler.Cache,
+            var scalarParameterType = new SimpleQuantityKind(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
                 this.session.Object.Credentials.Uri) as ScalarParameterType;
             this.siteReferenceDataLibrary.ParameterType.Add(scalarParameterType);
 
             scalarParameterType.ValidatePoco();
 
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(scalarParameterType.Iid, null),
+            this.session.Object.Assembler.Cache.TryAdd(
+                new CacheKey(scalarParameterType.Iid, null),
                 new Lazy<Thing>(() => scalarParameterType));
 
             this.viewModel.BindPocoErrors();
@@ -415,13 +449,24 @@ namespace Migration.Tests
         {
             Assert.DoesNotThrowAsync(async () => await this.session.Object.Open());
 
-            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.session.Object.Assembler.Cache,
+            var elementDefinition = new ElementDefinition(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
                 this.session.Object.Credentials.Uri);
-            var definition = new Definition(Guid.NewGuid(), this.session.Object.Assembler.Cache,
+            var definition = new Definition(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
                 this.session.Object.Credentials.Uri);
-            var parameter = new Parameter(Guid.NewGuid(), this.session.Object.Assembler.Cache,
-                this.session.Object.Credentials.Uri){ Owner = this.domain };
-            var valueSet = new ParameterValueSet(Guid.NewGuid(), this.session.Object.Assembler.Cache,
+            var parameter = new Parameter(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
+                this.session.Object.Credentials.Uri)
+            {
+                Owner = this.domain
+            };
+            var valueSet = new ParameterValueSet(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
                 this.session.Object.Credentials.Uri);
 
             parameter.ValueSet.Add(valueSet);
@@ -434,9 +479,11 @@ namespace Migration.Tests
             valueSet.ValidatePoco();
             parameter.ValidatePoco();
 
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(parameter.Iid, null),
+            this.session.Object.Assembler.Cache.TryAdd(
+                new CacheKey(parameter.Iid, null),
                 new Lazy<Thing>(() => parameter));
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(valueSet.Iid, null),
+            this.session.Object.Assembler.Cache.TryAdd(
+                new CacheKey(valueSet.Iid, null),
                 new Lazy<Thing>(() => valueSet));
 
             this.viewModel.BindPocoErrors();
