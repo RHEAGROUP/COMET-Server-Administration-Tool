@@ -85,16 +85,30 @@ namespace Common.ViewModels.PlainObjects
                 ? "SiteDirectory"
                 : thing.TopContainer.UserFriendlyShortName;
 
+            this.Path = GetPath(thing);
+        }
+
+        /// <summary>
+        /// Gets the path for the given <paramref name="thing"/>.
+        /// </summary>
+        /// <param name="thing">
+        /// The given <see cref="Thing"/>.
+        /// </param>
+        /// <returns>
+        /// The path.
+        /// </returns>
+        public static string GetPath(Thing thing)
+        {
             try
             {
                 var dto = thing.ToDto();
                 var dtoRoute = dto.Route;
                 var uriBuilder = new UriBuilder(thing.IDalUri) { Path = dtoRoute };
-                this.Path = uriBuilder.ToString();
+                return uriBuilder.ToString();
             }
             catch (ContainmentException ex)
             {
-                this.Path = ex.Message;
+                return ex.Message;
             }
         }
 

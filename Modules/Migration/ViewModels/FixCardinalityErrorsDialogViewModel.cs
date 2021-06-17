@@ -382,6 +382,14 @@ namespace Migration.ViewModels
                 case ParameterOverride parameterOverride:
                     elementDefinition = parameterOverride.Container.Container as ElementDefinition;
                     break;
+                default:
+                    // this will never happen as long as 10-25 spec doesn't change the ParameterOrOverrideBase concept
+                    CDPMessageBus.Current.SendMessage(new LogEvent
+                    {
+                        Message = $"ParameterOrOverrideBase is neither a Parameter nor a ParameterOverride: " +
+                                  $"{PocoErrorRowViewModel.GetPath(parameterOrOverrideBase)}"
+                    });
+                    return;
             }
 
             var iteration = elementDefinition.Container as Iteration;
