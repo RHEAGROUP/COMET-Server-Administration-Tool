@@ -39,22 +39,22 @@ namespace Common.ViewModels.PlainObjects
         /// <summary>
         /// Gets or sets the identifier or code of the Rule that may have been broken
         /// </summary>
-        private string Id { get; set; }
+        private string Id { get; }
 
         /// <summary>
         /// Gets the <see cref="ClassKind"/> of the <see cref="Thing"/> that contains the error.
         /// </summary>
-        public string ContainerThingClassKind { get; private set; }
+        public ClassKind ContainerThingClassKind { get; }
 
         /// <summary>
         /// Gets or sets the human readable content of the Error.
         /// </summary>
-        public string Error { get; private set; }
+        public string Error { get; }
 
         /// <summary>
         /// Gets or sets the human readable content of the Error.
         /// </summary>
-        public string Path { get; private set; }
+        public string Path { get; }
 
         /// <summary>
         /// Gets or sets top container name
@@ -77,7 +77,7 @@ namespace Common.ViewModels.PlainObjects
         /// </summary>
         public PocoErrorRowViewModel(Thing thing, string error)
         {
-            this.ContainerThingClassKind = thing.ClassKind.ToString();
+            this.ContainerThingClassKind = thing.ClassKind;
             this.Error = error;
             this.Thing = thing;
             this.Id = thing.Iid.ToString();
@@ -85,16 +85,30 @@ namespace Common.ViewModels.PlainObjects
                 ? "SiteDirectory"
                 : thing.TopContainer.UserFriendlyShortName;
 
+            this.Path = GetPath(thing);
+        }
+
+        /// <summary>
+        /// Gets the path for the given <paramref name="thing"/>.
+        /// </summary>
+        /// <param name="thing">
+        /// The given <see cref="Thing"/>.
+        /// </param>
+        /// <returns>
+        /// The path.
+        /// </returns>
+        public static string GetPath(Thing thing)
+        {
             try
             {
                 var dto = thing.ToDto();
                 var dtoRoute = dto.Route;
                 var uriBuilder = new UriBuilder(thing.IDalUri) { Path = dtoRoute };
-                this.Path = uriBuilder.ToString();
+                return uriBuilder.ToString();
             }
             catch (ContainmentException ex)
             {
-                this.Path = ex.Message;
+                return ex.Message;
             }
         }
 
@@ -105,8 +119,9 @@ namespace Common.ViewModels.PlainObjects
         public override string ToString()
         {
             return
-                $"{this.ContainerThingClassKind}({this.Id}) " +
-                $"Top container: {this.TopContainerName}{Environment.NewLine}{this.Error}{Environment.NewLine}" +
+                $"Thing: {this.ContainerThingClassKind} ({this.Id}){Environment.NewLine}" +
+                $"Top container: {this.TopContainerName}{Environment.NewLine}" +
+                $"Error: {this.Error}{Environment.NewLine}" +
                 $"Path: {this.Path}";
         }
     }
