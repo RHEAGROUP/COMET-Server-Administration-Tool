@@ -276,8 +276,9 @@ namespace Migration.ViewModels
                     FixValueSetsCount(parameter);
                     break;
                 case ParameterValueSet parameterValueSet:
-                    parameterValueSet.Manual = FixValueArray(parameterValueSet, parameterValueSet.Manual);
+                    parameterValueSet.Computed = FixValueArray(parameterValueSet, parameterValueSet.Computed);
                     parameterValueSet.Formula = FixValueArray(parameterValueSet, parameterValueSet.Formula);
+                    parameterValueSet.Manual = FixValueArray(parameterValueSet, parameterValueSet.Manual);
                     parameterValueSet.Published = FixValueArray(parameterValueSet, parameterValueSet.Published);
                     parameterValueSet.Reference = FixValueArray(parameterValueSet, parameterValueSet.Reference);
                     break;
