@@ -39,22 +39,22 @@ namespace Common.ViewModels.PlainObjects
         /// <summary>
         /// Gets or sets the identifier or code of the Rule that may have been broken
         /// </summary>
-        private string Id { get; set; }
+        private string Id { get; }
 
         /// <summary>
         /// Gets the <see cref="ClassKind"/> of the <see cref="Thing"/> that contains the error.
         /// </summary>
-        public string ContainerThingClassKind { get; private set; }
+        public string ContainerThingClassKind { get; }
 
         /// <summary>
         /// Gets or sets the human readable content of the Error.
         /// </summary>
-        public string Error { get; private set; }
+        public string Error { get; }
 
         /// <summary>
         /// Gets or sets the human readable content of the Error.
         /// </summary>
-        public string Path { get; private set; }
+        public string Path { get; }
 
         /// <summary>
         /// Gets or sets top container name
