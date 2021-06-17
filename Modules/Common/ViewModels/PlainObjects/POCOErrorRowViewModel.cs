@@ -44,7 +44,7 @@ namespace Common.ViewModels.PlainObjects
         /// <summary>
         /// Gets the <see cref="ClassKind"/> of the <see cref="Thing"/> that contains the error.
         /// </summary>
-        public string ContainerThingClassKind { get; }
+        public ClassKind ContainerThingClassKind { get; }
 
         /// <summary>
         /// Gets or sets the human readable content of the Error.
@@ -77,7 +77,7 @@ namespace Common.ViewModels.PlainObjects
         /// </summary>
         public PocoErrorRowViewModel(Thing thing, string error)
         {
-            this.ContainerThingClassKind = thing.ClassKind.ToString();
+            this.ContainerThingClassKind = thing.ClassKind;
             this.Error = error;
             this.Thing = thing;
             this.Id = thing.Iid.ToString();

@@ -501,19 +501,19 @@ namespace Migration.Tests
             this.viewModel.BindPocoErrors();
 
             Assert.That(this.viewModel.Errors.Any(e =>
-                e.ContainerThingClassKind == ClassKind.ParameterValueSet.ToString() &&
+                e.ContainerThingClassKind == ClassKind.ParameterValueSet &&
                 e.Error.Contains("The number of elements in the property Formula is wrong. It should be at least 1")));
 
             Assert.That(this.viewModel.Errors.Any(e =>
-                e.ContainerThingClassKind == ClassKind.ParameterValueSet.ToString() &&
+                e.ContainerThingClassKind == ClassKind.ParameterValueSet &&
                 e.Error.Contains("The number of elements in the property Manual is wrong. It should be at least 1.")));
 
             Assert.That(this.viewModel.Errors.Any(e =>
-                e.ContainerThingClassKind == ClassKind.ParameterValueSet.ToString() &&
+                e.ContainerThingClassKind == ClassKind.ParameterValueSet &&
                 e.Error.Contains("The number of elements in the property Published is wrong. It should be at least 1.")));
 
             Assert.That(this.viewModel.Errors.Any(e =>
-                e.ContainerThingClassKind == ClassKind.ParameterValueSet.ToString() &&
+                e.ContainerThingClassKind == ClassKind.ParameterValueSet &&
                 e.Error.Contains("The number of elements in the property Reference is wrong. It should be at least 1.")));
 
             Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute(null));
