@@ -105,8 +105,9 @@ namespace Common.ViewModels.PlainObjects
         public override string ToString()
         {
             return
-                $"{this.ContainerThingClassKind}({this.Id}) " +
-                $"Top container: {this.TopContainerName}{Environment.NewLine}{this.Error}{Environment.NewLine}" +
+                $"Thing: {this.ContainerThingClassKind} ({this.Id}){Environment.NewLine}" +
+                $"Top container: {this.TopContainerName}{Environment.NewLine}" +
+                $"Error: {this.Error}{Environment.NewLine}" +
                 $"Path: {this.Path}";
         }
     }

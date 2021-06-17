@@ -201,6 +201,15 @@ namespace Migration.ViewModels
                 ? new LogEvent { Message = "The cardinality errors have been successfully fixed" }
                 : new LogEvent { Message = "The cardinality errors have not been fixed" });
 
+            // log not fixed errors
+            foreach (var rowError in this.errors)
+            {
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "Could not fix POCO error:" + Environment.NewLine + rowError.ToString()
+                });
+            }
+
             this.IsBusy = false;
         }
 

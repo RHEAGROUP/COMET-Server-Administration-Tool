@@ -94,8 +94,9 @@ namespace Common.ViewModels.PlainObjects
         public override string ToString()
         {
             return
-                $"{this.ThingClassKind}({this.Id}) " +
-                $"Top container: {this.TopContainerName}{Environment.NewLine}{this.Description}{Environment.NewLine}" +
+                $"Thing: {this.ThingClassKind} ({this.Id}){Environment.NewLine}" +
+                $"Top container: {this.TopContainerName}{Environment.NewLine}" +
+                $"Description: {this.Description}{Environment.NewLine}" +
                 $"Severity: {this.Severity}";
         }
     }
