@@ -453,10 +453,12 @@ namespace Migration.Tests
                 Guid.NewGuid(),
                 this.session.Object.Assembler.Cache,
                 this.session.Object.Credentials.Uri);
+
             var definition = new Definition(
                 Guid.NewGuid(),
                 this.session.Object.Assembler.Cache,
                 this.session.Object.Credentials.Uri);
+
             var parameter = new Parameter(
                 Guid.NewGuid(),
                 this.session.Object.Assembler.Cache,
@@ -464,37 +466,55 @@ namespace Migration.Tests
             {
                 Owner = this.domain
             };
-            var valueSet = new ParameterValueSet(
+
+            var valueSet1 = new ParameterValueSet(
                 Guid.NewGuid(),
                 this.session.Object.Assembler.Cache,
                 this.session.Object.Credentials.Uri);
+            parameter.ValueSet.Add(valueSet1);
 
-            parameter.ValueSet.Add(valueSet);
+            var valueSet2 = new ParameterValueSet(
+                Guid.NewGuid(),
+                this.session.Object.Assembler.Cache,
+                this.session.Object.Credentials.Uri);
+            parameter.ValueSet.Add(valueSet2);
 
             elementDefinition.Parameter.Add(parameter);
 
             this.iteration.Element.Add(elementDefinition);
             elementDefinition.Definition.Add(definition);
 
-            valueSet.ValidatePoco();
+            valueSet1.ValidatePoco();
+            valueSet2.ValidatePoco();
             parameter.ValidatePoco();
 
             this.session.Object.Assembler.Cache.TryAdd(
                 new CacheKey(parameter.Iid, null),
                 new Lazy<Thing>(() => parameter));
             this.session.Object.Assembler.Cache.TryAdd(
-                new CacheKey(valueSet.Iid, null),
-                new Lazy<Thing>(() => valueSet));
+                new CacheKey(valueSet1.Iid, null),
+                new Lazy<Thing>(() => valueSet1));
+            this.session.Object.Assembler.Cache.TryAdd(
+                new CacheKey(valueSet2.Iid, null),
+                new Lazy<Thing>(() => valueSet2));
 
             this.viewModel.BindPocoErrors();
 
-            Assert.That(this.viewModel.Errors.Any(e => e.ContainerThingClassKind == ClassKind.ParameterValueSet.ToString() && e.Error.Contains("The number of elements in the property Formula is wrong. It should be at least 1")));
+            Assert.That(this.viewModel.Errors.Any(e =>
+                e.ContainerThingClassKind == ClassKind.ParameterValueSet.ToString() &&
+                e.Error.Contains("The number of elements in the property Formula is wrong. It should be at least 1")));
 
-            Assert.That(this.viewModel.Errors.Any(e => e.ContainerThingClassKind == ClassKind.ParameterValueSet.ToString() && e.Error.Contains("The number of elements in the property Manual is wrong. It should be at least 1.")));
+            Assert.That(this.viewModel.Errors.Any(e =>
+                e.ContainerThingClassKind == ClassKind.ParameterValueSet.ToString() &&
+                e.Error.Contains("The number of elements in the property Manual is wrong. It should be at least 1.")));
 
-            Assert.That(this.viewModel.Errors.Any(e => e.ContainerThingClassKind == ClassKind.ParameterValueSet.ToString() && e.Error.Contains("The number of elements in the property Published is wrong. It should be at least 1.")));
+            Assert.That(this.viewModel.Errors.Any(e =>
+                e.ContainerThingClassKind == ClassKind.ParameterValueSet.ToString() &&
+                e.Error.Contains("The number of elements in the property Published is wrong. It should be at least 1.")));
 
-            Assert.That(this.viewModel.Errors.Any(e => e.ContainerThingClassKind == ClassKind.ParameterValueSet.ToString() && e.Error.Contains("The number of elements in the property Reference is wrong. It should be at least 1.")));
+            Assert.That(this.viewModel.Errors.Any(e =>
+                e.ContainerThingClassKind == ClassKind.ParameterValueSet.ToString() &&
+                e.Error.Contains("The number of elements in the property Reference is wrong. It should be at least 1.")));
 
             Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute(null));
 
