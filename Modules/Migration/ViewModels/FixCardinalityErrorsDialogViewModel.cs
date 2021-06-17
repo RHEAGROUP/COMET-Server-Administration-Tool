@@ -427,16 +427,13 @@ namespace Migration.ViewModels
         /// <returns>
         /// The new <see cref="ValueArray{T}"/>.
         /// </returns>
-        private static ValueArray<string> FixValueArray(ParameterValueSet parameterValueSet, ValueArray<string> oldValues = null)
+        private static ValueArray<string> FixValueArray(ParameterValueSet parameterValueSet, ValueArray<string> oldValues)
         {
             var newValues = new List<string>();
 
-            if (oldValues != null)
+            foreach (var oldValue in oldValues)
             {
-                foreach (var oldValue in oldValues)
-                {
-                    newValues.Add(oldValue);
-                }
+                newValues.Add(oldValue);
             }
 
             for (var i = newValues.Count; i < parameterValueSet.QueryParameterType().NumberOfValues; ++i)
