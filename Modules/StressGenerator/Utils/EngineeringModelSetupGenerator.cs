@@ -23,12 +23,13 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System;
-using System.Linq;
-
 namespace StressGenerator.Utils
 {
+    using System;
+    using System.Linq;
+    using System.Threading.Tasks;
     using CDP4Common.EngineeringModelData;
+    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
 
@@ -41,12 +42,17 @@ namespace StressGenerator.Utils
         /// Create a new instance of <see cref="Iteration" />
         /// </summary>
         /// <param name="session">Server session <see cref="ISession"/></param>
-        /// <param name="siteDirectory"></param>
-        /// <param name="modelName"></param>
-        /// <param name="sourceEngineeringModelSetup"></param>
-        /// <returns>An iteration instance <see cref="Iteration"/></returns>
-        public static EngineeringModelSetup Create(ISession session, SiteDirectory siteDirectory, string modelName, EngineeringModelSetup sourceEngineeringModelSetup = null)
+        /// <param name="modelName">EngineeringModelSetup name</param>
+        /// <param name="sourceEngineeringModelSetup">The source EngineeringModelSetup <see cref="EngineeringModelSetup"/></param>
+        /// <returns>An instance of <see cref="EngineeringModelSetup"/></returns>
+        public static async Task<EngineeringModelSetup> Create(
+            ISession session,
+            string modelName,
+            EngineeringModelSetup sourceEngineeringModelSetup = null)
         {
+            var siteDirectory = session.RetrieveSiteDirectory();
+            var siteDirectoryCloned = siteDirectory.Clone(true);
+
             var participant = new Participant(Guid.NewGuid(), session.Assembler.Cache, session.Credentials.Uri) { Person = siteDirectory.Person.FirstOrDefault() };
             participant.Domain.Add(siteDirectory.Person.FirstOrDefault()?.DefaultDomain);
 
@@ -83,9 +89,54 @@ namespace StressGenerator.Utils
             engineeringModelSetup.IterationSetup.Add(iterationSetup);
             engineeringModelSetup.Participant.Add(participant);
 
-            siteDirectory.Model.Add(engineeringModelSetup);
+            siteDirectoryCloned.Model.Add(engineeringModelSetup);
+
+            await WriteEngineeringModelSetup(session, engineeringModelSetup, siteDirectory, siteDirectoryCloned);
 
             return engineeringModelSetup;
+        }
+
+        /// <summary>
+        /// Write new EngineeringModelSetup
+        /// </summary>
+        /// <param name="session">
+        /// Server session <see cref="ISession"/>
+        /// </param>
+        /// <param name="engineeringModelSetup">
+        /// The EngineeringModelSetup <see cref="EngineeringModelSetup"/>
+        /// </param>
+        /// <param name="siteDirectory">
+        /// Current site directory used for creating write transaction <see cref="SiteDirectory"/>
+        /// </param>
+        /// <param name="siteDirectoryCloned">
+        /// Cloned site directory used for creating write transaction <see cref="SiteDirectory"/>
+        /// </param>
+        /// <returns></returns>
+        private static async Task WriteEngineeringModelSetup(
+            ISession session,
+            EngineeringModelSetup engineeringModelSetup,
+            SiteDirectory siteDirectory,
+            SiteDirectory siteDirectoryCloned)
+        {
+            try
+            {
+                var transactionContext = TransactionContextResolver.ResolveContext(siteDirectory);
+                var operationContainer = new OperationContainer(transactionContext.ContextRoute());
+
+                operationContainer.AddOperation(new Operation(siteDirectory.ToDto(), siteDirectoryCloned.ToDto(), OperationKind.Update));
+                operationContainer.AddOperation(new Operation(null, engineeringModelSetup.ToDto(),
+                    OperationKind.Create));
+                operationContainer.AddOperation(new Operation(null, engineeringModelSetup.RequiredRdl.FirstOrDefault()?.ToDto(),
+                    OperationKind.Create));
+
+                await session.Dal.Write(operationContainer);
+
+                //this.NotifyMessage($"Successfully generated EngineeringModelSetup {engineeringModelSetup.Name} ({engineeringModelSetup.ShortName}).", StressGenerator.LogVerbosity.Info);
+            }
+            catch (Exception ex)
+            {
+                //this.NotifyMessage($"Cannot generate EngineeringModelSetup {engineeringModelSetup.Name} ({engineeringModelSetup.ShortName}). Exception: {ex.Message}", StressGenerator.LogVerbosity.Error);
+            }
         }
     }
 }

@@ -349,8 +349,8 @@ namespace StressGenerator.ViewModels
                 vm => vm.TestObjectsNumber,
                 vm => vm.ElementName,
                 vm => vm.ElementShortName,
-                //vm => vm.SelectedEngineeringModelSetup,
-                (sourceLoggedIn, interval, objectsNumber, name, shortName/*, modelSetup*/) =>
+                vm => vm.SelectedEngineeringModelSetup,
+                (sourceLoggedIn, interval, objectsNumber, name, shortName, modelSetup) =>
                     sourceLoggedIn &&
                     interval >= StressGeneratorConfiguration.MinTimeInterval &&
                     objectsNumber >= StressGeneratorConfiguration.MinNumberOfTestObjects &&
@@ -361,44 +361,44 @@ namespace StressGenerator.ViewModels
 
             canExecuteStress.ToProperty(this, vm => vm.CanStress, out this.canStress);
 
-            this.WhenAnyValue(vm => vm.SourceViewModel.LoginSuccessfully, vm => vm.SourceViewModel.ServerSession)
-                .Subscribe(delegate (Tuple<bool, ISession> tuple)
+            this.WhenAnyValue(
+                    vm => vm.SourceViewModel.LoginSuccessfully,
+                    vm => vm.SourceViewModel.ServerSession)
+                .Subscribe(delegate(Tuple<bool, ISession> tuple)
                 {
                     var (success, session) = tuple;
 
                     if (!success || session == null) return;
 
                     this.LoginSuccessfully = true;
-                    this.BindEngineeringModels(session.RetrieveSiteDirectory());
+                    this.SelectedOperationMode = SupportedOperationModes.Open;
+                    this.BindEngineeringModels();
                 });
 
-            this.WhenAnyValue(vm => vm.SelectedOperationMode).Subscribe((mode) =>
-            {
-                switch (mode)
+            this.WhenAnyValue(
+                    vm => vm.SelectedOperationMode)
+                .Subscribe((mode) =>
                 {
-                    case SupportedOperationModes.Open:
-                        this.ModeOpenOrOverwrite = true;
-                        this.ModeCreate = false;
-                        this.SourceModelIsEnabled = false;
-                        break;
-                    case SupportedOperationModes.Create:
-                        this.ModeOpenOrOverwrite = true;
-                        this.ModeCreate = true;
-                        this.SourceModelIsEnabled = true;
-                        this.SelectedEngineeringModelSetup = null;
-                        this.BindSourceEngineeringModels(this.SourceViewModel.ServerSession.RetrieveSiteDirectory());
-                        break;
-                    case SupportedOperationModes.CreateOverwrite:
-                        this.ModeOpenOrOverwrite = true;
-                        this.ModeCreate = false;
-                        this.SourceModelIsEnabled = true;
-                        this.SelectedEngineeringModelSetup = null;
-                        this.BindSourceEngineeringModels(this.SourceViewModel.ServerSession.RetrieveSiteDirectory());
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
-                }
-            });
+                    switch (mode)
+                    {
+                        case SupportedOperationModes.Open:
+                            this.ModeOpenOrOverwrite = true;
+                            this.ModeCreate = false;
+                            this.SourceModelIsEnabled = false;
+                            break;
+                        case SupportedOperationModes.Create:
+                        case SupportedOperationModes.CreateOverwrite:
+                            this.ModeOpenOrOverwrite = true;
+                            this.ModeCreate = mode == SupportedOperationModes.Create;
+                            this.SourceModelIsEnabled = true;
+                            this.SelectedEngineeringModelSetup = null;
+                            this.BindSourceEngineeringModels(this.SourceViewModel.ServerSession
+                                .RetrieveSiteDirectory());
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
+                    }
+                });
 
             this.StressCommand = ReactiveCommand.CreateAsyncTask(
                 canExecuteStress,
@@ -441,10 +441,12 @@ namespace StressGenerator.ViewModels
 
             if (this.SelectedOperationMode == SupportedOperationModes.Create)
             {
-                var siteDirectory = this.SourceViewModel.ServerSession.RetrieveSiteDirectory();
-                var engineeringModelSetup = EngineeringModelSetupGenerator.Create(
-                    this.SourceViewModel.ServerSession, siteDirectory, this.ModelName);
-                await this.stressGenerator.WriteEngineeringModelSetup(engineeringModelSetup, siteDirectory);
+                var engineeringModelSetup = await EngineeringModelSetupGenerator.Create(
+                    this.SourceViewModel.ServerSession, this.ModelName, this.SelectedSourceEngineeringModelSetup);
+
+                this.BindEngineeringModels();
+
+                this.SelectedEngineeringModelSetup = engineeringModelSetup;
             }
 
             await this.stressGenerator.GenerateTestObjects(this.SelectedEngineeringModelSetup);
@@ -464,9 +466,10 @@ namespace StressGenerator.ViewModels
         /// <summary>
         /// Bind engineering models to the reactive list
         /// </summary>
-        /// <param name="siteDirectory">The <see cref="SiteDirectory"/> top container</param>
-        private void BindEngineeringModels(SiteDirectory siteDirectory)
+        private void BindEngineeringModels()
         {
+            var siteDirectory = this.SourceViewModel.ServerSession.RetrieveSiteDirectory();
+
             this.EngineeringModelSetupList.Clear();
 
             foreach (var modelSetup in siteDirectory.Model.Where(m => m.Name.StartsWith(StressGeneratorConfiguration.ModelPrefix)).OrderBy(m => m.Name))

@@ -431,28 +431,6 @@ namespace StressGenerator.Utils
             }
         }
 
-        public async Task WriteEngineeringModelSetup(EngineeringModelSetup engineeringModelSetup, SiteDirectory siteDirectory)
-        {
-            try
-            {
-                var transactionContext = TransactionContextResolver.ResolveContext(siteDirectory);
-                var operationContainer = new OperationContainer(transactionContext.ContextRoute());
-                operationContainer.AddOperation(new Operation(siteDirectory.ToDto(), siteDirectory.ToDto(), OperationKind.Update));
 
-                foreach (var newThing in engineeringModelSetup.QueryContainedThingsDeep())
-                {
-                    operationContainer.AddOperation(new Operation(null, newThing.ToDto(),
-                        OperationKind.Create));
-                }
-
-                await this.configuration.Session.Dal.Write(operationContainer);
-
-                this.NotifyMessage($"Successfully generated EngineeringModelSetup {engineeringModelSetup.Name} ({engineeringModelSetup.ShortName}).", LogVerbosity.Info);
-            }
-            catch (Exception ex)
-            {
-                this.NotifyMessage($"Cannot generate EngineeringModelSetup {engineeringModelSetup.Name} ({engineeringModelSetup.ShortName}). Exception: {ex.Message}", LogVerbosity.Error);
-            }
-        }
     }
 }
