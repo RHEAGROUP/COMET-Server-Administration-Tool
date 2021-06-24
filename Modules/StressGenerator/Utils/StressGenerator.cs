@@ -281,7 +281,7 @@ namespace StressGenerator.Utils
 
                 await WriteElementDefinition(elementDefinition, iteration, clonedIteration);
 
-                Thread.Sleep(this.configuration.TimeInterval);
+                Thread.Sleep(this.configuration.TimeInterval * 1000);
             }
 
             return generatedElementsList;
