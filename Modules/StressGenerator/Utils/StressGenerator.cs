@@ -474,11 +474,11 @@ namespace StressGenerator.Utils
             {
                 await Policy
                     .Handle<Exception>()
-                    .Retry(3, (ex, retryCount) =>
+                    .RetryAsync(3, (ex, retryCount) =>
                     {
                         this.LogOperationResult(false, actionDescription, ex, retryCount);
                     })
-                    .Execute(async () => await this.configuration.Session.Dal.Write(operationContainer));
+                    .ExecuteAsync(async () => await this.configuration.Session.Dal.Write(operationContainer));
 
                 this.LogOperationResult(true, actionDescription);
             }
