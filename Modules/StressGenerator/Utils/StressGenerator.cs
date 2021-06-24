@@ -27,6 +27,7 @@ namespace StressGenerator.Utils
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
@@ -252,6 +253,7 @@ namespace StressGenerator.Utils
             var start = this.FindHighestNumberOnElementDefinitions(iteration) + 1;
             var clearRequested = false;
             var generatedElementsList = new List<ElementDefinition>();
+            var stopwatch = new Stopwatch();
 
             for (var number = start; number < start + this.configuration.TestObjectsNumber; number++)
             {
@@ -279,9 +281,11 @@ namespace StressGenerator.Utils
                 clonedIteration.Element.Add(elementDefinition);
                 generatedElementsList.Add(elementDefinition);
 
+                stopwatch.Restart();
                 await WriteElementDefinition(elementDefinition, iteration, clonedIteration);
+                stopwatch.Stop();
 
-                Thread.Sleep(this.configuration.TimeInterval * 1000);
+                Thread.Sleep((int)Math.Max(0, this.configuration.TimeInterval * 1000 - stopwatch.ElapsedMilliseconds));
             }
 
             return generatedElementsList;
