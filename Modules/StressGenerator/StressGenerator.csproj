@@ -61,7 +61,6 @@
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NLog" Version="4.6.8" />
-    <PackageReference Include="Polly" Version="7.2.2" />
     <PackageReference Include="reactiveui-core.Net40" Version="6.5.0" />
     <PackageReference Include="Rx-Core" Version="2.2.5" />
     <PackageReference Include="Rx-Interfaces" Version="2.2.5" />

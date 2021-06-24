@@ -39,7 +39,6 @@ namespace StressGenerator.Utils
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal.Operations;
     using NLog;
-    using Polly;
     using ViewModels;
 
     /// <summary>
@@ -465,21 +464,19 @@ namespace StressGenerator.Utils
         /// </param>
         private async Task WriteWithRetries(OperationContainer operationContainer, string actionDescription)
         {
-            try
+            for (var currentAttempt = 1; currentAttempt <= MaxRetryCount; currentAttempt++)
             {
-                await Policy
-                    .Handle<Exception>()
-                    .Retry(3, (ex, retryCount) =>
-                    {
-                        this.LogOperationResult(false, actionDescription, ex, retryCount);
-                    })
-                    .Execute(async () => await this.configuration.Session.Dal.Write(operationContainer));
+                try
+                {
+                    await this.configuration.Session.Dal.Write(operationContainer);
 
-                this.LogOperationResult(true, actionDescription);
-            }
-            catch (Exception ex)
-            {
-                this.LogOperationResult(false, actionDescription, ex);
+                    this.LogOperationResult(true, actionDescription);
+                    return;
+                }
+                catch (Exception e)
+                {
+                    this.LogOperationResult(false, actionDescription, e, currentAttempt);
+                }
             }
         }
 
@@ -495,23 +492,23 @@ namespace StressGenerator.Utils
         /// <param name="exception">
         /// Optionally, the <see cref="Exception"/> which caused the operation to fail.
         /// </param>
-        /// <param name="retryCount">
-        /// Optionally, the retry count of the failed operation.
+        /// <param name="attempt">
+        /// Optionally, the attempt number of the failed operation.
         /// </param>
         private void LogOperationResult(
             bool success,
             string actionDescription,
             Exception exception = null,
-            int? retryCount = null)
+            int? attempt = null)
         {
             var sb = new StringBuilder();
             
             sb.Append(success ? "Succeeded" : "Failed");
             sb.Append(" ");
 
-            if (retryCount != null)
+            if (attempt != null)
             {
-                sb.Append($"(retry count {retryCount})");
+                sb.Append($"(attempt {attempt})");
                 sb.Append(" ");
             }
 
