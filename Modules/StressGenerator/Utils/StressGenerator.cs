@@ -305,9 +305,6 @@ namespace StressGenerator.Utils
         /// <param name="generatedElementsList">
         /// The generated <see cref="ElementDefinition"/> list.
         /// </param>
-        /// <returns>
-        /// The <see cref="Task"/>.
-        /// </returns>
         private async Task GenerateAndWriteParameterValueSets(List<ElementDefinition> generatedElementsList)
         {
             if (generatedElementsList == null)
@@ -399,9 +396,6 @@ namespace StressGenerator.Utils
         /// <param name="clonedIteration">
         /// Cloned <see cref="Iteration"/> that will contain the <see cref="ElementDefinition"/>.
         /// </param>
-        /// <returns>
-        /// The <see cref="Task"/>.
-        /// </returns>
         private async Task WriteElementDefinition(
             ElementDefinition elementDefinition,
             Iteration originalIteration,
@@ -438,9 +432,6 @@ namespace StressGenerator.Utils
         /// <param name="elementIndex">
         /// The <see cref="ElementDefinition"/> index (used to see different parameter values).
         /// </param>
-        /// <returns>
-        /// The <see cref="Task"/>.
-        /// </returns>
         [ExcludeFromCodeCoverage]
         private async Task WriteParametersValueSets(Parameter parameter, int elementIndex)
         {
