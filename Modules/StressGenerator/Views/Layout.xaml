@@ -131,7 +131,7 @@
                 <Image Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left"
                        Source="{dx:DXImage Image=Info_16x16.png}" />
                 <TextBlock Grid.Row="0" Grid.Column="1" MaxWidth="320" HorizontalAlignment="Left" Margin="5" TextWrapping="Wrap">
-                    For safety, the short name of the engineering model must start with 'StressTester'.
+                    For safety, the short name of the engineering model must start with 'StressTester_TemporaryTestModel'.
                 </TextBlock>
             </Grid>
         </Grid>
