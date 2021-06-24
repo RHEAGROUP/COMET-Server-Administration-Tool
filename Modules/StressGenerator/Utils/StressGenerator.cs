@@ -31,6 +31,7 @@ namespace StressGenerator.Utils
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
+    using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
@@ -38,6 +39,7 @@ namespace StressGenerator.Utils
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal.Operations;
     using NLog;
+    using Polly;
     using ViewModels;
 
     /// <summary>
@@ -49,6 +51,11 @@ namespace StressGenerator.Utils
         /// The NLog logger
         /// </summary>
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
+        /// The maximum retry count for a write operation.
+        /// </summary>
+        private static readonly int MaxRetryCount = 3;
 
         /// <summary>
         /// Stress generator configuration
@@ -135,7 +142,7 @@ namespace StressGenerator.Utils
                     Logger.Debug(message);
                     break;
                 case LogVerbosity.Error:
-                    Logger.Error(ex?.Message != null ? message + ex.Message : message);
+                    Logger.Error(ex?.Message != null ? message + Environment.NewLine + ex.Message : message);
                     break;
                 default:
                     Logger.Trace(message);
@@ -400,30 +407,40 @@ namespace StressGenerator.Utils
             Iteration originalIteration,
             Iteration clonedIteration)
         {
+            var transactionContext = TransactionContextResolver.ResolveContext(originalIteration);
+            var operationContainer = new OperationContainer(transactionContext.ContextRoute());
+            operationContainer.AddOperation(new Operation(
+                originalIteration.ToDto(), 
+                clonedIteration.ToDto(),
+                OperationKind.Update));
+
+            foreach (var newThing in elementDefinition.QueryContainedThingsDeep())
+            {
+                operationContainer.AddOperation(new Operation(
+                    null,
+                    newThing.ToDto(),
+                    OperationKind.Create));
+            }
+
+            var actionDescription = $"writing ElementDefinition to server " +
+                                    $"for ElementDefinition \"{elementDefinition.Name} ({elementDefinition.ShortName})\" " +
+                                    $"owned by {elementDefinition.Owner.ShortName}.";
+
             try
             {
-                var transactionContext = TransactionContextResolver.ResolveContext(originalIteration);
-                var operationContainer = new OperationContainer(transactionContext.ContextRoute());
-                operationContainer.AddOperation(new Operation(
-                    originalIteration.ToDto(), 
-                    clonedIteration.ToDto(),
-                    OperationKind.Update));
+                await Policy
+                    .Handle<Exception>()
+                    .Retry(3, (ex, retryCount) =>
+                    {
+                        this.LogOperationResult(false, actionDescription, ex, retryCount);
+                    })
+                    .Execute(async () => await this.configuration.Session.Dal.Write(operationContainer));
 
-                foreach (var newThing in elementDefinition.QueryContainedThingsDeep())
-                {
-                    operationContainer.AddOperation(new Operation(
-                        null,
-                        newThing.ToDto(),
-                        OperationKind.Create));
-                }
-
-                await this.configuration.Session.Dal.Write(operationContainer);
-
-                this.NotifyMessage($"Successfully generated ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName}).", LogVerbosity.Info);
+                this.LogOperationResult(true, actionDescription);
             }
             catch (Exception ex)
             {
-                this.NotifyMessage($"Cannot generate ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName}). Exception: {ex.Message}", LogVerbosity.Error);
+                this.LogOperationResult(false, actionDescription, ex);
             }
         }
 
@@ -450,20 +467,70 @@ namespace StressGenerator.Utils
             var parameterValue = (valueConfigPair.Value + elementIndex).ToString(CultureInfo.InvariantCulture);
             var valueSetClone = ParameterGenerator.UpdateValueSets(parameter.ValueSets, parameterSwitchKind, parameterValue);
 
+            var transactionContext = TransactionContextResolver.ResolveContext(valueSetClone);
+            var transaction = new ThingTransaction(transactionContext);
+            transaction.CreateOrUpdate(valueSetClone);
+            var operationContainer = transaction.FinalizeTransaction();
+
+            var actionDescription = $"writing ParameterValueSet (published value {parameterValue}) to server " +
+                                    $"for Parameter \"{parameter.ParameterType.Name} ({parameter.ParameterType.ShortName})\".";
+
             try
             {
-                var transactionContext = TransactionContextResolver.ResolveContext(valueSetClone);
-                var transaction = new ThingTransaction(transactionContext);
-                transaction.CreateOrUpdate(valueSetClone);
-                var operationContainer = transaction.FinalizeTransaction();
-                await this.configuration.Session.Write(operationContainer);
+                await Policy
+                    .Handle<Exception>()
+                    .Retry(3, (ex, retryCount) =>
+                    {
+                        this.LogOperationResult(false, actionDescription, ex, retryCount);
+                    })
+                    .Execute(async () => await this.configuration.Session.Dal.Write(operationContainer));
 
-                this.NotifyMessage($"Successfully generated ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName}).");
+                this.LogOperationResult(true, actionDescription);
             }
             catch (Exception ex)
             {
-                this.NotifyMessage($"Cannot update ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName}). Exception: {ex.Message}");
+                this.LogOperationResult(false, actionDescription, ex);
             }
+        }
+
+        /// <summary>
+        /// Log the result of on operation.
+        /// </summary>
+        /// <param name="success">
+        /// The operation success.
+        /// </param>
+        /// <param name="actionDescription">
+        /// The description of the action.
+        /// </param>
+        /// <param name="exception">
+        /// Optionally, the <see cref="Exception"/> which caused the operation to fail.
+        /// </param>
+        /// <param name="retryCount">
+        /// Optionally, the retry count of the failed operation.
+        /// </param>
+        private void LogOperationResult(
+            bool success,
+            string actionDescription,
+            Exception exception = null,
+            int? retryCount = null)
+        {
+            var sb = new StringBuilder();
+            
+            sb.Append(success ? "Succeeded" : "Failed");
+            sb.Append(" ");
+
+            if (retryCount != null)
+            {
+                sb.Append($"(retry count {retryCount})");
+                sb.Append(" ");
+            }
+
+            sb.Append(actionDescription);
+            sb.Append(" ");
+            
+            this.NotifyMessage(sb.ToString(),
+                success ? (LogVerbosity?) null : LogVerbosity.Error,
+                exception);
         }
     }
 }
