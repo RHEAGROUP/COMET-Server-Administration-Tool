@@ -127,6 +127,11 @@ namespace StressGenerator.Utils
         /// </param>
         private void NotifyMessage(string message, LogVerbosity? logLevel = null, Exception ex = null)
         {
+            if (ex != null)
+            {
+                message += Environment.NewLine + "    " + ex.Message;
+            }
+
             NotifyMessageEvent?.Invoke(message);
 
             switch (logLevel)
@@ -141,7 +146,7 @@ namespace StressGenerator.Utils
                     Logger.Debug(message);
                     break;
                 case LogVerbosity.Error:
-                    Logger.Error(ex?.Message != null ? message + Environment.NewLine + ex.Message : message);
+                    Logger.Error(message);
                     break;
                 default:
                     Logger.Trace(message);
