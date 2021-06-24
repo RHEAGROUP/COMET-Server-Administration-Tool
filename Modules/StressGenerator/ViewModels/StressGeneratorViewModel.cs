@@ -37,6 +37,16 @@ namespace StressGenerator.ViewModels
     using Utils;
 
     /// <summary>
+    /// Supported operation modes
+    /// </summary>
+    public enum SupportedOperationModes
+    {
+        Open,
+        Create,
+        CreateOverwrite
+    }
+
+    /// <summary>
     /// The view-model for the StressGenerator tool
     /// </summary>
     public class StressGeneratorViewModel : ReactiveObject
@@ -80,16 +90,6 @@ namespace StressGenerator.ViewModels
                 {SupportedOperationModes.Create, SupportedOperationModes.Create.ToString()},
                 {SupportedOperationModes.CreateOverwrite, SupportedOperationModes.CreateOverwrite.ToString()}
             };
-
-        /// <summary>
-        /// Supported operation modes
-        /// </summary>
-        public enum SupportedOperationModes
-        {
-            Open,
-            Create,
-            CreateOverwrite
-        }
 
         /// <summary>
         /// Backing field for the <see cref="SelectedEngineeringModelSetup"/> property
@@ -392,8 +392,7 @@ namespace StressGenerator.ViewModels
                             this.ModeCreate = mode == SupportedOperationModes.Create;
                             this.SourceModelIsEnabled = true;
                             this.SelectedEngineeringModelSetup = null;
-                            this.BindSourceEngineeringModels(this.SourceViewModel.ServerSession
-                                .RetrieveSiteDirectory());
+                            this.BindSourceEngineeringModels();
                             break;
                         default:
                             throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
@@ -412,8 +411,8 @@ namespace StressGenerator.ViewModels
         {
             this.TimeInterval = StressGeneratorConfiguration.MinTimeInterval;
             this.TestObjectsNumber = StressGeneratorConfiguration.MinNumberOfTestObjects;
-            this.ElementName = "Element";
-            this.ElementShortName = "ED";
+            this.ElementName = StressGeneratorConfiguration.GenericElementName;
+            this.ElementShortName = StressGeneratorConfiguration.GenericElementShortName;
             this.EngineeringModelSetupList = new ReactiveList<EngineeringModelSetup>();
             this.SourceEngineeringModelSetupList = new ReactiveList<EngineeringModelSetup>();
             this.ModeCreate = false;
@@ -430,26 +429,22 @@ namespace StressGenerator.ViewModels
         /// </returns>
         private async Task ExecuteStressCommand()
         {
-            this.stressGenerator.Init(new StressGeneratorConfiguration(
-                this.SourceViewModel.ServerSession,
-                this.TimeInterval,
-                this.TestObjectsNumber,
-                this.ElementName,
-                this.ElementShortName,
-                this.DeleteAllElements,
-                this.DeleteModel));
-
-            if (this.SelectedOperationMode == SupportedOperationModes.Create)
+            this.stressGenerator.Init(new StressGeneratorConfiguration(this.SourceViewModel.ServerSession)
             {
-                var engineeringModelSetup = await EngineeringModelSetupGenerator.Create(
-                    this.SourceViewModel.ServerSession, this.ModelName, this.SelectedSourceEngineeringModelSetup);
+                TimeInterval = this.TimeInterval * 1000,
+                OperationMode = this.SelectedOperationMode,
+                TestModelSetupName = this.ModelName,
+                TestModelSetup = this.SelectedEngineeringModelSetup,
+                SourceModelSetup = this.SelectedSourceEngineeringModelSetup,
+                ElementName = this.ElementName.Trim(),
+                ElementShortName = this.ElementShortName.Trim().Replace(" ", "_"),
+                DeleteAllElements = this.DeleteAllElements,
+                DeleteModel = this.DeleteModel
+            });
 
-                this.BindEngineeringModels();
+            await this.stressGenerator.GenerateTestObjects();
 
-                this.SelectedEngineeringModelSetup = engineeringModelSetup;
-            }
-
-            await this.stressGenerator.GenerateTestObjects(this.SelectedEngineeringModelSetup);
+            await this.stressGenerator.CleanUpTestObjects();
         }
 
         /// <summary>
@@ -481,9 +476,11 @@ namespace StressGenerator.ViewModels
         /// <summary>
         /// Bind engineering models to the reactive list
         /// </summary>
-        /// <param name="siteDirectory">The <see cref="SiteDirectory"/> top container</param>
-        private void BindSourceEngineeringModels(SiteDirectory siteDirectory)
+        private void BindSourceEngineeringModels()
         {
+            // Retrieve SiteDirectory
+            var siteDirectory = this.SourceViewModel.ServerSession.RetrieveSiteDirectory();
+
             this.SourceEngineeringModelSetupList.Clear();
 
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))

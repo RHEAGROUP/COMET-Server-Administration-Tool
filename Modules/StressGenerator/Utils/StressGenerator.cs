@@ -138,11 +138,10 @@ namespace StressGenerator.Utils
         }
 
         /// <summary>
-        /// Generate test objects in the engineering model with the given short name.
+        /// Generate test objects in the engineering model.
         /// </summary>
-        /// <param name="engineeringModelSetup">The engineering model</param>
         [ExcludeFromCodeCoverage]
-        public async Task GenerateTestObjects(EngineeringModelSetup engineeringModelSetup)
+        public async Task GenerateTestObjects()
         {
             if (this.configuration == null)
             {
@@ -152,16 +151,24 @@ namespace StressGenerator.Utils
 
             var session = this.configuration.Session;
 
-            // Open session and retrieve SiteDirectory
-            if (session.RetrieveSiteDirectory() == null)
+            if (this.configuration.OperationMode == SupportedOperationModes.Create)
             {
-                await session.Open();
-                session.RetrieveSiteDirectory();
+                // Generate and write EngineeringModelSetup
+                var engineeringModelSetup = await EngineeringModelSetupGenerator.Create(
+                    session, this.configuration.TestModelSetupName, this.configuration.SourceModelSetup);
+
+                await session.Refresh();
+
+                this.configuration.TestModelSetup = session.Assembler.Cache.Select(x => x.Value).
+                    Select(lazy => lazy.Value).OfType<EngineeringModelSetup>().SingleOrDefault(em => em.Iid == engineeringModelSetup?.Iid);
             }
 
-            // Read latest iteration
-            await session.Refresh();
-            var iteration = await ReadIteration(engineeringModelSetup);
+            if (this.configuration.TestModelSetup == null)
+            {
+                return;
+            }
+
+            var iteration = await this.ReadIteration(this.configuration.TestModelSetup);
 
             if (iteration == null)
             {
@@ -171,11 +178,34 @@ namespace StressGenerator.Utils
             // Generate and write ElementDefinition list
             var generatedElementsList = await this.GenerateAndWriteElementDefinitions(iteration);
 
-            // Refresh session
             await session.Refresh();
 
             // Generate and write ParameterValueSets
-            await GenerateAndWriteParameterValueSets(generatedElementsList);
+            await this.GenerateAndWriteParameterValueSets(generatedElementsList);
+
+            await session.Refresh();
+        }
+
+        /// <summary>
+        /// Cleanup test objects.
+        /// </summary>
+        /// <returns></returns>
+        public async Task CleanUpTestObjects()
+        {
+            var session = this.configuration.Session;
+
+            if (this.configuration.TestModelSetup == null)
+            {
+                this.NotifyMessage("EngineeringModelSetup test model is not initialized.", LogVerbosity.Error);
+                return;
+            }
+
+            if (this.configuration.DeleteModel)
+            {
+                await EngineeringModelSetupGenerator.Delete(session, this.configuration.TestModelSetup);
+
+                await session.Refresh();
+            }
 
             // Close session
             await session.Close();
@@ -200,7 +230,7 @@ namespace StressGenerator.Utils
 
                 iteration = await IterationGenerator.Create(this.configuration.Session, engineeringModelSetup);
 
-                this.NotifyMessage($"Successfully loaded EngineeringModel {engineeringModelSetup.ShortName} (Iteration {iteration.IterationSetup.IterationNumber}).");
+                this.NotifyMessage($"Successfully loaded EngineeringModel {engineeringModelSetup.ShortName} (Iteration {iteration.IterationSetup?.IterationNumber}).");
             }
             catch (Exception ex)
             {
@@ -430,7 +460,5 @@ namespace StressGenerator.Utils
                 this.NotifyMessage($"Cannot update ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName}). Exception: {ex.Message}");
             }
         }
-
-
     }
 }

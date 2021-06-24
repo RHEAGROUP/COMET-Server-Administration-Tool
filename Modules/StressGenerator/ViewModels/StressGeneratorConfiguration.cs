@@ -89,7 +89,7 @@ namespace StressGenerator.ViewModels
         /// <summary>
         /// Back-tier field of the <see cref="TestObjectsNumber"/>
         /// </summary>
-        private int testObjectsNumber;
+        private int testObjectsNumber = MinNumberOfTestObjects;
 
         /// <summary>
         /// Gets or sets the number of the test objects to be generated

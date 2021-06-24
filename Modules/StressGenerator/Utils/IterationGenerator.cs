@@ -58,9 +58,10 @@ namespace StressGenerator.Utils
                 .Single(iterationSetup => !iterationSetup.IsDeleted && iterationSetup.FrozenOn == null);
 
             var lastIteration = new Iteration(
-                lastIterationSetup.IterationIid,
-                session.Assembler.Cache,
-                session.Credentials.Uri) {IterationSetup = lastIterationSetup};
+                    lastIterationSetup.IterationIid,
+                    session.Assembler.Cache,
+                    session.Credentials.Uri);
+
             model.Iteration.Add(lastIteration);
 
             await session.Read(lastIteration, session.ActivePerson.DefaultDomain);

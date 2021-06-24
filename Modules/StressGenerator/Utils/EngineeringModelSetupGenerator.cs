@@ -41,9 +41,15 @@ namespace StressGenerator.Utils
         /// <summary>
         /// Create a new instance of <see cref="Iteration" />
         /// </summary>
-        /// <param name="session">Server session <see cref="ISession"/></param>
-        /// <param name="modelName">EngineeringModelSetup name</param>
-        /// <param name="sourceEngineeringModelSetup">The source EngineeringModelSetup <see cref="EngineeringModelSetup"/></param>
+        /// <param name="session">
+        /// Server session <see cref="ISession"/>
+        /// </param>
+        /// <param name="modelName">
+        /// EngineeringModelSetup name
+        /// </param>
+        /// <param name="sourceEngineeringModelSetup">
+        /// The source EngineeringModelSetup <see cref="EngineeringModelSetup"/>
+        /// </param>
         /// <returns>An instance of <see cref="EngineeringModelSetup"/></returns>
         public static async Task<EngineeringModelSetup> Create(
             ISession session,
@@ -51,47 +57,34 @@ namespace StressGenerator.Utils
             EngineeringModelSetup sourceEngineeringModelSetup = null)
         {
             var siteDirectory = session.RetrieveSiteDirectory();
-            var siteDirectoryCloned = siteDirectory.Clone(true);
-
-            var participant = new Participant(Guid.NewGuid(), session.Assembler.Cache, session.Credentials.Uri) { Person = siteDirectory.Person.FirstOrDefault() };
-            participant.Domain.Add(siteDirectory.Person.FirstOrDefault()?.DefaultDomain);
-
-            var iterationSetup = new IterationSetup(Guid.NewGuid(), session.Assembler.Cache, session.Credentials.Uri)
-            {
-                Description = "Iteration_1"
-            };
-
-            var iteration = new Iteration(Guid.NewGuid(), session.Assembler.Cache, session.Credentials.Uri)
-            {
-                IterationSetup = iterationSetup
-            };
-            iterationSetup.IterationIid = iteration.Iid;
-
-            var engineeringModel = new EngineeringModel(Guid.NewGuid(), session.Assembler.Cache, session.Credentials.Uri);
-            engineeringModel.Iteration.Add(iteration);
-
-            var modelReferenceDataLibrary =
-                new ModelReferenceDataLibrary(Guid.NewGuid(), session.Assembler.Cache, session.Credentials.Uri)
-                {
-                    Name = $"ModelReferenceDataLibrary_{modelName}",
-                    ShortName = $"ModelReferenceDataLibrary_{modelName}",
-                    RequiredRdl = siteDirectory.SiteReferenceDataLibrary.FirstOrDefault()
-                };
+            var siteDirectoryCloned = siteDirectory.Clone(false);
 
             var engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), session.Assembler.Cache, session.Credentials.Uri)
             {
-                EngineeringModelIid = engineeringModel.Iid,
                 Name = modelName,
-                ShortName = modelName
+                ShortName = modelName,
+                EngineeringModelIid = Guid.NewGuid(),
             };
-            engineeringModel.EngineeringModelSetup = engineeringModelSetup;
-            engineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
-            engineeringModelSetup.IterationSetup.Add(iterationSetup);
-            engineeringModelSetup.Participant.Add(participant);
+
+            if (sourceEngineeringModelSetup == null)
+            {
+                var modelReferenceDataLibrary =
+                    new ModelReferenceDataLibrary(Guid.NewGuid(), session.Assembler.Cache, session.Credentials.Uri)
+                    {
+                        Name = $"{modelName} MODEL RDL",
+                        ShortName = $"{modelName} MRDL",
+                        RequiredRdl = siteDirectory.SiteReferenceDataLibrary.FirstOrDefault()
+                    };
+                engineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
+            }
+            else
+            {
+                engineeringModelSetup.SourceEngineeringModelSetupIid = sourceEngineeringModelSetup.Iid;
+            }
 
             siteDirectoryCloned.Model.Add(engineeringModelSetup);
 
-            await WriteEngineeringModelSetup(session, engineeringModelSetup, siteDirectory, siteDirectoryCloned);
+            engineeringModelSetup = await Write(session, engineeringModelSetup, siteDirectory, siteDirectoryCloned);
 
             return engineeringModelSetup;
         }
@@ -112,7 +105,7 @@ namespace StressGenerator.Utils
         /// Cloned site directory used for creating write transaction <see cref="SiteDirectory"/>
         /// </param>
         /// <returns></returns>
-        private static async Task WriteEngineeringModelSetup(
+        private static async Task<EngineeringModelSetup> Write(
             ISession session,
             EngineeringModelSetup engineeringModelSetup,
             SiteDirectory siteDirectory,
@@ -126,8 +119,12 @@ namespace StressGenerator.Utils
                 operationContainer.AddOperation(new Operation(siteDirectory.ToDto(), siteDirectoryCloned.ToDto(), OperationKind.Update));
                 operationContainer.AddOperation(new Operation(null, engineeringModelSetup.ToDto(),
                     OperationKind.Create));
-                operationContainer.AddOperation(new Operation(null, engineeringModelSetup.RequiredRdl.FirstOrDefault()?.ToDto(),
-                    OperationKind.Create));
+
+                if (engineeringModelSetup.RequiredRdl.Count != 0)
+                {
+                    operationContainer.AddOperation(new Operation(null, engineeringModelSetup.RequiredRdl.FirstOrDefault()?.ToDto(),
+                        OperationKind.Create));
+                }
 
                 await session.Dal.Write(operationContainer);
 
@@ -136,6 +133,40 @@ namespace StressGenerator.Utils
             catch (Exception ex)
             {
                 //this.NotifyMessage($"Cannot generate EngineeringModelSetup {engineeringModelSetup.Name} ({engineeringModelSetup.ShortName}). Exception: {ex.Message}", StressGenerator.LogVerbosity.Error);
+                engineeringModelSetup = null;
+            }
+
+            return engineeringModelSetup;
+        }
+
+        /// <summary>
+        /// Delete an existing EngineeringModelSetup
+        /// </summary>
+        /// <param name="session">
+        /// Server session <see cref="ISession"/>
+        /// </param>
+        /// <param name="engineeringModelSetup">
+        /// The EngineeringModelSetup <see cref="EngineeringModelSetup"/>
+        /// </param>
+        /// <returns></returns>
+        public static async Task Delete(ISession session, EngineeringModelSetup engineeringModelSetup)
+        {
+            try
+            {
+                var siteDirectory = session.RetrieveSiteDirectory();
+                var siteDirectoryCloned = siteDirectory.Clone(true);
+
+                var transactionContext = TransactionContextResolver.ResolveContext(siteDirectory);
+                var operationContainer = new OperationContainer(transactionContext.ContextRoute());
+
+                operationContainer.AddOperation(new Operation(siteDirectory.ToDto(), siteDirectoryCloned.ToDto(), OperationKind.Update));
+                operationContainer.AddOperation(new Operation(null, engineeringModelSetup.ToDto(),
+                    OperationKind.Delete));
+
+                await session.Dal.Write(operationContainer);
+            }
+            catch (Exception ex)
+            {
             }
         }
     }
