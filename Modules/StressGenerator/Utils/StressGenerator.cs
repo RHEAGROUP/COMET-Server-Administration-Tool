@@ -422,26 +422,11 @@ namespace StressGenerator.Utils
                     OperationKind.Create));
             }
 
-            var actionDescription = $"writing ElementDefinition to server " +
-                                    $"for ElementDefinition \"{elementDefinition.Name} ({elementDefinition.ShortName})\" " +
-                                    $"owned by {elementDefinition.Owner.ShortName}.";
-
-            try
-            {
-                await Policy
-                    .Handle<Exception>()
-                    .Retry(3, (ex, retryCount) =>
-                    {
-                        this.LogOperationResult(false, actionDescription, ex, retryCount);
-                    })
-                    .Execute(async () => await this.configuration.Session.Dal.Write(operationContainer));
-
-                this.LogOperationResult(true, actionDescription);
-            }
-            catch (Exception ex)
-            {
-                this.LogOperationResult(false, actionDescription, ex);
-            }
+            await this.WriteWithRetries(
+                operationContainer,
+                "writing to server ElementDefinition " +
+                $"\"{elementDefinition.Name} ({elementDefinition.ShortName})\" " +
+                $"owned by {elementDefinition.Owner.ShortName}.");
         }
 
         /// <summary>
@@ -470,11 +455,25 @@ namespace StressGenerator.Utils
             var transactionContext = TransactionContextResolver.ResolveContext(valueSetClone);
             var transaction = new ThingTransaction(transactionContext);
             transaction.CreateOrUpdate(valueSetClone);
-            var operationContainer = transaction.FinalizeTransaction();
 
-            var actionDescription = $"writing ParameterValueSet (published value {parameterValue}) to server " +
-                                    $"for Parameter \"{parameter.ParameterType.Name} ({parameter.ParameterType.ShortName})\".";
+            await this.WriteWithRetries(
+                transaction.FinalizeTransaction(),
+                "writing to server ParameterValueSet " +
+                $"(published value {parameterValue}) " +
+                $"for Parameter \"{parameter.ParameterType.Name} ({parameter.ParameterType.ShortName})\".");
+        }
 
+        /// <summary>
+        /// Write the given <paramref name="operationContainer"/> to the server, retrying on failure.
+        /// </summary>
+        /// <param name="operationContainer">
+        /// The given <see cref="OperationContainer"/>.
+        /// </param>
+        /// <param name="actionDescription">
+        /// The description of the action.
+        /// </param>
+        private async Task WriteWithRetries(OperationContainer operationContainer, string actionDescription)
+        {
             try
             {
                 await Policy
