@@ -33,23 +33,18 @@ namespace StressGenerator.Utils
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
-    using CDP4Common.CommonData;
+    using ViewModels;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Dal;
     using CDP4Dal.Operations;
-    using NLog;
-    using ViewModels;
+    using Common.Events;
 
     /// <summary>
     /// The purpose of this class is to assist in the simulation of concurrent multi-user testing
     /// </summary>
     internal class StressGenerator
     {
-        /// <summary>
-        /// The NLog logger
-        /// </summary>
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         /// <summary>
         /// Stress generator configuration
         /// </summary>
@@ -59,29 +54,6 @@ namespace StressGenerator.Utils
         /// The singleton class instance
         /// </summary>
         private static readonly StressGenerator Instance = new StressGenerator();
-
-        // TODO #81 Unify output messages mechanism inside SAT solution
-        /// <summary>
-        /// Log verbosity
-        /// </summary>
-        private enum LogVerbosity
-        {
-            Info,
-            Warn,
-            Debug,
-            Error
-        };
-
-        /// <summary>
-        /// Delegate used for notifying stress generator progress message
-        /// </summary>
-        /// <param name="message">Progress message</param>
-        public delegate void NotifyMessageDelegate(string message);
-
-        /// <summary>
-        /// Associated event with the <see cref="NotifyMessageDelegate"/>
-        /// </summary>
-        public event NotifyMessageDelegate NotifyMessageEvent;
 
         /// <summary>
         /// Gets the singleton class instance
@@ -108,36 +80,6 @@ namespace StressGenerator.Utils
         }
 
         /// <summary>
-        /// Invoke NotifyMessageEvent and optionally log
-        /// </summary>
-        /// <param name="message">Progress message</param>
-        /// <param name="logLevel">Log verbosity level(optional) <see cref="LogVerbosity"/></param>
-        /// <param name="ex">Exception(optional) <see cref="Exception"/></param>
-        private void NotifyMessage(string message, LogVerbosity? logLevel = null, Exception ex = null)
-        {
-            NotifyMessageEvent?.Invoke(message);
-
-            switch (logLevel)
-            {
-                case LogVerbosity.Info:
-                    Logger.Info(message);
-                    break;
-                case LogVerbosity.Warn:
-                    Logger.Warn(message);
-                    break;
-                case LogVerbosity.Debug:
-                    Logger.Debug(message);
-                    break;
-                case LogVerbosity.Error:
-                    Logger.Error(ex?.Message != null ? message + ex.Message : message);
-                    break;
-                default:
-                    Logger.Trace(message);
-                    break;
-            }
-        }
-
-        /// <summary>
         /// Generate test objects in the engineering model.
         /// </summary>
         [ExcludeFromCodeCoverage]
@@ -145,7 +87,12 @@ namespace StressGenerator.Utils
         {
             if (this.configuration == null)
             {
-                this.NotifyMessage("Stress generator configuration is not initialized.", LogVerbosity.Error);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "Stress generator configuration is not initialized.",
+                    Verbosity = LogVerbosity.Error
+                });
+
                 return;
             }
 
@@ -196,7 +143,12 @@ namespace StressGenerator.Utils
 
             if (this.configuration.TestModelSetup == null)
             {
-                this.NotifyMessage("EngineeringModelSetup test model is not initialized.", LogVerbosity.Error);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "EngineeringModelSetup test model is not initialized.",
+                    Verbosity = LogVerbosity.Error
+                });
+
                 return;
             }
 
@@ -226,15 +178,26 @@ namespace StressGenerator.Utils
 
             try
             {
-                this.NotifyMessage($"Loading last iteration from EngineeringModel {engineeringModelSetup.ShortName}...");
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = $"Loading last iteration from EngineeringModel {engineeringModelSetup.ShortName}..."
+                });
 
                 iteration = await IterationGenerator.Create(this.configuration.Session, engineeringModelSetup);
 
-                this.NotifyMessage($"Successfully loaded EngineeringModel {engineeringModelSetup.ShortName} (Iteration {iteration.IterationSetup?.IterationNumber}).");
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = $"Successfully loaded last iteration from EngineeringModel {engineeringModelSetup.ShortName}."
+                });
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                this.NotifyMessage($"Invalid iteration. Engineering model {engineeringModelSetup.ShortName} must contain at least one active iteration. Exception: {ex.Message}", LogVerbosity.Error);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = $"Invalid iteration. Engineering model {engineeringModelSetup.ShortName} must contain at least one active iteration.",
+                    Exception = exception,
+                    Verbosity = LogVerbosity.Error
+                });
 
                 return null;
             }
@@ -244,7 +207,12 @@ namespace StressGenerator.Utils
                 return iteration;
             }
 
-            this.NotifyMessage($"Invalid RDL chain. Engineering model {(iteration.Container as EngineeringModel)?.EngineeringModelSetup.ShortName} must reference Site RDL \"{StressGeneratorConfiguration.GenericRdlShortName}\".", LogVerbosity.Error);
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message =
+                    $"Invalid RDL chain. Engineering model {(iteration.Container as EngineeringModel)?.EngineeringModelSetup.ShortName} must reference Site RDL \"{StressGeneratorConfiguration.GenericRdlShortName}\".",
+                Verbosity = LogVerbosity.Error
+            });
 
             return null;
         }
@@ -260,15 +228,23 @@ namespace StressGenerator.Utils
         {
             if (iteration == null)
             {
-                this.NotifyMessage("Cannot find Iteration that contains generated ElementDefinition list.",
-                    LogVerbosity.Error);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "Cannot find Iteration that contains generated ElementDefinition list.",
+                    Verbosity = LogVerbosity.Error
+                });
+
                 return null;
             }
 
             if (this.configuration.Session.OpenIterations == null)
             {
-                this.NotifyMessage("This session does not contains open Iterations.",
-                    LogVerbosity.Error);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "This session does not contains open Iterations.",
+                    Verbosity = LogVerbosity.Error
+                });
+
                 return null;
             }
 
@@ -322,7 +298,12 @@ namespace StressGenerator.Utils
         {
             if (generatedElementsList == null)
             {
-                this.NotifyMessage("Generated ElementDefinition list is empty.", LogVerbosity.Error);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "Generated ElementDefinition list is empty.",
+                    Verbosity = LogVerbosity.Error
+                });
+
                 return;
             }
 
@@ -331,8 +312,12 @@ namespace StressGenerator.Utils
 
             if (generatedIteration == null)
             {
-                this.NotifyMessage("Cannot find Iteration that contains generated ElementDefinition list.",
-                    LogVerbosity.Error);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "Cannot find Iteration that contains generated ElementDefinition list.",
+                    Verbosity = LogVerbosity.Error
+                });
+
                 return;
             }
 
@@ -345,8 +330,10 @@ namespace StressGenerator.Utils
                     continue;
                 }
 
-                this.NotifyMessage($"Generating ParameterValueSet for {generatedIteration.Element[index].Name} ({generatedIteration.Element[index].ShortName}).",
-                    LogVerbosity.Info);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = $"Generating ParameterValueSet for {generatedIteration.Element[index].Name} ({generatedIteration.Element[index].ShortName})."
+                });
 
                 foreach (var parameter in elementDefinition.Parameter)
                 {
@@ -417,24 +404,34 @@ namespace StressGenerator.Utils
 
                 await this.configuration.Session.Dal.Write(operationContainer);
 
-                this.NotifyMessage($"Successfully generated ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName}).", LogVerbosity.Info);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message =
+                        $"Successfully generated ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName})."
+                });
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                this.NotifyMessage($"Cannot generate ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName}). Exception: {ex.Message}", LogVerbosity.Error);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message =
+                        $"Cannot generate ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName}).",
+                    Exception = exception,
+                    Verbosity = LogVerbosity.Error
+                });
             }
         }
 
         /// <summary>
         /// Write parameters value sets
         /// </summary>
-        /// <param name="parameter">The parameter whose values will be written <see cref="Parameter"/></param>
+        /// <param name="parameter">The parameter whose values will be written <see cref="ParameterBase"/></param>
         /// <param name="elementIndex">The element definition index(used to see different parameter values)</param>
         /// <returns>
         /// The <see cref="Task"/>
         /// </returns>
         [ExcludeFromCodeCoverage]
-        private async Task WriteParametersValueSets(Parameter parameter, int elementIndex)
+        private async Task WriteParametersValueSets(ParameterBase parameter, int elementIndex)
         {
             var valueConfigPair =
                 StressGeneratorConfiguration.ParamValueConfig.FirstOrDefault(pvc =>
@@ -453,11 +450,21 @@ namespace StressGenerator.Utils
                 var operationContainer = transaction.FinalizeTransaction();
                 await this.configuration.Session.Write(operationContainer);
 
-                this.NotifyMessage($"Successfully generated ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName}).");
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message =
+                        $"Successfully generated ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName})."
+                });
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                this.NotifyMessage($"Cannot update ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName}). Exception: {ex.Message}");
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message =
+                        $"Cannot update ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName})",
+                    Exception = exception,
+                    Verbosity = LogVerbosity.Error
+                });
             }
         }
     }
