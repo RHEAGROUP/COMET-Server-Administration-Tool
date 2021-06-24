@@ -45,6 +45,11 @@ namespace Migration.ViewModels
     public class FixCardinalityErrorsDialogViewModel : ReactiveObject, IFixCardinalityErrorsDialogViewModel
     {
         /// <summary>
+        /// The default <see cref="IValueSet"/> value.
+        /// </summary>
+        private static readonly string DefaultValueSetValue = "-";
+
+        /// <summary>
         /// The migration source <see cref="ISession" />
         /// </summary>
         private readonly ISession migrationSourceSession;
@@ -118,7 +123,7 @@ namespace Migration.ViewModels
         {
             this.migrationSourceSession = migrationSourceSession;
 
-            this.Errors = new ReactiveList<PocoErrorRowViewModel> {ChangeTrackingEnabled = true};
+            this.Errors = new ReactiveList<PocoErrorRowViewModel> { ChangeTrackingEnabled = true };
 
             this.IsBusy = false;
 
@@ -176,7 +181,7 @@ namespace Migration.ViewModels
 
             CDPMessageBus.Current.SendMessage(new LogEvent { Message = "Fixing the cardinality errors for the selected models..." });
 
-            // these should be traversed in bottom-up containment order, but for now reverse also works
+            // these should be traversed in bottom-up containment order (?), but for now reverse also works
             foreach (var rowError in this.Errors.OrderBy(e => e.Thing.ClassKind.ToString()).Reverse())
             {
                 FixNameAndShortName(rowError);
@@ -195,6 +200,15 @@ namespace Migration.ViewModels
             CDPMessageBus.Current.SendMessage(this.Errors.Count == 0
                 ? new LogEvent { Message = "The cardinality errors have been successfully fixed" }
                 : new LogEvent { Message = "The cardinality errors have not been fixed" });
+
+            // log not fixed errors
+            foreach (var rowError in this.errors)
+            {
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = $"Could not fix POCO error: {Environment.NewLine}{rowError}"
+                });
+            }
 
             this.IsBusy = false;
         }
@@ -259,24 +273,29 @@ namespace Migration.ViewModels
                     }
                     break;
                 case Parameter parameter:
-                    FixValueSets(parameter);
+                    FixValueSetsCount(parameter);
                     break;
                 case ParameterValueSet parameterValueSet:
-                    parameterValueSet.Manual = FixValueArray(parameterValueSet.Manual, parameterValueSet);
-                    parameterValueSet.Formula = FixValueArray(parameterValueSet.Formula, parameterValueSet);
-                    parameterValueSet.Published = FixValueArray(parameterValueSet.Published, parameterValueSet);
-                    parameterValueSet.Reference = FixValueArray(parameterValueSet.Reference, parameterValueSet);
+                    parameterValueSet.Computed = FixValueArray(parameterValueSet, parameterValueSet.Computed);
+                    parameterValueSet.Formula = FixValueArray(parameterValueSet, parameterValueSet.Formula);
+                    parameterValueSet.Manual = FixValueArray(parameterValueSet, parameterValueSet.Manual);
+                    parameterValueSet.Published = FixValueArray(parameterValueSet, parameterValueSet.Published);
+                    parameterValueSet.Reference = FixValueArray(parameterValueSet, parameterValueSet.Reference);
+                    break;
+                case ParameterSubscription parameterSubscription:
+                    FixValueSetsCount(parameterSubscription);
                     break;
             }
         }
 
         /// <summary>
-        /// Generate a new <see cref="Dictionary{TKey,TValue}"/> with the correct values, for each option and state
+        /// Ensure only exactly one <see cref="ParameterValueSet"/> exists
+        /// for each <see cref="Option"/> and <see cref="ActualFiniteState"/>.
         /// </summary>
         /// <param name="parameter">
-        /// See <see cref="Parameter"/>
+        /// The containing <see cref="Parameter"/>.
         /// </param>
-        private static void FixValueSets(Parameter parameter)
+        private static void FixValueSetsCount(Parameter parameter)
         {
             var valueSets = new Dictionary<string, Dictionary<string, List<ParameterValueSet>>>();
 
@@ -298,11 +317,11 @@ namespace Migration.ViewModels
                 valueSets[optionIid][stateIid].Add(valueSet);
             }
 
-            // no better way to determine which of the ValueSets to keep
             foreach (var dictionary in valueSets.Values)
             {
                 foreach (var list in dictionary.Values)
                 {
+                    // no better way to determine which of the ValueSets to keep, so we keep the first one
                     for (var i = 1; i < list.Count; ++i)
                     {
                         parameter.ValueSet.Remove(list[i]);
@@ -312,19 +331,125 @@ namespace Migration.ViewModels
         }
 
         /// <summary>
+        /// Ensure only exactly one <see cref="ParameterSubscriptionValueSet"/> exists
+        /// for each <see cref="Option"/> and <see cref="ActualFiniteState"/>.
+        /// NOTE: Duplicate code needed because <see cref="ParameterSubscriptionValueSet"/> is not 
+        /// a subclass of <see cref="ParameterValueSetBase"/>.
+        /// </summary>
+        /// <param name="parameterSubscription">
+        /// The containing <see cref="ParameterSubscription"/>.
+        /// </param>
+        private static void FixValueSetsCount(ParameterSubscription parameterSubscription)
+        {
+            var valueSets = new Dictionary<string, Dictionary<string, List<ParameterSubscriptionValueSet>>>();
+
+            foreach (var valueSet in parameterSubscription.ValueSet)
+            {
+                var optionIid = valueSet.ActualOption?.Iid.ToString() ?? "";
+                var stateIid = valueSet.ActualState?.Iid.ToString() ?? "";
+
+                if (!valueSets.ContainsKey(optionIid))
+                {
+                    valueSets[optionIid] = new Dictionary<string, List<ParameterSubscriptionValueSet>>();
+                }
+
+                if (!valueSets[optionIid].ContainsKey(stateIid))
+                {
+                    valueSets[optionIid][stateIid] = new List<ParameterSubscriptionValueSet>();
+                }
+
+                valueSets[optionIid][stateIid].Add(valueSet);
+            }
+
+            foreach (var dictionary in valueSets.Values)
+            {
+                foreach (var list in dictionary.Values)
+                {
+                    // no better way to determine which of the ValueSets to keep, so we keep the first one
+                    for (var i = 1; i < list.Count; ++i)
+                    {
+                        parameterSubscription.ValueSet.Remove(list[i]);
+                    }
+                }
+            }
+
+            AddMissingValueSets(parameterSubscription);
+        }
+
+        /// <summary>
+        /// Adds <see cref="ParameterSubscriptionValueSet"/>s for the missing combinations of
+        /// <see cref="Option"/> and <see cref="ActualFiniteState"/>.
+        /// </summary>
+        /// <param name="parameterSubscription">
+        /// The containing <see cref="ParameterSubscription"/>.
+        /// </param>
+        private static void AddMissingValueSets(ParameterSubscription parameterSubscription)
+        {
+            var parameterOrOverrideBase = parameterSubscription.Container as ParameterOrOverrideBase;
+            ElementDefinition elementDefinition = null;
+
+            switch (parameterOrOverrideBase)
+            {
+                case Parameter parameter:
+                    elementDefinition = parameter.Container as ElementDefinition;
+                    break;
+                case ParameterOverride parameterOverride:
+                    elementDefinition = parameterOverride.Container.Container as ElementDefinition;
+                    break;
+                default:
+                    // this will never happen as long as 10-25 spec doesn't change the ParameterOrOverrideBase concept
+                    CDPMessageBus.Current.SendMessage(new LogEvent
+                    {
+                        Message = $"ParameterOrOverrideBase is neither a Parameter nor a ParameterOverride: " +
+                                  $"{PocoErrorRowViewModel.GetPath(parameterOrOverrideBase)}"
+                    });
+                    return;
+            }
+
+            var iteration = elementDefinition.Container as Iteration;
+
+            // Select needed because OrderedItemList iterates to object
+            var options = parameterSubscription.IsOptionDependent
+                ? iteration.Option.Select(x => x)
+                : new List<Option> { null };
+
+            var actualFiniteStates = parameterSubscription.StateDependence != null
+                ? parameterSubscription.StateDependence.ActualState
+                : new List<ActualFiniteState> { null };
+
+            foreach (var option in options)
+            {
+                foreach (var actualFiniteState in actualFiniteStates)
+                {
+                    try
+                    {
+                        parameterSubscription.QueryParameterBaseValueSet(option, actualFiniteState);
+                    }
+                    catch
+                    {
+                        parameterSubscription.ValueSet.Add(new ParameterSubscriptionValueSet
+                        {
+                            SubscribedValueSet = parameterOrOverrideBase.QueryParameterBaseValueSet(option, actualFiniteState) as ParameterValueSetBase
+                        });
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Generate a new <see cref="ValueArray{T}"/> with the correct number of values, containing the values
         /// in <paramref name="oldValues"/>.
         /// </summary>
-        /// <param name="oldValues">
-        /// The values in the old <see cref="ValueArray{T}"/>.
-        /// </param>
         /// <param name="parameterValueSet">
         /// The containing <see cref="ParameterValueSet"/>.
+        /// </param>
+        /// <param name="oldValues">
+        /// The values in the old <see cref="ValueArray{T}"/>.
         /// </param>
         /// <returns>
         /// The new <see cref="ValueArray{T}"/>.
         /// </returns>
-        private static ValueArray<string> FixValueArray(ValueArray<string> oldValues, ParameterValueSet parameterValueSet)
+        private static ValueArray<string> FixValueArray(ParameterValueSet parameterValueSet, ValueArray<string> oldValues)
         {
             var newValues = new List<string>();
 
@@ -335,7 +460,7 @@ namespace Migration.ViewModels
 
             for (var i = newValues.Count; i < parameterValueSet.QueryParameterType().NumberOfValues; ++i)
             {
-                newValues.Add("-");
+                newValues.Add(DefaultValueSetValue);
             }
 
             return new ValueArray<string>(newValues, parameterValueSet);

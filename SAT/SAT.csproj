@@ -14,8 +14,10 @@
     <Company>RHEA System S.A</Company>
     <Description>The CDP4 Server Administration Tool</Description>
     <Copyright>Copyright © RHEA System S.A</Copyright>
-    <AssemblyVersion>1.2.0.0</AssemblyVersion>
-    <FileVersion>1.2.0.0</FileVersion>
+    <AssemblyVersion>1.4.2.0</AssemblyVersion>
+    <FileVersion>1.4.2.0</FileVersion>
+    <Version>1.4.2</Version>
+    <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -51,8 +53,6 @@
     <PackageReference Include="DotNetZip" Version="1.13.8" />
     <PackageReference Include="ExceptionReporter" Version="2.1.2" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
-    <PackageReference Include="Microsoft.Bcl" Version="1.1.10" />
-    <PackageReference Include="Microsoft.Bcl.Build" Version="1.0.21" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NLog" Version="4.6.8" />
     <PackageReference Include="reactiveui-core.Net40" Version="6.5.0" />
