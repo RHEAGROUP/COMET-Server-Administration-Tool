@@ -55,7 +55,7 @@ namespace StressGenerator.Utils
         /// <summary>
         /// The maximum retry count for a write operation.
         /// </summary>
-        private static readonly int MaxRetryCount = 3;
+        private const int MaxRetryCount = 3;
 
         /// <summary>
         /// Stress generator configuration
