@@ -90,7 +90,8 @@ namespace StressGenerator.Utils
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
                     Message = "Stress generator configuration is not initialized.",
-                    Verbosity = LogVerbosity.Error
+                    Verbosity = LogVerbosity.Error,
+                    Type = typeof(StressGeneratorViewModel)
                 });
 
                 return;
@@ -146,7 +147,8 @@ namespace StressGenerator.Utils
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
                     Message = "EngineeringModelSetup test model is not initialized.",
-                    Verbosity = LogVerbosity.Error
+                    Verbosity = LogVerbosity.Error,
+                    Type = typeof(StressGeneratorViewModel)
                 });
 
                 return;
@@ -180,14 +182,16 @@ namespace StressGenerator.Utils
             {
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
-                    Message = $"Loading last iteration from EngineeringModel {engineeringModelSetup.ShortName}..."
+                    Message = $"Loading last iteration from EngineeringModel {engineeringModelSetup.ShortName}...",
+                    Type = typeof(StressGeneratorViewModel)
                 });
 
                 iteration = await IterationGenerator.Create(this.configuration.Session, engineeringModelSetup);
 
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
-                    Message = $"Successfully loaded last iteration from EngineeringModel {engineeringModelSetup.ShortName}."
+                    Message = $"Successfully loaded last iteration from EngineeringModel {engineeringModelSetup.ShortName}.",
+                    Type = typeof(StressGeneratorViewModel)
                 });
             }
             catch (Exception exception)
@@ -196,7 +200,8 @@ namespace StressGenerator.Utils
                 {
                     Message = $"Invalid iteration. Engineering model {engineeringModelSetup.ShortName} must contain at least one active iteration.",
                     Exception = exception,
-                    Verbosity = LogVerbosity.Error
+                    Verbosity = LogVerbosity.Error,
+                    Type = typeof(StressGeneratorViewModel)
                 });
 
                 return null;
@@ -211,7 +216,8 @@ namespace StressGenerator.Utils
             {
                 Message =
                     $"Invalid RDL chain. Engineering model {(iteration.Container as EngineeringModel)?.EngineeringModelSetup.ShortName} must reference Site RDL \"{StressGeneratorConfiguration.GenericRdlShortName}\".",
-                Verbosity = LogVerbosity.Error
+                Verbosity = LogVerbosity.Error,
+                Type = typeof(StressGeneratorViewModel)
             });
 
             return null;
@@ -231,7 +237,8 @@ namespace StressGenerator.Utils
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
                     Message = "Cannot find Iteration that contains generated ElementDefinition list.",
-                    Verbosity = LogVerbosity.Error
+                    Verbosity = LogVerbosity.Error,
+                    Type = typeof(StressGeneratorViewModel)
                 });
 
                 return null;
@@ -242,7 +249,8 @@ namespace StressGenerator.Utils
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
                     Message = "This session does not contains open Iterations.",
-                    Verbosity = LogVerbosity.Error
+                    Verbosity = LogVerbosity.Error,
+                    Type = typeof(StressGeneratorViewModel)
                 });
 
                 return null;
@@ -301,7 +309,8 @@ namespace StressGenerator.Utils
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
                     Message = "Generated ElementDefinition list is empty.",
-                    Verbosity = LogVerbosity.Error
+                    Verbosity = LogVerbosity.Error,
+                    Type = typeof(StressGeneratorViewModel)
                 });
 
                 return;
@@ -315,7 +324,8 @@ namespace StressGenerator.Utils
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
                     Message = "Cannot find Iteration that contains generated ElementDefinition list.",
-                    Verbosity = LogVerbosity.Error
+                    Verbosity = LogVerbosity.Error,
+                    Type = typeof(StressGeneratorViewModel)
                 });
 
                 return;
@@ -332,7 +342,8 @@ namespace StressGenerator.Utils
 
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
-                    Message = $"Generating ParameterValueSet for {generatedIteration.Element[index].Name} ({generatedIteration.Element[index].ShortName})."
+                    Message = $"Generating ParameterValueSet for {generatedIteration.Element[index].Name} ({generatedIteration.Element[index].ShortName}).",
+                    Type = typeof(StressGeneratorViewModel)
                 });
 
                 foreach (var parameter in elementDefinition.Parameter)
@@ -407,7 +418,8 @@ namespace StressGenerator.Utils
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
                     Message =
-                        $"Successfully generated ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName})."
+                        $"Successfully generated ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName}).",
+                    Type = typeof(StressGeneratorViewModel)
                 });
             }
             catch (Exception exception)
@@ -417,7 +429,8 @@ namespace StressGenerator.Utils
                     Message =
                         $"Cannot generate ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName}).",
                     Exception = exception,
-                    Verbosity = LogVerbosity.Error
+                    Verbosity = LogVerbosity.Error,
+                    Type = typeof(StressGeneratorViewModel)
                 });
             }
         }
@@ -453,7 +466,8 @@ namespace StressGenerator.Utils
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
                     Message =
-                        $"Successfully generated ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName})."
+                        $"Successfully generated ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName}).",
+                    Type = typeof(StressGeneratorViewModel)
                 });
             }
             catch (Exception exception)
@@ -463,7 +477,8 @@ namespace StressGenerator.Utils
                     Message =
                         $"Cannot update ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName})",
                     Exception = exception,
-                    Verbosity = LogVerbosity.Error
+                    Verbosity = LogVerbosity.Error,
+                    Type = typeof(StressGeneratorViewModel)
                 });
             }
         }

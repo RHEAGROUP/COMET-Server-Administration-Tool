@@ -51,13 +51,8 @@ namespace StressGenerator.ViewModels
     /// <summary>
     /// The view-model for the StressGenerator tool
     /// </summary>
-    public class StressGeneratorViewModel : ReactiveObject
+    public class StressGeneratorViewModel : BaseModuleViewModel
     {
-        /// <summary>
-        /// The NLog logger
-        /// </summary>
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         /// <summary>
         /// The <see cref="StressGenerator"/> used to build the helper sync classes
         /// </summary>
@@ -239,20 +234,6 @@ namespace StressGenerator.ViewModels
         }
 
         /// <summary>
-        /// Backing field for the the <see cref="Output"/> messages property
-        /// </summary>
-        private string output;
-
-        /// <summary>
-        /// Gets or sets operation output messages
-        /// </summary>
-        public string Output
-        {
-            get => this.output;
-            set => this.RaiseAndSetIfChanged(ref this.output, value);
-        }
-
-        /// <summary>
         /// Out property for the <see cref="CanStress"/> property
         /// </summary>
         private ObservableAsPropertyHelper<bool> canStress;
@@ -351,8 +332,10 @@ namespace StressGenerator.ViewModels
         /// <summary>
         /// Add subscription to the login view models
         /// </summary>
-        private void AddSubscriptions()
+        public override void AddSubscriptions()
         {
+            base.AddSubscriptions();
+
             this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(_ => {
                 OperationMessageHandler(this.SourceViewModel.Output);
             });
@@ -417,36 +400,15 @@ namespace StressGenerator.ViewModels
                 canExecuteStress,
                 _ => this.ExecuteStressCommand(),
                 RxApp.MainThreadScheduler);
-
-            CDPMessageBus.Current.Listen<LogEvent>().Subscribe(operationEvent => {
-                var message = operationEvent.Message;
-                var exception = operationEvent.Exception;
-                var logLevel = operationEvent.Verbosity;
-
-                if (operationEvent.Exception != null)
-                {
-                    message += $"\n\tException: {exception.Message}";
-
-                    if (exception.InnerException != null)
-                    {
-                        message += $"\n\tInner exception: {exception.InnerException.Message}";
-                        message += $"\n{exception.InnerException.StackTrace}";
-                    }
-                    else
-                    {
-                        message += $"\n{exception.StackTrace}";
-                    }
-                }
-
-                this.OperationMessageHandler(message, logLevel);
-            });
         }
 
         /// <summary>
         /// Set properties
         /// </summary>
-        private void SetProperties()
+        public override void SetProperties()
         {
+            base.SetProperties();
+
             this.TimeInterval = StressGeneratorConfiguration.MinTimeInterval;
             this.TestObjectsNumber = StressGeneratorConfiguration.MinNumberOfTestObjects;
             this.ElementName = StressGeneratorConfiguration.GenericElementName;
@@ -513,38 +475,6 @@ namespace StressGenerator.ViewModels
             foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
             {
                 this.SourceEngineeringModelSetupList.Add(modelSetup);
-            }
-        }
-
-        // TODO #81 Unify output messages mechanism inside SAT solution
-        /// <summary>
-        /// Add text message to the output panel
-        /// </summary>
-        /// <param name="message">The text message</param>
-        /// <param name="logLevel"></param>
-        private void OperationMessageHandler(string message, LogVerbosity? logLevel = null)
-        {
-            if (string.IsNullOrEmpty(message)) return;
-
-            this.Output += $"{DateTime.Now:HH:mm:ss} {message}{Environment.NewLine}";
-
-            switch (logLevel)
-            {
-                case LogVerbosity.Info:
-                    Logger.Info(message);
-                    break;
-                case LogVerbosity.Warn:
-                    Logger.Warn(message);
-                    break;
-                case LogVerbosity.Debug:
-                    Logger.Debug(message);
-                    break;
-                case LogVerbosity.Error:
-                    Logger.Error(message);
-                    break;
-                default:
-                    Logger.Trace(message);
-                    break;
             }
         }
     }

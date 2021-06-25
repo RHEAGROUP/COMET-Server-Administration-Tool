@@ -56,5 +56,10 @@ namespace Common.Events
         /// Exception that will be logged <see cref="Exception"/>
         /// </summary>
         public Exception Exception { get; set; }
+
+        /// <summary>
+        /// Exception that will be logged <see cref="Exception"/>
+        /// </summary>
+        public Type Type { get; set; }
     }
 }

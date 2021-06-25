@@ -49,7 +49,7 @@ namespace Migration.Behaviors
 
             currentDataContext.SourceViewModel = AssociatedObject.LoginSource.DataContext as LoginViewModel;
             currentDataContext.TargetViewModel = AssociatedObject.LoginTarget.DataContext as LoginViewModel;
-            currentDataContext.AddSubscriptions();
+            //currentDataContext.AddSubscriptions();
         }
 
         /// <summary>
