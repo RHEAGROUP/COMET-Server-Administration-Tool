@@ -48,24 +48,32 @@ namespace StressGenerator.Utils
     internal class StressGenerator
     {
         /// <summary>
-        /// The NLog logger
-        /// </summary>
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
-        /// <summary>
         /// The maximum retry count for a write operation.
         /// </summary>
         private const int MaxRetryCount = 3;
 
         /// <summary>
-        /// Stress generator configuration
-        /// </summary>
-        private StressGeneratorConfiguration configuration;
-
-        /// <summary>
         /// The singleton class instance
         /// </summary>
         private static readonly StressGenerator Instance = new StressGenerator();
+
+        /// <summary>
+        /// Gets the singleton class instance
+        /// </summary>
+        /// <returns>
+        /// The singleton class instance
+        /// </returns>
+        internal static StressGenerator GetInstance() => Instance;
+
+        /// <summary>
+        /// The NLog logger
+        /// </summary>
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
+        /// Stress generator configuration
+        /// </summary>
+        private StressGeneratorConfiguration configuration;
 
         // TODO #81 Unify output messages mechanism inside SAT solution
         /// <summary>
@@ -89,14 +97,6 @@ namespace StressGenerator.Utils
         /// Associated event with the <see cref="NotifyMessageDelegate"/>
         /// </summary>
         public event NotifyMessageDelegate NotifyMessageEvent;
-
-        /// <summary>
-        /// Gets the singleton class instance
-        /// </summary>
-        /// <returns>
-        /// The singleton class instance
-        /// </returns>
-        internal static StressGenerator GetInstance() => Instance;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StressGenerator"/> class
