@@ -322,14 +322,14 @@ namespace StressGenerator.ViewModels
         }
 
         /// <summary>
-        /// Backing field for the <see cref="ModelName"/> property
+        /// Backing field for the <see cref="NewModelName"/> property
         /// </summary>
-        private string modelName;
+        private string newModelName;
 
-        public string ModelName
+        public string NewModelName
         {
-            get => this.modelName;
-            set => this.RaiseAndSetIfChanged(ref this.modelName, value);
+            get => this.newModelName;
+            set => this.RaiseAndSetIfChanged(ref this.newModelName, value);
         }
 
         /// <summary>
@@ -350,14 +350,15 @@ namespace StressGenerator.ViewModels
                 vm => vm.ElementName,
                 vm => vm.ElementShortName,
                 vm => vm.SelectedEngineeringModelSetup,
-                (sourceLoggedIn, interval, objectsNumber, name, shortName, modelSetup) =>
+                vm => vm.NewModelName,
+                (sourceLoggedIn, interval, objectsNumber, name, shortName, modelSetup, modelName) =>
                     sourceLoggedIn &&
                     interval >= StressGeneratorConfiguration.MinTimeInterval &&
                     objectsNumber >= StressGeneratorConfiguration.MinNumberOfTestObjects &&
                     objectsNumber <= StressGeneratorConfiguration.MaxNumberOfTestObjects &&
                     !string.IsNullOrEmpty(name) &&
-                    !string.IsNullOrEmpty(shortName)/* &&
-                    modelSetup != null*/);
+                    !string.IsNullOrEmpty(shortName) &&
+                    (modelSetup != null || !string.IsNullOrEmpty(modelName)));
 
             canExecuteStress.ToProperty(this, vm => vm.CanStress, out this.canStress);
 
@@ -418,7 +419,7 @@ namespace StressGenerator.ViewModels
             this.ModeCreate = false;
             this.ModeOpenOrOverwrite = false;
             this.SourceModelIsEnabled = false;
-            this.ModelName = "StressTester_TemporaryTestModel";
+            this.NewModelName = "StressTester_TemporaryTestModel";
         }
 
         /// <summary>
@@ -433,7 +434,7 @@ namespace StressGenerator.ViewModels
             {
                 TimeInterval = this.TimeInterval * 1000,
                 OperationMode = this.SelectedOperationMode,
-                TestModelSetupName = this.ModelName,
+                TestModelSetupName = this.NewModelName,
                 TestModelSetup = this.SelectedEngineeringModelSetup,
                 SourceModelSetup = this.SelectedSourceEngineeringModelSetup,
                 ElementName = this.ElementName.Trim(),
@@ -467,7 +468,8 @@ namespace StressGenerator.ViewModels
 
             this.EngineeringModelSetupList.Clear();
 
-            foreach (var modelSetup in siteDirectory.Model.Where(m => m.Name.StartsWith(StressGeneratorConfiguration.ModelPrefix)).OrderBy(m => m.Name))
+            foreach (var modelSetup in siteDirectory.Model
+                .Where(m => m.Name.StartsWith(StressGeneratorConfiguration.ModelPrefix)).OrderBy(m => m.Name))
             {
                 this.EngineeringModelSetupList.Add(modelSetup);
             }

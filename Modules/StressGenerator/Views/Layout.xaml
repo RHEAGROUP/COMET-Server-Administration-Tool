@@ -76,7 +76,7 @@
                 <dxe:TextEdit
                     IsEnabled="{Binding Path=LoginSuccessfully}"
                     Visibility="{Binding Path=ModeCreate, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}"
-                    Text="{Binding Path=ModelName, Mode=TwoWay}"
+                    Text="{Binding Path=NewModelName, Mode=TwoWay}"
                     Height="Auto"
                     Margin="5"
                     FontSize="12"

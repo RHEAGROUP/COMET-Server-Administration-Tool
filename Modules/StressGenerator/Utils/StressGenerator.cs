@@ -33,10 +33,11 @@ namespace StressGenerator.Utils
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
-    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Dal;
     using CDP4Dal.Operations;
+    using Common.Events;
     using NLog;
     using ViewModels;
 
@@ -59,18 +60,6 @@ namespace StressGenerator.Utils
         /// The singleton class instance
         /// </summary>
         private static readonly StressGenerator Instance = new StressGenerator();
-
-        // TODO #81 Unify output messages mechanism inside SAT solution
-        /// <summary>
-        /// Log verbosity
-        /// </summary>
-        private enum LogVerbosity
-        {
-            Info,
-            Warn,
-            Debug,
-            Error
-        };
 
         /// <summary>
         /// Delegate used for notifying stress generator progress message
@@ -107,6 +96,7 @@ namespace StressGenerator.Utils
             this.configuration = config;
         }
 
+        // TODO #81 Unify output messages mechanism inside SAT solution
         /// <summary>
         /// Invoke NotifyMessageEvent and optionally log
         /// </summary>
@@ -151,16 +141,25 @@ namespace StressGenerator.Utils
 
             var session = this.configuration.Session;
 
-            if (this.configuration.OperationMode == SupportedOperationModes.Create)
+            if (this.configuration.OperationMode == SupportedOperationModes.Create ||
+                this.configuration.OperationMode == SupportedOperationModes.CreateOverwrite)
             {
+                if (this.configuration.OperationMode == SupportedOperationModes.CreateOverwrite)
+                {
+                    await EngineeringModelSetupGenerator.Delete(session, this.configuration.TestModelSetup);
+
+                    await session.Refresh();
+                }
+
                 // Generate and write EngineeringModelSetup
                 var engineeringModelSetup = await EngineeringModelSetupGenerator.Create(
                     session, this.configuration.TestModelSetupName, this.configuration.SourceModelSetup);
 
                 await session.Refresh();
 
-                this.configuration.TestModelSetup = session.Assembler.Cache.Select(x => x.Value).
-                    Select(lazy => lazy.Value).OfType<EngineeringModelSetup>().SingleOrDefault(em => em.Iid == engineeringModelSetup?.Iid);
+                this.configuration.TestModelSetup = session.Assembler.Cache.Select(x => x.Value)
+                    .Select(lazy => lazy.Value).OfType<EngineeringModelSetup>()
+                    .SingleOrDefault(em => em.Iid == engineeringModelSetup?.Iid);
             }
 
             if (this.configuration.TestModelSetup == null)
@@ -196,19 +195,16 @@ namespace StressGenerator.Utils
 
             if (this.configuration.TestModelSetup == null)
             {
-                this.NotifyMessage("EngineeringModelSetup test model is not initialized.", LogVerbosity.Error);
+                this.NotifyMessage("EngineeringModelSetup is not initialized.", LogVerbosity.Error);
                 return;
             }
 
             if (this.configuration.DeleteModel)
             {
                 await EngineeringModelSetupGenerator.Delete(session, this.configuration.TestModelSetup);
-
-                await session.Refresh();
             }
 
-            // Close session
-            await session.Close();
+            CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent {CurrentSession = this.configuration.Session});
         }
 
         /// <summary>
@@ -226,15 +222,19 @@ namespace StressGenerator.Utils
 
             try
             {
-                this.NotifyMessage($"Loading last iteration from EngineeringModel {engineeringModelSetup.ShortName}...");
+                this.NotifyMessage(
+                    $"Loading last iteration from EngineeringModel {engineeringModelSetup.ShortName}...");
 
                 iteration = await IterationGenerator.Create(this.configuration.Session, engineeringModelSetup);
 
-                this.NotifyMessage($"Successfully loaded EngineeringModel {engineeringModelSetup.ShortName} (Iteration {iteration.IterationSetup?.IterationNumber}).");
+                this.NotifyMessage(
+                    $"Successfully loaded EngineeringModel {engineeringModelSetup.ShortName} (Iteration {iteration.IterationSetup?.IterationNumber}).");
             }
             catch (Exception ex)
             {
-                this.NotifyMessage($"Invalid iteration. Engineering model {engineeringModelSetup.ShortName} must contain at least one active iteration. Exception: {ex.Message}", LogVerbosity.Error);
+                this.NotifyMessage(
+                    $"Invalid iteration. Engineering model {engineeringModelSetup.ShortName} must contain at least one active iteration. Exception: {ex.Message}",
+                    LogVerbosity.Error);
 
                 return null;
             }
@@ -244,7 +244,9 @@ namespace StressGenerator.Utils
                 return iteration;
             }
 
-            this.NotifyMessage($"Invalid RDL chain. Engineering model {(iteration.Container as EngineeringModel)?.EngineeringModelSetup.ShortName} must reference Site RDL \"{StressGeneratorConfiguration.GenericRdlShortName}\".", LogVerbosity.Error);
+            this.NotifyMessage(
+                $"Invalid RDL chain. Engineering model {(iteration.Container as EngineeringModel)?.EngineeringModelSetup.ShortName} must reference Site RDL \"{StressGeneratorConfiguration.GenericRdlShortName}\".",
+                LogVerbosity.Error);
 
             return null;
         }
@@ -295,8 +297,8 @@ namespace StressGenerator.Utils
                 }
 
                 var elementDefinition = ElementDefinitionGenerator.Create(
-                    $"{configuration.ElementName} #{number:D3}",
-                    $"{configuration.ElementShortName} #{number:D3}",
+                    $"{configuration.ElementName}#{number:D3}",
+                    $"{configuration.ElementShortName}#{number:D3}",
                     clonedIteration,
                     this.configuration.Session.ActivePerson.DefaultDomain);
 
@@ -345,7 +347,8 @@ namespace StressGenerator.Utils
                     continue;
                 }
 
-                this.NotifyMessage($"Generating ParameterValueSet for {generatedIteration.Element[index].Name} ({generatedIteration.Element[index].ShortName}).",
+                this.NotifyMessage(
+                    $"Generating ParameterValueSet for {generatedIteration.Element[index].Name} ({generatedIteration.Element[index].ShortName}).",
                     LogVerbosity.Info);
 
                 foreach (var parameter in elementDefinition.Parameter)
@@ -417,11 +420,15 @@ namespace StressGenerator.Utils
 
                 await this.configuration.Session.Dal.Write(operationContainer);
 
-                this.NotifyMessage($"Successfully generated ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName}).", LogVerbosity.Info);
+                this.NotifyMessage(
+                    $"Successfully generated ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName}).",
+                    LogVerbosity.Info);
             }
             catch (Exception ex)
             {
-                this.NotifyMessage($"Cannot generate ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName}). Exception: {ex.Message}", LogVerbosity.Error);
+                this.NotifyMessage(
+                    $"Cannot generate ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName}). Exception: {ex.Message}",
+                    LogVerbosity.Error);
             }
         }
 
@@ -453,11 +460,13 @@ namespace StressGenerator.Utils
                 var operationContainer = transaction.FinalizeTransaction();
                 await this.configuration.Session.Write(operationContainer);
 
-                this.NotifyMessage($"Successfully generated ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName}).");
+                this.NotifyMessage(
+                    $"Successfully generated ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName}).");
             }
             catch (Exception ex)
             {
-                this.NotifyMessage($"Cannot update ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName}). Exception: {ex.Message}");
+                this.NotifyMessage(
+                    $"Cannot update ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName}). Exception: {ex.Message}");
             }
         }
     }
