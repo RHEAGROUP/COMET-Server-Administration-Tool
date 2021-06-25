@@ -343,6 +343,8 @@ namespace StressGenerator.ViewModels
 
         private void AddSubscriptions()
         {
+            this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(StressGeneratorMessageHandler);
+
             var canExecuteStress = this.WhenAnyValue(
                 vm => vm.SourceViewModel.LoginSuccessfully,
                 vm => vm.TimeInterval,
