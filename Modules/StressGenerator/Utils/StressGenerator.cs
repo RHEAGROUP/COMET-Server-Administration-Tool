@@ -474,7 +474,7 @@ namespace StressGenerator.Utils
             {
                 await Policy
                     .Handle<Exception>()
-                    .RetryAsync(3, (ex, retryCount) =>
+                    .RetryAsync(MaxRetryCount, (ex, retryCount) =>
                     {
                         this.LogOperationResult(false, actionDescription, ex, retryCount);
                     })
