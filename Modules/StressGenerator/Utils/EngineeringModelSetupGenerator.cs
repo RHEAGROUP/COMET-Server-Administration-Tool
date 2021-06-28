@@ -51,7 +51,9 @@ namespace StressGenerator.Utils
         /// <param name="sourceEngineeringModelSetup">
         /// The source EngineeringModelSetup <see cref="EngineeringModelSetup"/>
         /// </param>
-        /// <returns>An instance of <see cref="EngineeringModelSetup"/></returns>
+        /// <returns>
+        /// An instance of <see cref="EngineeringModelSetup"/>
+        /// </returns>
         public static async Task<EngineeringModelSetup> Create(
             ISession session,
             string modelName,
@@ -60,18 +62,22 @@ namespace StressGenerator.Utils
             var siteDirectory = session.RetrieveSiteDirectory();
             var siteDirectoryCloned = siteDirectory.Clone(false);
 
-            var engineeringModelSetup =
-                new EngineeringModelSetup(Guid.NewGuid(), session.Assembler.Cache, session.Credentials.Uri)
-                {
-                    Name = modelName,
-                    ShortName = modelName,
-                    EngineeringModelIid = Guid.NewGuid(),
-                };
+            var engineeringModelSetup = new EngineeringModelSetup(
+                Guid.NewGuid(),
+                session.Assembler.Cache,
+                session.Credentials.Uri)
+            {
+                Name = modelName,
+                ShortName = modelName,
+                EngineeringModelIid = Guid.NewGuid(),
+            };
 
             if (sourceEngineeringModelSetup == null)
             {
-                var modelReferenceDataLibrary =
-                    new ModelReferenceDataLibrary(Guid.NewGuid(), session.Assembler.Cache, session.Credentials.Uri)
+                var modelReferenceDataLibrary = new ModelReferenceDataLibrary(
+                    Guid.NewGuid(),
+                    session.Assembler.Cache,
+                    session.Credentials.Uri)
                     {
                         Name = $"{modelName} MODEL RDL",
                         ShortName = $"{modelName} MRDL",
@@ -106,7 +112,9 @@ namespace StressGenerator.Utils
         /// <param name="siteDirectoryCloned">
         /// Cloned site directory used for creating write transaction <see cref="SiteDirectory"/>
         /// </param>
-        /// <returns></returns>
+        /// <returns>
+        /// An instance of <see cref="EngineeringModelSetup"/>
+        /// </returns>
         private static async Task<EngineeringModelSetup> Write(
             ISession session,
             EngineeringModelSetup engineeringModelSetup,
@@ -118,14 +126,19 @@ namespace StressGenerator.Utils
                 var transactionContext = TransactionContextResolver.ResolveContext(siteDirectory);
                 var operationContainer = new OperationContainer(transactionContext.ContextRoute());
 
-                operationContainer.AddOperation(new Operation(siteDirectory.ToDto(), siteDirectoryCloned.ToDto(),
+                operationContainer.AddOperation(new Operation(
+                    siteDirectory.ToDto(), 
+                    siteDirectoryCloned.ToDto(),
                     OperationKind.Update));
-                operationContainer.AddOperation(new Operation(null, engineeringModelSetup.ToDto(),
+                operationContainer.AddOperation(new Operation(
+                    null,
+                    engineeringModelSetup.ToDto(),
                     OperationKind.Create));
 
                 if (engineeringModelSetup.RequiredRdl.Count != 0)
                 {
-                    operationContainer.AddOperation(new Operation(null,
+                    operationContainer.AddOperation(new Operation(
+                        null,
                         engineeringModelSetup.RequiredRdl.FirstOrDefault()?.ToDto(),
                         OperationKind.Create));
                 }
@@ -134,8 +147,7 @@ namespace StressGenerator.Utils
 
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
-                    Message =
-                        $"Successfully generated EngineeringModelSetup {engineeringModelSetup.Name} ({engineeringModelSetup.ShortName}).",
+                    Message = $"Successfully generated EngineeringModelSetup {engineeringModelSetup.Name} ({engineeringModelSetup.ShortName}).",
                     Verbosity = LogVerbosity.Info
                 });
             }
@@ -143,8 +155,7 @@ namespace StressGenerator.Utils
             {
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
-                    Message =
-                        $"Cannot generate EngineeringModelSetup {engineeringModelSetup.Name} ({engineeringModelSetup.ShortName}). Exception: {ex.Message}",
+                    Message = $"Cannot generate EngineeringModelSetup {engineeringModelSetup.Name} ({engineeringModelSetup.ShortName}). Exception: {ex.Message}",
                     Exception = ex,
                     Verbosity = LogVerbosity.Error
                 });
@@ -164,7 +175,6 @@ namespace StressGenerator.Utils
         /// <param name="engineeringModelSetup">
         /// The EngineeringModelSetup <see cref="EngineeringModelSetup"/>
         /// </param>
-        /// <returns></returns>
         public static async Task Delete(ISession session, EngineeringModelSetup engineeringModelSetup)
         {
             try
@@ -175,9 +185,13 @@ namespace StressGenerator.Utils
                 var transactionContext = TransactionContextResolver.ResolveContext(siteDirectory);
                 var operationContainer = new OperationContainer(transactionContext.ContextRoute());
 
-                operationContainer.AddOperation(new Operation(siteDirectory.ToDto(), siteDirectoryCloned.ToDto(),
+                operationContainer.AddOperation(new Operation(
+                    siteDirectory.ToDto(),
+                    siteDirectoryCloned.ToDto(),
                     OperationKind.Update));
-                operationContainer.AddOperation(new Operation(null, engineeringModelSetup.ToDto(),
+                operationContainer.AddOperation(new Operation(
+                    null,
+                    engineeringModelSetup.ToDto(),
                     OperationKind.Delete));
 
                 await session.Dal.Write(operationContainer);
@@ -186,8 +200,7 @@ namespace StressGenerator.Utils
             {
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
-                    Message =
-                        $"Cannot delete EngineeringModelSetup {engineeringModelSetup.Name} ({engineeringModelSetup.ShortName}). Exception: {ex.Message}",
+                    Message = $"Cannot delete EngineeringModelSetup {engineeringModelSetup.Name} ({engineeringModelSetup.ShortName}). Exception: {ex.Message}",
                     Exception = ex,
                     Verbosity = LogVerbosity.Error
                 });

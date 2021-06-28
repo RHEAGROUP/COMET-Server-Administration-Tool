@@ -84,7 +84,7 @@
                 <ComboBox
                     IsEnabled="{Binding Path=LoginSuccessfully}"
                     Visibility="{Binding Path=ModeOpenOrOverwrite, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}"
-                    ItemsSource="{Binding Path=EngineeringModelSetupList, Mode=OneTime }"
+                    ItemsSource="{Binding Path=EngineeringModelSetupList, Mode=OneTime}"
                     SelectedValue="{Binding Path=SelectedEngineeringModelSetup, Mode=TwoWay}"
                     Width="250"
                     FontSize="12"
@@ -106,7 +106,7 @@
                 Content="Source model" />
             <ComboBox
                 IsEnabled="{Binding Path=SourceModelIsEnabled}"
-                ItemsSource="{Binding Path=SourceEngineeringModelSetupList, Mode=OneTime }"
+                ItemsSource="{Binding Path=SourceEngineeringModelSetupList, Mode=OneTime}"
                 SelectedValue="{Binding Path=SelectedSourceEngineeringModelSetup, Mode=TwoWay}"
                 Grid.Row="3"
                 Grid.Column="1"

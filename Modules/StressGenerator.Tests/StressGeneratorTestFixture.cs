@@ -270,10 +270,12 @@ namespace StressGenerator.Tests
                                     if (operationThing is CDP4Common.DTO.EngineeringModelSetup newModelSetup)
                                     {
                                         // Add iteration & iterationSetup
-                                        var newIteration = new Iteration(Guid.NewGuid(),
+                                        var newIteration = new Iteration(
+                                            Guid.NewGuid(),
                                             this.session.Object.Assembler.Cache,
                                             this.session.Object.Credentials.Uri);
-                                        var newIterationSetup = new IterationSetup(Guid.NewGuid(),
+                                        var newIterationSetup = new IterationSetup(
+                                            Guid.NewGuid(),
                                             this.session.Object.Assembler.Cache,
                                             this.session.Object.Credentials.Uri)
                                         {
@@ -282,16 +284,12 @@ namespace StressGenerator.Tests
                                         this.iteration.IterationSetup = this.iterationSetup;
 
                                         this.session.Object.Assembler.Cache.TryAdd(
-                                            new CacheKey(newIteration.Iid,
-                                                null),
-                                            new Lazy<CDP4Common.CommonData.Thing>(() =>
-                                                newIteration));
+                                            new CacheKey(newIteration.Iid, null),
+                                            new Lazy<CDP4Common.CommonData.Thing>(() => newIteration));
 
                                         this.session.Object.Assembler.Cache.TryAdd(
-                                            new CacheKey(newIterationSetup.Iid,
-                                                null),
-                                            new Lazy<CDP4Common.CommonData.Thing>(() =>
-                                                newIterationSetup));
+                                            new CacheKey(newIterationSetup.Iid, null),
+                                            new Lazy<CDP4Common.CommonData.Thing>(() => newIterationSetup));
 
                                         newModelSetup.IterationSetup.Add(iterationSetup.Iid);
                                     }

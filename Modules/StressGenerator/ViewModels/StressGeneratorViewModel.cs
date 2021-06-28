@@ -76,8 +76,8 @@ namespace StressGenerator.ViewModels
         public static Dictionary<DataSource, string> StressGeneratorTargetServerTypes { get; } =
             new Dictionary<DataSource, string>
             {
-                {DataSource.CDP4, "CDP4 WebServices"},
-                {DataSource.WSP, "OCDT WSP Server"}
+                { DataSource.CDP4, "CDP4 WebServices" },
+                { DataSource.WSP, "OCDT WSP Server" }
             };
 
         /// <summary>
@@ -86,9 +86,9 @@ namespace StressGenerator.ViewModels
         public static Dictionary<SupportedOperationModes, string> StressGeneratorModes { get; } =
             new Dictionary<SupportedOperationModes, string>
             {
-                {SupportedOperationModes.Open, SupportedOperationModes.Open.ToString()},
-                {SupportedOperationModes.Create, SupportedOperationModes.Create.ToString()},
-                {SupportedOperationModes.CreateOverwrite, SupportedOperationModes.CreateOverwrite.ToString()}
+                { SupportedOperationModes.Open, SupportedOperationModes.Open.ToString() },
+                { SupportedOperationModes.Create, SupportedOperationModes.Create.ToString() },
+                { SupportedOperationModes.CreateOverwrite, SupportedOperationModes.CreateOverwrite.ToString() }
             };
 
         /// <summary>

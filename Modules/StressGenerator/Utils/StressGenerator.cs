@@ -27,7 +27,6 @@ namespace StressGenerator.Utils
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Text.RegularExpressions;
@@ -187,7 +186,6 @@ namespace StressGenerator.Utils
         /// <summary>
         /// Cleanup test objects.
         /// </summary>
-        /// <returns></returns>
         public async Task CleanUpTestObjects()
         {
             var session = this.configuration.Session;
@@ -203,7 +201,7 @@ namespace StressGenerator.Utils
                 await EngineeringModelSetupGenerator.Delete(session, this.configuration.TestModelSetup);
             }
 
-            CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent {CurrentSession = this.configuration.Session});
+            CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent { CurrentSession = this.configuration.Session });
         }
 
         /// <summary>
@@ -213,7 +211,7 @@ namespace StressGenerator.Utils
         /// The selected engineering model for test <see cref="EngineeringModelSetup"/>
         /// </param>
         /// <returns>
-        /// A <see cref="Task{Iteration}"/>, or null if the iteration cannot be created
+        /// An <see cref="Iteration"/>, or null if the iteration cannot be created
         /// </returns>
         private async Task<Iteration> ReadIteration(EngineeringModelSetup engineeringModelSetup)
         {

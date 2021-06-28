@@ -138,7 +138,7 @@ namespace StressGenerator.ViewModels
         /// <summary>
         /// Currently open server session
         /// </summary>
-        public ISession Session { get; private set; }
+        public ISession Session { get; }
 
         /// <summary>
         /// EngineeringModelSetup used for stress test <see cref="EngineeringModelSetup"/>
@@ -146,14 +146,14 @@ namespace StressGenerator.ViewModels
         public EngineeringModelSetup TestModelSetup { get; set; }
 
         /// <summary>
-        /// Source EngineeringModelSetup for the TestModelSetup
-        /// </summary>
-        public EngineeringModelSetup SourceModelSetup { get; set; }
-
-        /// <summary>
         /// EngineeringModelSetup name used for stress test
         /// </summary>
         public string TestModelSetupName { get; set; }
+
+        /// <summary>
+        /// Source EngineeringModelSetup for the TestModelSetup
+        /// </summary>
+        public EngineeringModelSetup SourceModelSetup { get; set; }
 
         /// <summary>
         /// Supported mode <see cref="SupportedOperationModes"/>
