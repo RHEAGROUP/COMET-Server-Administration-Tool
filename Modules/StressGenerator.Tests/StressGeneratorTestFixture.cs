@@ -265,8 +265,6 @@ namespace StressGenerator.Tests
                             case OperationKind.Create:
                                 if (!this.generatedThings.ContainsKey(operationThing.Iid))
                                 {
-                                    //var newThings = new List<Thing> { operationThing };
-
                                     this.generatedThings[operationThing.Iid] = operationThing;
 
                                     if (operationThing is CDP4Common.DTO.EngineeringModelSetup newModelSetup)
@@ -304,6 +302,14 @@ namespace StressGenerator.Tests
                                 if (!this.modifiedThings.ContainsKey(operationThing.Iid))
                                 {
                                     this.modifiedThings[operationThing.Iid] = operationThing;
+                                }
+
+                                break;
+
+                            case OperationKind.Delete:
+                                if (this.generatedThings.ContainsKey(operationThing.Iid))
+                                {
+                                    this.generatedThings.Remove(operationThing.Iid);
                                 }
 
                                 break;
@@ -407,6 +413,25 @@ namespace StressGenerator.Tests
         }
 
         [Test]
+        public void VerifyThatStressGeneratorDeleteCreatedTestModel()
+        {
+            var initialObjectsNumber = this.sessionThings.Count;
+
+            this.session.Setup(x => x.ActivePerson).Returns(this.person);
+            this.session.Setup(x => x.OpenIterations).Returns(
+                new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
+                {
+                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
+                });
+            this.stressGeneratorViewModel.SelectedOperationMode = SupportedOperationModes.Create;
+            this.stressGeneratorViewModel.DeleteModel = true;
+
+            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
+
+            Assert.AreEqual(initialObjectsNumber, this.generatedThings.Count);
+        }
+
+        [Test]
         public void VerifyThatStressGeneratorWorksInOpenMode()
         {
             this.assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null),
@@ -463,6 +488,8 @@ namespace StressGenerator.Tests
             };
 
             var clone = ParameterGenerator.UpdateValueSets(valueSet, ParameterSwitchKind.MANUAL, "1");
+
+            Assert.NotNull(clone);
 
             Assert.AreEqual("{\"1\"}", clone.Manual.ToString());
         }

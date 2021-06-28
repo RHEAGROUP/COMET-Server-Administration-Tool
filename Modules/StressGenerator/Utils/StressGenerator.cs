@@ -449,6 +449,13 @@ namespace StressGenerator.Utils
             var valueSetClone = ParameterGenerator.UpdateValueSets(parameter.ValueSets,
                 parameterSwitchKind, parameterValue);
 
+            if (valueSetClone == null)
+            {
+                this.NotifyMessage(
+                    $"ValueSets is null for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName})");
+                return;
+            }
+
             try
             {
                 var transactionContext = TransactionContextResolver.ResolveContext(valueSetClone);
