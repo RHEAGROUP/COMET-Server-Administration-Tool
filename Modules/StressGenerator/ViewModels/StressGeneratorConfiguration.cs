@@ -32,7 +32,7 @@ namespace StressGenerator.ViewModels
     /// <summary>
     /// This class is used to define the start configuration for the StressGenerator tool
     /// </summary>
-    internal class StressGeneratorConfiguration
+    public class StressGeneratorConfiguration
     {
         /// <summary>
         /// Stress generator models prefix
@@ -102,12 +102,16 @@ namespace StressGenerator.ViewModels
                 if (value < MinNumberOfTestObjects)
                 {
                     this.testObjectsNumber = MinNumberOfTestObjects;
+                    return;
                 }
 
                 if (value > MaxNumberOfTestObjects)
                 {
                     this.testObjectsNumber = MaxNumberOfTestObjects;
+                    return;
                 }
+
+                this.testObjectsNumber = value;
             }
         }
 

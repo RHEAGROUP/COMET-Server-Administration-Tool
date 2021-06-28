@@ -182,6 +182,7 @@ namespace StressGenerator.Tests
             {
                 IterationIid = this.iteration.Iid
             };
+            this.iteration.IterationSetup = this.iterationSetup;
 
             // Engineering Model & Setup
             this.engineeringModel = new EngineeringModel(Guid.NewGuid(), this.session.Object.Assembler.Cache,
@@ -223,40 +224,23 @@ namespace StressGenerator.Tests
                 {this.engineeringModel.Iid, this.engineeringModel.ToDto()}
             };
 
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.siteDirectory.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.siteDirectory));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.domain.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.domain));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.person.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.person));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.participant.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.participant));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.siteReferenceDataLibrary.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.siteReferenceDataLibrary));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.quantityKindParamType.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.quantityKindParamType));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.modelReferenceDataLibrary.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.modelReferenceDataLibrary));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.engineeringModelSetup.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.engineeringModelSetup));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.iteration));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.iterationSetup.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.iterationSetup));
+            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.engineeringModel.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.engineeringModel));
+
             this.session = new Mock<ISession>();
             this.session.Setup(s => s.Assembler).Returns(this.assembler);
             this.session.Setup(s => s.Credentials).Returns(this.credentials);
             this.session.Setup(s => s.ActivePerson).Returns(this.person);
             this.session.Setup(s => s.RetrieveSiteDirectory()).Returns(this.siteDirectory);
-
-            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>(), It.IsAny<IEnumerable<string>>()))
-                .Returns<OperationContainer, IEnumerable<string>>((operationContainer, files) =>
-                {
-                    foreach (var operation in operationContainer.Operations)
-                    {
-                        var operationThing = operation.ModifiedThing;
-
-                        switch (operation.OperationKind)
-                        {
-                            case OperationKind.Create:
-                                if (!this.generatedThings.ContainsKey(operationThing.Iid))
-                                {
-                                    this.generatedThings[operationThing.Iid] = operationThing;
-                                }
-
-                                break;
-                            case OperationKind.Update:
-                                if (!this.modifiedThings.ContainsKey(operationThing.Iid))
-                                {
-                                    this.modifiedThings[operationThing.Iid] = operationThing;
-                                }
-
-                                break;
-                        }
-                    }
-
-                    return Task.FromResult((IEnumerable<Thing>)new List<Thing>());
-                });
         }
 
         private void InitDalOperations()
@@ -270,7 +254,7 @@ namespace StressGenerator.Tests
                     });
 
             this.dal.Setup(x => x.Write(It.IsAny<OperationContainer>(), It.IsAny<IEnumerable<string>>()))
-                .Returns<OperationContainer, IEnumerable<string>>((operationContainer, files) =>
+                .Returns<OperationContainer, IEnumerable<string>>(async (operationContainer, files) =>
                 {
                     foreach (var operation in operationContainer.Operations)
                     {
@@ -281,7 +265,38 @@ namespace StressGenerator.Tests
                             case OperationKind.Create:
                                 if (!this.generatedThings.ContainsKey(operationThing.Iid))
                                 {
+                                    //var newThings = new List<Thing> { operationThing };
+
                                     this.generatedThings[operationThing.Iid] = operationThing;
+
+                                    if (operationThing is CDP4Common.DTO.EngineeringModelSetup newModelSetup)
+                                    {
+                                        // Add iteration & iterationSetup
+                                        var newIteration = new Iteration(Guid.NewGuid(),
+                                            this.session.Object.Assembler.Cache,
+                                            this.session.Object.Credentials.Uri);
+                                        var newIterationSetup = new IterationSetup(Guid.NewGuid(),
+                                            this.session.Object.Assembler.Cache,
+                                            this.session.Object.Credentials.Uri)
+                                        {
+                                            IterationIid = this.iteration.Iid
+                                        };
+                                        this.iteration.IterationSetup = this.iterationSetup;
+
+                                        this.session.Object.Assembler.Cache.TryAdd(
+                                            new CacheKey(newIteration.Iid,
+                                                null),
+                                            new Lazy<CDP4Common.CommonData.Thing>(() =>
+                                                newIteration));
+
+                                        this.session.Object.Assembler.Cache.TryAdd(
+                                            new CacheKey(newIterationSetup.Iid,
+                                                null),
+                                            new Lazy<CDP4Common.CommonData.Thing>(() =>
+                                                newIterationSetup));
+
+                                        newModelSetup.IterationSetup.Add(iterationSetup.Iid);
+                                    }
                                 }
 
                                 break;
@@ -295,7 +310,10 @@ namespace StressGenerator.Tests
                         }
                     }
 
-                    return Task.FromResult((IEnumerable<Thing>) new List<Thing>());
+                    await this.session.Object.Assembler.Synchronize(this.generatedThings.Values.ToList());
+                    await this.session.Object.Assembler.Synchronize(this.modifiedThings.Values.ToList());
+
+                    return await Task.FromResult((IEnumerable<Thing>)new List<Thing>());
                 });
         }
 
@@ -319,9 +337,9 @@ namespace StressGenerator.Tests
             {
                 SourceViewModel = this.sourceViewModel.Object,
                 TimeInterval = 1,
-                TestObjectsNumber = 5,
-                ElementName = "ElementDefinition",
-                ElementShortName = "ED",
+                TestObjectsNumber = StressGeneratorConfiguration.MinNumberOfTestObjects,
+                ElementName = StressGeneratorConfiguration.GenericElementName,
+                ElementShortName = StressGeneratorConfiguration.GenericElementShortName,
                 SelectedEngineeringModelSetup = this.engineeringModelSetup
             };
         }
@@ -357,10 +375,12 @@ namespace StressGenerator.Tests
         {
             Assert.AreEqual(this.sourceViewModel.Object, this.stressGeneratorViewModel.SourceViewModel);
             Assert.AreEqual(1, this.stressGeneratorViewModel.TimeInterval);
-            Assert.AreEqual(5, this.stressGeneratorViewModel.TestObjectsNumber);
-            Assert.AreEqual("ElementDefinition", this.stressGeneratorViewModel.ElementName);
-            Assert.AreEqual("ED", this.stressGeneratorViewModel.ElementShortName);
+            Assert.AreEqual(StressGeneratorConfiguration.MinNumberOfTestObjects, this.stressGeneratorViewModel.TestObjectsNumber);
+            Assert.AreEqual(StressGeneratorConfiguration.GenericElementName, this.stressGeneratorViewModel.ElementName);
+            Assert.AreEqual(StressGeneratorConfiguration.GenericElementShortName, this.stressGeneratorViewModel.ElementShortName);
             Assert.AreEqual(this.engineeringModelSetup, this.stressGeneratorViewModel.SelectedEngineeringModelSetup);
+            Assert.AreEqual(SupportedOperationModes.Open, this.stressGeneratorViewModel.SelectedOperationMode);
+            Assert.AreEqual(StressGeneratorConfiguration.ModelPrefix, this.stressGeneratorViewModel.NewModelName);
         }
 
         [Test]
@@ -387,7 +407,7 @@ namespace StressGenerator.Tests
         }
 
         [Test]
-        public void VerifyThatStressGeneratorWorksIfOpenIterationIsPresent()
+        public void VerifyThatStressGeneratorWorksInOpenMode()
         {
             this.assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null),
                 new Lazy<CDP4Common.CommonData.Thing>(() => this.iteration));
@@ -400,11 +420,38 @@ namespace StressGenerator.Tests
 
             Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
 
-            // Iteration will be modified
+            // Iteration was modified
             Assert.AreEqual(1, this.modifiedThings.Count);
 
             // Five element definition and five parameters will be added
             Assert.AreEqual(this.stressGeneratorViewModel.TestObjectsNumber * 2, this.generatedThings.Count);
+        }
+
+        [Test]
+        public void VerifyThatStressGeneratorWorksInCreateMode()
+        {
+            this.session.Setup(x => x.ActivePerson).Returns(this.person);
+            this.session.Setup(x => x.OpenIterations).Returns(
+                new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
+                {
+                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
+                });
+            this.stressGeneratorViewModel.SelectedOperationMode = SupportedOperationModes.Create;
+
+            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
+
+            // SiteDirectory and iterations was modified
+            Assert.AreEqual(2, this.modifiedThings.Count);
+
+            // New EngineeringModelSetup was created
+            Assert.AreEqual(1, this.generatedThings.Values.Count(t => t.ClassKind == CDP4Common.CommonData.ClassKind.EngineeringModelSetup));
+
+            // New Iteration was created
+            Assert.AreEqual(1, this.generatedThings.Values.Count(t => t.ClassKind == CDP4Common.CommonData.ClassKind.ModelReferenceDataLibrary));
+
+            // Five element definition and five parameters will be added
+            Assert.AreEqual(this.stressGeneratorViewModel.TestObjectsNumber, this.generatedThings.Values.Count(t => t.ClassKind == CDP4Common.CommonData.ClassKind.ElementDefinition));
+            Assert.AreEqual(this.stressGeneratorViewModel.TestObjectsNumber, this.generatedThings.Values.Count(t => t.ClassKind == CDP4Common.CommonData.ClassKind.Parameter));
         }
 
         [Test]
