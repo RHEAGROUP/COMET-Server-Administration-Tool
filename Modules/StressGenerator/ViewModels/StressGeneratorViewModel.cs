@@ -33,6 +33,8 @@ namespace StressGenerator.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
     using Common.ViewModels;
+    using Common.Events;
+    using NLog;
     using ReactiveUI;
     using Utils;
 
@@ -51,6 +53,11 @@ namespace StressGenerator.ViewModels
     /// </summary>
     public class StressGeneratorViewModel : ReactiveObject
     {
+        /// <summary>
+        /// The NLog logger
+        /// </summary>
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// The <see cref="StressGenerator"/> used to build the helper sync classes
         /// </summary>
@@ -76,8 +83,8 @@ namespace StressGenerator.ViewModels
         public static Dictionary<DataSource, string> StressGeneratorTargetServerTypes { get; } =
             new Dictionary<DataSource, string>
             {
-                { DataSource.CDP4, "CDP4 WebServices" },
-                { DataSource.WSP, "OCDT WSP Server" }
+                {DataSource.CDP4, "CDP4 WebServices"},
+                {DataSource.WSP, "OCDT WSP Server"}
             };
 
         /// <summary>
@@ -86,9 +93,9 @@ namespace StressGenerator.ViewModels
         public static Dictionary<SupportedOperationModes, string> StressGeneratorModes { get; } =
             new Dictionary<SupportedOperationModes, string>
             {
-                { SupportedOperationModes.Open, SupportedOperationModes.Open.ToString() },
-                { SupportedOperationModes.Create, SupportedOperationModes.Create.ToString() },
-                { SupportedOperationModes.CreateOverwrite, SupportedOperationModes.CreateOverwrite.ToString() }
+                {SupportedOperationModes.Open, SupportedOperationModes.Open.ToString()},
+                {SupportedOperationModes.Create, SupportedOperationModes.Create.ToString()},
+                {SupportedOperationModes.CreateOverwrite, SupportedOperationModes.CreateOverwrite.ToString()}
             };
 
         /// <summary>
@@ -333,7 +340,8 @@ namespace StressGenerator.ViewModels
         /// <summary>
         /// Get model prefix information
         /// </summary>
-        public string ModelPrefixInformation => $"For safety, the short name of the engineering model must start with '{StressGeneratorConfiguration.ModelPrefix}'";
+        public string ModelPrefixInformation =>
+            $"For safety, the short name of the engineering model must start with '{StressGeneratorConfiguration.ModelPrefix}'";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StressGeneratorViewModel"/> class
@@ -411,7 +419,65 @@ namespace StressGenerator.ViewModels
                 _ => this.ExecuteStressCommand(),
                 RxApp.MainThreadScheduler);
 
-            this.stressGenerator.NotifyMessageEvent += StressGeneratorMessageHandler;
+            CDPMessageBus.Current.Listen<LogEvent>().Subscribe((operationEvent) =>
+            {
+                var message = operationEvent.Message;
+                var exception = operationEvent.Exception;
+                var logLevel = operationEvent.Verbosity;
+
+                if (operationEvent.Type != this.GetType())
+                {
+                    return;
+                }
+
+                if (operationEvent.Exception != null)
+                {
+                    message += $"\n\tException: {exception.Message}";
+
+                    if (exception.InnerException != null)
+                    {
+                        message += $"\n\tInner exception: {exception.InnerException.Message}";
+                        message += $"\n{exception.InnerException.StackTrace}";
+                    }
+                    else
+                    {
+                        message += $"\n{exception.StackTrace}";
+                    }
+                }
+
+                this.OperationMessageHandler(message, logLevel);
+            });
+        }
+
+        /// <summary>
+        /// Add text message to the output panel
+        /// </summary>
+        /// <param name="message">The text message</param>
+        /// <param name="logLevel"></param>
+        private void OperationMessageHandler(string message, LogVerbosity? logLevel = null)
+        {
+            if (string.IsNullOrEmpty(message)) return;
+
+            this.Output += $"{DateTime.Now:HH:mm:ss} {message}{Environment.NewLine}";
+
+            switch (logLevel)
+            {
+                case LogVerbosity.Info:
+                    Logger.Info(message);
+                    break;
+                case LogVerbosity.Warn:
+                    Logger.Warn(message);
+                    break;
+                case LogVerbosity.Debug:
+                    Logger.Debug(message);
+                    break;
+                case LogVerbosity.Error:
+                    Logger.Error(message);
+                    break;
+                default:
+                    Logger.Trace(message);
+                    break;
+            }
         }
 
         /// <summary>
@@ -485,7 +551,10 @@ namespace StressGenerator.ViewModels
         {
             var siteDirectory = this.SourceViewModel.ServerSession.RetrieveSiteDirectory();
 
-            var modelSetups = filterPrefix.HasValue ? siteDirectory.Model.Where(m => m.Name.StartsWith(StressGeneratorConfiguration.ModelPrefix)).OrderBy(m => m.Name) : siteDirectory.Model.OrderBy(m => m.Name);
+            var modelSetups = filterPrefix.HasValue
+                ? siteDirectory.Model.Where(m => m.Name.StartsWith(StressGeneratorConfiguration.ModelPrefix))
+                    .OrderBy(m => m.Name)
+                : siteDirectory.Model.OrderBy(m => m.Name);
 
             return new ReactiveList<EngineeringModelSetup>(modelSetups);
         }
