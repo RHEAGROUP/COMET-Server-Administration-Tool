@@ -33,16 +33,22 @@ namespace StressGenerator.Utils
     using ViewModels;
 
     /// <summary>
-    /// Helper class for creating iteration <see cref="Iteration"/> for test purposes
+    /// Helper class for creating iteration <see cref="Iteration"/> for test purposes.
     /// </summary>
     internal static class IterationGenerator
     {
         /// <summary>
-        /// Create a new instance of <see cref="Iteration" />
+        /// Create a new instance of <see cref="Iteration"/>.
         /// </summary>
-        /// <param name="session">Server session <see cref="ISession"/></param>
-        /// <param name="modelSetup">Engineering model setup that iteration belongs to </param>
-        /// <returns>An iteration instance <see cref="Iteration"/></returns>
+        /// <param name="session">
+        /// Server <see cref="ISession"/>
+        /// </param>
+        /// <param name="modelSetup">
+        /// <see cref="EngineeringModelSetup"/> that iteration belongs to.
+        /// </param>
+        /// <returns>
+        /// An <see cref="Iteration"/>.
+        /// </returns>
         public static async Task<Iteration> Create(ISession session, EngineeringModelSetup modelSetup)
         {
             var model = new EngineeringModel(
@@ -73,14 +79,18 @@ namespace StressGenerator.Utils
         }
 
         /// <summary>
-        /// Check that the engineering model references the Generic RDL
+        /// Check that the <see cref="EngineeringModelSetup"/> references the required <see cref="ReferenceDataLibrary"/>.
         /// </summary>
-        /// <param name="iteration">Last originalIteration from the model <see cref="Iteration" /></param>
-        /// <returns>True if iteration references generic Rdl, false otherwise</returns>
+        /// <param name="iteration">
+        /// An <see cref="Iteration"/>.
+        /// </param>
+        /// <returns>
+        /// True if iteration references the required <see cref="ReferenceDataLibrary"/>, false otherwise.
+        /// </returns>
         public static bool CheckIfIterationReferencesGenericRdl(Iteration iteration)
         {
-            var modelRdl = (iteration.Container as EngineeringModel)?.EngineeringModelSetup.RequiredRdl
-                .FirstOrDefault();
+            var model = iteration.Container as EngineeringModel;
+            var modelRdl = model?.EngineeringModelSetup.RequiredRdl.FirstOrDefault();
             var chainedRdl = modelRdl?.RequiredRdl;
 
             while (chainedRdl != null)

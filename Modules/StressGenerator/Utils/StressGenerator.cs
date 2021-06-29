@@ -27,8 +27,11 @@ namespace StressGenerator.Utils
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
+    using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
@@ -38,6 +41,7 @@ namespace StressGenerator.Utils
     using CDP4Dal.Operations;
     using Common.Events;
     using NLog;
+    using Polly;
     using ViewModels;
 
     /// <summary>
@@ -45,6 +49,24 @@ namespace StressGenerator.Utils
     /// </summary>
     internal class StressGenerator
     {
+        /// <summary>
+        /// The maximum retry count for a write operation.
+        /// </summary>
+        private const int MaxRetryCount = 3;
+
+        /// <summary>
+        /// The singleton class instance
+        /// </summary>
+        private static readonly StressGenerator Instance = new StressGenerator();
+
+        /// <summary>
+        /// Gets the singleton class instance
+        /// </summary>
+        /// <returns>
+        /// The singleton class instance
+        /// </returns>
+        internal static StressGenerator GetInstance() => Instance;
+
         /// <summary>
         /// The NLog logger
         /// </summary>
@@ -56,11 +78,6 @@ namespace StressGenerator.Utils
         private StressGeneratorConfiguration configuration;
 
         /// <summary>
-        /// The singleton class instance
-        /// </summary>
-        private static readonly StressGenerator Instance = new StressGenerator();
-
-        /// <summary>
         /// Delegate used for notifying stress generator progress message
         /// </summary>
         /// <param name="message">Progress message</param>
@@ -70,14 +87,6 @@ namespace StressGenerator.Utils
         /// Associated event with the <see cref="NotifyMessageDelegate"/>
         /// </summary>
         public event NotifyMessageDelegate NotifyMessageEvent;
-
-        /// <summary>
-        /// Gets the singleton class instance
-        /// </summary>
-        /// <returns>
-        /// The singleton class instance
-        /// </returns>
-        internal static StressGenerator GetInstance() => Instance;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StressGenerator"/> class
@@ -97,13 +106,24 @@ namespace StressGenerator.Utils
 
         // TODO #81 Unify output messages mechanism inside SAT solution
         /// <summary>
-        /// Invoke NotifyMessageEvent and optionally log
+        /// Invoke <see cref="NotifyMessageEvent"/> and optionally log.
         /// </summary>
-        /// <param name="message">Progress message</param>
-        /// <param name="logLevel">Log verbosity level(optional) <see cref="LogVerbosity"/></param>
-        /// <param name="ex">Exception(optional) <see cref="Exception"/></param>
+        /// <param name="message">
+        /// The message.
+        /// </param>
+        /// <param name="logLevel">
+        /// <see cref="LogVerbosity"/> level (optional)
+        /// </param>
+        /// <param name="ex">
+        /// <see cref="Exception"/> (optional)
+        /// </param>
         private void NotifyMessage(string message, LogVerbosity? logLevel = null, Exception ex = null)
         {
+            if (ex != null)
+            {
+                message += Environment.NewLine + "    " + ex.Message;
+            }
+
             NotifyMessageEvent?.Invoke(message);
 
             switch (logLevel)
@@ -118,7 +138,7 @@ namespace StressGenerator.Utils
                     Logger.Debug(message);
                     break;
                 case LogVerbosity.Error:
-                    Logger.Error(ex?.Message != null ? message + ex.Message : message);
+                    Logger.Error(message);
                     break;
                 default:
                     Logger.Trace(message);
@@ -197,13 +217,13 @@ namespace StressGenerator.Utils
         }
 
         /// <summary>
-        /// Read latest iteration from the model
+        /// Read latest iteration from the given <paramref name="engineeringModelSetup"/>.
         /// </summary>
         /// <param name="engineeringModelSetup">
-        /// The selected engineering model for test <see cref="EngineeringModelSetup"/>
+        /// The selected <see cref="EngineeringModelSetup"/>.
         /// </param>
         /// <returns>
-        /// An <see cref="Iteration"/>, or null if the iteration cannot be created
+        /// An <see cref="Iteration"/>, or null if the <see cref="Iteration"/> cannot be created.
         /// </returns>
         private async Task<Iteration> ReadIteration(EngineeringModelSetup engineeringModelSetup)
         {
@@ -241,37 +261,37 @@ namespace StressGenerator.Utils
         }
 
         /// <summary>
-        /// Generate and write a set of test element definition base on configuration
+        /// Generate and write a set of test <see cref="ElementDefinition"/> based on configuration.
         /// </summary>
-        /// <param name="iteration">Latest server session read <see cref="Iteration"/></param>
+        /// <param name="iteration">
+        /// The given <see cref="Iteration"/>.
+        /// </param>
         /// <returns>
-        /// A <see cref="Task{List}"/> of <see cref="ElementDefinition"/>, or null if the iteration could not be found
+        /// A <see cref="List{T}"/> of <see cref="ElementDefinition"/>s, or null if the <see cref="Iteration"/> could not be found.
         /// </returns>
         private async Task<List<ElementDefinition>> GenerateAndWriteElementDefinitions(Iteration iteration)
         {
             if (iteration == null)
             {
-                this.NotifyMessage("Cannot find Iteration that contains generated ElementDefinition list.",
-                    LogVerbosity.Error);
+                this.NotifyMessage("Cannot find Iteration that contains generated ElementDefinition list.", LogVerbosity.Error);
                 return null;
             }
 
             if (this.configuration.Session.OpenIterations == null)
             {
-                this.NotifyMessage("This session does not contains open Iterations.",
-                    LogVerbosity.Error);
+                this.NotifyMessage("This session does not contains open Iterations.", LogVerbosity.Error);
                 return null;
             }
 
             var start = this.FindHighestNumberOnElementDefinitions(iteration) + 1;
             var clearRequested = false;
             var generatedElementsList = new List<ElementDefinition>();
+            var stopwatch = new Stopwatch();
 
             for (var number = start; number < start + this.configuration.TestObjectsNumber; number++)
             {
-                iteration =
-                    this.configuration.Session.OpenIterations.Keys.FirstOrDefault(it =>
-                        iteration != null && it.Iid == iteration.Iid);
+                iteration = this.configuration.Session.OpenIterations.Keys
+                    .FirstOrDefault(it => iteration != null && it.Iid == iteration.Iid);
                 var clonedIteration = iteration?.Clone(true);
 
                 if (clonedIteration == null)
@@ -294,21 +314,23 @@ namespace StressGenerator.Utils
                 clonedIteration.Element.Add(elementDefinition);
                 generatedElementsList.Add(elementDefinition);
 
+                stopwatch.Restart();
                 await WriteElementDefinition(elementDefinition, iteration, clonedIteration);
+                stopwatch.Stop();
 
-                Thread.Sleep(this.configuration.TimeInterval);
+                Thread.Sleep((int)Math.Max(0, this.configuration.TimeInterval - stopwatch.ElapsedMilliseconds));
             }
 
             return generatedElementsList;
         }
 
         /// <summary>
-        /// Generate and write ParameterValueSet for each parameter that belongs to a generated element definition
+        /// Generate and write <see cref="ParameterValueSet"/>s for each <see cref="Parameter"/>
+        /// that belongs to a generated <see cref="ElementDefinition"/>.
         /// </summary>
-        /// <param name="generatedElementsList">The generated element definition list</param>
-        /// <returns>
-        /// The <see cref="Task"/>
-        /// </returns>
+        /// <param name="generatedElementsList">
+        /// The generated <see cref="ElementDefinition"/> list.
+        /// </param>
         private async Task GenerateAndWriteParameterValueSets(List<ElementDefinition> generatedElementsList)
         {
             if (generatedElementsList == null)
@@ -322,8 +344,7 @@ namespace StressGenerator.Utils
 
             if (generatedIteration == null)
             {
-                this.NotifyMessage("Cannot find Iteration that contains generated ElementDefinition list.",
-                    LogVerbosity.Error);
+                this.NotifyMessage("Cannot find Iteration that contains generated ElementDefinition list.", LogVerbosity.Error);
                 return;
             }
 
@@ -348,10 +369,16 @@ namespace StressGenerator.Utils
                 index++;
             }
         }
-
-        /// <summary>Find highest number in the name or short name of the element definitions.</summary>
-        /// <param name="iteration">The last iteration from the model <see cref="Iteration"/></param>
-        /// <returns>The highest number that was found, or zero if no matching element definitions were found.</returns>
+      
+        /// <summary>
+        /// Find the highest number in the name or short name of the <see cref="ElementDefinition"/>s.
+        /// </summary>
+        /// <param name="iteration">
+        /// The given <see cref="Iteration"/>.
+        /// </param>
+        /// <returns>
+        /// The highest number that was found, or zero if no matching <see cref="ElementDefinition"/>s were found.
+        /// </returns>
         private int FindHighestNumberOnElementDefinitions(Iteration iteration)
         {
             var regexName = new Regex($@"^{this.configuration.ElementName}\s*#(\d+)$", RegexOptions.IgnoreCase);
@@ -383,78 +410,142 @@ namespace StressGenerator.Utils
             return highestNumber;
         }
 
-        /// <summary>Write generated element definition</summary>
-        /// <param name="elementDefinition">Element definition that will be written <see cref="ElementDefinition"/></param>
-        /// <param name="originalIteration">Current iteration used for creating write transaction <see cref="Iteration"/></param>
-        /// <param name="clonedIteration">Cloned iteration that will contain element definition <see cref="Iteration"/></param>
-        /// <returns>
-        /// The <see cref="Task"/>
-        /// </returns>
-        private async Task WriteElementDefinition(ElementDefinition elementDefinition, Iteration originalIteration,
+        /// <summary>
+        /// Write the generated <see cref="ElementDefinition"/>.
+        /// </summary>
+        /// <param name="elementDefinition">
+        /// <see cref="ElementDefinition"/> that will be written.
+        /// </param>
+        /// <param name="originalIteration">
+        /// Current <see cref="Iteration"/> used for creating write transaction.
+        /// </param>
+        /// <param name="clonedIteration">
+        /// Cloned <see cref="Iteration"/> that will contain the <see cref="ElementDefinition"/>.
+        /// </param>
+        private async Task WriteElementDefinition(
+            ElementDefinition elementDefinition,
+            Iteration originalIteration,
             Iteration clonedIteration)
+        {
+            var transactionContext = TransactionContextResolver.ResolveContext(originalIteration);
+            var operationContainer = new OperationContainer(transactionContext.ContextRoute());
+            operationContainer.AddOperation(new Operation(
+                originalIteration.ToDto(), 
+                clonedIteration.ToDto(),
+                OperationKind.Update));
+
+            foreach (var newThing in elementDefinition.QueryContainedThingsDeep())
+            {
+                operationContainer.AddOperation(new Operation(
+                    null,
+                    newThing.ToDto(),
+                    OperationKind.Create));
+            }
+
+            await this.WriteWithRetries(
+                operationContainer,
+                "writing to server ElementDefinition " +
+                $"\"{elementDefinition.Name} ({elementDefinition.ShortName})\" " +
+                $"owned by {elementDefinition.Owner.ShortName}.");
+        }
+
+        /// <summary>
+        /// Write <see cref="ParameterValueSet"/>s.
+        /// </summary>
+        /// <param name="parameter">
+        /// The <see cref="Parameter"/> whose values will be written.
+        /// </param>
+        /// <param name="elementIndex">
+        /// The <see cref="ElementDefinition"/> index (used to see different parameter values).
+        /// </param>
+        private async Task WriteParametersValueSets(Parameter parameter, int elementIndex)
+        {
+            var valueConfigPair = StressGeneratorConfiguration.ParamValueConfig
+                .FirstOrDefault(pvc => pvc.Key == parameter.ParameterType.ShortName);
+            var parameterSwitchKind = elementIndex % 2 == 0
+                ? ParameterSwitchKind.MANUAL
+                : ParameterSwitchKind.REFERENCE;
+            var parameterValue = (valueConfigPair.Value + elementIndex).ToString(CultureInfo.InvariantCulture);
+            var valueSetClone = ParameterGenerator.UpdateValueSets(parameter.ValueSets, parameterSwitchKind, parameterValue);
+
+            var transactionContext = TransactionContextResolver.ResolveContext(valueSetClone);
+            var transaction = new ThingTransaction(transactionContext);
+            transaction.CreateOrUpdate(valueSetClone);
+
+            await this.WriteWithRetries(
+                transaction.FinalizeTransaction(),
+                "writing to server ParameterValueSet " +
+                $"(published value {parameterValue}) " +
+                $"for Parameter \"{parameter.ParameterType.Name} ({parameter.ParameterType.ShortName})\".");
+        }
+
+        /// <summary>
+        /// Write the given <paramref name="operationContainer"/> to the server, retrying on failure.
+        /// </summary>
+        /// <param name="operationContainer">
+        /// The given <see cref="OperationContainer"/>.
+        /// </param>
+        /// <param name="actionDescription">
+        /// The description of the action.
+        /// </param>
+        private async Task WriteWithRetries(OperationContainer operationContainer, string actionDescription)
         {
             try
             {
-                var transactionContext = TransactionContextResolver.ResolveContext(originalIteration);
-                var operationContainer = new OperationContainer(transactionContext.ContextRoute());
-                operationContainer.AddOperation(new Operation(originalIteration.ToDto(), clonedIteration.ToDto(),
-                    OperationKind.Update));
+                await Policy
+                    .Handle<Exception>()
+                    .RetryAsync(MaxRetryCount, (ex, retryCount) =>
+                    {
+                        this.LogOperationResult(false, actionDescription, ex, retryCount);
+                    })
+                    .ExecuteAsync(async () => await this.configuration.Session.Dal.Write(operationContainer));
 
-                foreach (var newThing in elementDefinition.QueryContainedThingsDeep())
-                {
-                    operationContainer.AddOperation(new Operation(null, newThing.ToDto(),
-                        OperationKind.Create));
-                }
-
-                await this.configuration.Session.Dal.Write(operationContainer);
-
-                this.NotifyMessage(
-                    $"Successfully generated ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName}).",
-                    LogVerbosity.Info);
+                this.LogOperationResult(true, actionDescription);
             }
             catch (Exception ex)
             {
-                this.NotifyMessage(
-                    $"Cannot generate ElementDefinition {elementDefinition.Name} ({elementDefinition.ShortName}). Exception: {ex.Message}",
-                    LogVerbosity.Error);
+                this.LogOperationResult(false, actionDescription, ex);
             }
         }
 
         /// <summary>
-        /// Write parameters value sets
+        /// Log the result of on operation.
         /// </summary>
-        /// <param name="parameter">The parameter whose values will be written <see cref="Parameter"/></param>
-        /// <param name="elementIndex">The element definition index(used to see different parameter values)</param>
-        /// <returns>
-        /// The <see cref="Task"/>
-        /// </returns>
-        private async Task WriteParametersValueSets(Parameter parameter, int elementIndex)
+        /// <param name="success">
+        /// The operation success.
+        /// </param>
+        /// <param name="actionDescription">
+        /// The description of the action.
+        /// </param>
+        /// <param name="exception">
+        /// Optionally, the <see cref="Exception"/> which caused the operation to fail.
+        /// </param>
+        /// <param name="retryCount">
+        /// Optionally, the retry count of the failed operation.
+        /// </param>
+        private void LogOperationResult(
+            bool success,
+            string actionDescription,
+            Exception exception = null,
+            int? retryCount = null)
         {
-            var valueConfigPair =
-                StressGeneratorConfiguration.ParamValueConfig.FirstOrDefault(pvc =>
-                    pvc.Key == parameter.ParameterType.ShortName);
-            var parameterSwitchKind =
-                elementIndex % 2 == 0 ? ParameterSwitchKind.MANUAL : ParameterSwitchKind.REFERENCE;
-            var parameterValue = (valueConfigPair.Value + elementIndex).ToString(CultureInfo.InvariantCulture);
-            var valueSetClone = ParameterGenerator.UpdateValueSets(parameter.ValueSets,
-                parameterSwitchKind, parameterValue);
+            var sb = new StringBuilder();
+            
+            sb.Append(success ? "Succeeded" : "Failed");
+            sb.Append(" ");
 
-            try
+            if (retryCount != null)
             {
-                var transactionContext = TransactionContextResolver.ResolveContext(valueSetClone);
-                var transaction = new ThingTransaction(transactionContext);
-                transaction.CreateOrUpdate(valueSetClone);
-                var operationContainer = transaction.FinalizeTransaction();
-                await this.configuration.Session.Write(operationContainer);
+                sb.Append($"(retry count {retryCount})");
+                sb.Append(" ");
+            }
 
-                this.NotifyMessage(
-                    $"Successfully generated ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName}).");
-            }
-            catch (Exception ex)
-            {
-                this.NotifyMessage(
-                    $"Cannot update ValueSet (Published value: {parameterValue}) for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName}). Exception: {ex.Message}");
-            }
+            sb.Append(actionDescription);
+            sb.Append(" ");
+            
+            this.NotifyMessage(sb.ToString(),
+                success ? (LogVerbosity?) null : LogVerbosity.Error,
+                exception);
         }
     }
 }
