@@ -28,10 +28,8 @@ namespace StressGenerator.Utils
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
-    using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
@@ -40,8 +38,6 @@ namespace StressGenerator.Utils
     using CDP4Dal;
     using CDP4Dal.Operations;
     using Common.Events;
-    using NLog;
-    using Polly;
     using ViewModels;
 
     /// <summary>
@@ -49,11 +45,6 @@ namespace StressGenerator.Utils
     /// </summary>
     internal class StressGenerator
     {
-        /// <summary>
-        /// The maximum retry count for a write operation.
-        /// </summary>
-        private const int MaxRetryCount = 3;
-
         /// <summary>
         /// The singleton class instance
         /// </summary>
@@ -68,25 +59,9 @@ namespace StressGenerator.Utils
         internal static StressGenerator GetInstance() => Instance;
 
         /// <summary>
-        /// The NLog logger
-        /// </summary>
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
-        /// <summary>
         /// Stress generator configuration
         /// </summary>
         private StressGeneratorConfiguration configuration;
-
-        /// <summary>
-        /// Delegate used for notifying stress generator progress message
-        /// </summary>
-        /// <param name="message">Progress message</param>
-        public delegate void NotifyMessageDelegate(string message);
-
-        /// <summary>
-        /// Associated event with the <see cref="NotifyMessageDelegate"/>
-        /// </summary>
-        public event NotifyMessageDelegate NotifyMessageEvent;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StressGenerator"/> class
@@ -105,46 +80,6 @@ namespace StressGenerator.Utils
         }
 
         // TODO #81 Unify output messages mechanism inside SAT solution
-        /// <summary>
-        /// Invoke <see cref="NotifyMessageEvent"/> and optionally log.
-        /// </summary>
-        /// <param name="message">
-        /// The message.
-        /// </param>
-        /// <param name="logLevel">
-        /// <see cref="LogVerbosity"/> level (optional)
-        /// </param>
-        /// <param name="ex">
-        /// <see cref="Exception"/> (optional)
-        /// </param>
-        private void NotifyMessage(string message, LogVerbosity? logLevel = null, Exception ex = null)
-        {
-            if (ex != null)
-            {
-                message += Environment.NewLine + "    " + ex.Message;
-            }
-
-            NotifyMessageEvent?.Invoke(message);
-
-            switch (logLevel)
-            {
-                case LogVerbosity.Info:
-                    Logger.Info(message);
-                    break;
-                case LogVerbosity.Warn:
-                    Logger.Warn(message);
-                    break;
-                case LogVerbosity.Debug:
-                    Logger.Debug(message);
-                    break;
-                case LogVerbosity.Error:
-                    Logger.Error(message);
-                    break;
-                default:
-                    Logger.Trace(message);
-                    break;
-            }
-        }
 
         /// <summary>
         /// Generate test objects in the engineering model.
@@ -153,7 +88,13 @@ namespace StressGenerator.Utils
         {
             if (this.configuration == null)
             {
-                this.NotifyMessage("Stress generator configuration is not initialized.", LogVerbosity.Error);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "Stress generator configuration is not initialized.",
+                    Verbosity = LogVerbosity.Error,
+                    Type = typeof(StressGeneratorViewModel)
+                });
+
                 return;
             }
 
@@ -170,8 +111,7 @@ namespace StressGenerator.Utils
                 }
 
                 // Generate and write EngineeringModelSetup
-                var engineeringModelSetup = await EngineeringModelSetupGenerator.Create(
-                    session, this.configuration.TestModelSetupName, this.configuration.SourceModelSetup);
+                var engineeringModelSetup = await EngineeringModelSetupGenerator.Create(session, this.configuration.TestModelSetupName, this.configuration.SourceModelSetup);
 
                 await session.Refresh();
 
@@ -206,14 +146,13 @@ namespace StressGenerator.Utils
         /// </summary>
         public async Task CleanUp()
         {
-            var session = this.configuration.Session;
-
             if (this.configuration.DeleteModel)
             {
-                await EngineeringModelSetupGenerator.Delete(session, this.configuration.TestModelSetup);
+                await EngineeringModelSetupGenerator.Delete(this.configuration.Session,
+                    this.configuration.TestModelSetup);
             }
 
-            CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent { CurrentSession = this.configuration.Session });
+            CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent {CurrentSession = this.configuration.Session});
         }
 
         /// <summary>
@@ -231,19 +170,30 @@ namespace StressGenerator.Utils
 
             try
             {
-                this.NotifyMessage(
-                    $"Loading last iteration from EngineeringModel {engineeringModelSetup.ShortName}...");
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = $"Loading last iteration from EngineeringModel {engineeringModelSetup.ShortName}...",
+                    Verbosity = LogVerbosity.Info,
+                    Type = typeof(StressGeneratorViewModel)
+                });
 
                 iteration = await IterationGenerator.Create(this.configuration.Session, engineeringModelSetup);
 
-                this.NotifyMessage(
-                    $"Successfully loaded EngineeringModel {engineeringModelSetup.ShortName} (Iteration {iteration.IterationSetup?.IterationNumber}).");
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = $"Successfully loaded EngineeringModel {engineeringModelSetup.ShortName} (Iteration {iteration.IterationSetup?.IterationNumber}).",
+                    Verbosity = LogVerbosity.Info,
+                    Type = typeof(StressGeneratorViewModel)
+                });
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                this.NotifyMessage(
-                    $"Invalid iteration. Engineering model {engineeringModelSetup.ShortName} must contain at least one active iteration. Exception: {ex.Message}",
-                    LogVerbosity.Error);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = $"Invalid iteration. Engineering model {engineeringModelSetup.ShortName} must contain at least one active iteration. Exception: {exception.Message}",
+                    Verbosity = LogVerbosity.Error,
+                    Type = typeof(StressGeneratorViewModel)
+                });
 
                 return null;
             }
@@ -253,9 +203,12 @@ namespace StressGenerator.Utils
                 return iteration;
             }
 
-            this.NotifyMessage(
-                $"Invalid RDL chain. Engineering model {(iteration.Container as EngineeringModel)?.EngineeringModelSetup.ShortName} must reference Site RDL \"{StressGeneratorConfiguration.GenericRdlShortName}\".",
-                LogVerbosity.Error);
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = $"Invalid RDL chain. Engineering model {(iteration.Container as EngineeringModel)?.EngineeringModelSetup.ShortName} must reference Site RDL \"{StressGeneratorConfiguration.GenericRdlShortName}\".",
+                Verbosity = LogVerbosity.Error,
+                Type = typeof(StressGeneratorViewModel)
+            });
 
             return null;
         }
@@ -273,13 +226,25 @@ namespace StressGenerator.Utils
         {
             if (iteration == null)
             {
-                this.NotifyMessage("Cannot find Iteration that contains generated ElementDefinition list.", LogVerbosity.Error);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "Cannot find Iteration that contains generated ElementDefinition list.",
+                    Verbosity = LogVerbosity.Error,
+                    Type = typeof(StressGeneratorViewModel)
+                });
+
                 return null;
             }
 
             if (this.configuration.Session.OpenIterations == null)
             {
-                this.NotifyMessage("This session does not contains open Iterations.", LogVerbosity.Error);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "This session does not contains open Iterations.",
+                    Verbosity = LogVerbosity.Error,
+                    Type = typeof(StressGeneratorViewModel)
+                });
+
                 return null;
             }
 
@@ -335,7 +300,13 @@ namespace StressGenerator.Utils
         {
             if (generatedElementsList == null)
             {
-                this.NotifyMessage("Generated ElementDefinition list is empty.", LogVerbosity.Error);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "Generated ElementDefinition list is empty.",
+                    Verbosity = LogVerbosity.Error,
+                    Type = typeof(StressGeneratorViewModel)
+                });
+
                 return;
             }
 
@@ -344,7 +315,13 @@ namespace StressGenerator.Utils
 
             if (generatedIteration == null)
             {
-                this.NotifyMessage("Cannot find Iteration that contains generated ElementDefinition list.", LogVerbosity.Error);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "Cannot find Iteration that contains generated ElementDefinition list.",
+                    Verbosity = LogVerbosity.Error,
+                    Type = typeof(StressGeneratorViewModel)
+                });
+
                 return;
             }
 
@@ -357,9 +334,12 @@ namespace StressGenerator.Utils
                     continue;
                 }
 
-                this.NotifyMessage(
-                    $"Generating ParameterValueSet for {generatedIteration.Element[index].Name} ({generatedIteration.Element[index].ShortName}).",
-                    LogVerbosity.Info);
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = $"Generating ParameterValueSet for {generatedIteration.Element[index].Name} ({generatedIteration.Element[index].ShortName}).",
+                    Verbosity = LogVerbosity.Info,
+                    Type = typeof(StressGeneratorViewModel)
+                });
 
                 foreach (var parameter in elementDefinition.Parameter)
                 {
@@ -369,7 +349,7 @@ namespace StressGenerator.Utils
                 index++;
             }
         }
-      
+
         /// <summary>
         /// Find the highest number in the name or short name of the <see cref="ElementDefinition"/>s.
         /// </summary>
@@ -430,7 +410,7 @@ namespace StressGenerator.Utils
             var transactionContext = TransactionContextResolver.ResolveContext(originalIteration);
             var operationContainer = new OperationContainer(transactionContext.ContextRoute());
             operationContainer.AddOperation(new Operation(
-                originalIteration.ToDto(), 
+                originalIteration.ToDto(),
                 clonedIteration.ToDto(),
                 OperationKind.Update));
 
@@ -442,7 +422,8 @@ namespace StressGenerator.Utils
                     OperationKind.Create));
             }
 
-            await this.WriteWithRetries(
+            await GeneratorHelper.WriteWithRetries(
+                this.configuration.Session,
                 operationContainer,
                 "writing to server ElementDefinition " +
                 $"\"{elementDefinition.Name} ({elementDefinition.ShortName})\" " +
@@ -458,7 +439,7 @@ namespace StressGenerator.Utils
         /// <param name="elementIndex">
         /// The <see cref="ElementDefinition"/> index (used to see different parameter values).
         /// </param>
-        private async Task WriteParametersValueSets(Parameter parameter, int elementIndex)
+        private async Task WriteParametersValueSets(ParameterBase parameter, int elementIndex)
         {
             var valueConfigPair = StressGeneratorConfiguration.ParamValueConfig
                 .FirstOrDefault(pvc => pvc.Key == parameter.ParameterType.ShortName);
@@ -468,84 +449,21 @@ namespace StressGenerator.Utils
             var parameterValue = (valueConfigPair.Value + elementIndex).ToString(CultureInfo.InvariantCulture);
             var valueSetClone = ParameterGenerator.UpdateValueSets(parameter.ValueSets, parameterSwitchKind, parameterValue);
 
+            if (valueSetClone == null)
+            {
+                return;
+            }
+
             var transactionContext = TransactionContextResolver.ResolveContext(valueSetClone);
             var transaction = new ThingTransaction(transactionContext);
             transaction.CreateOrUpdate(valueSetClone);
 
-            await this.WriteWithRetries(
+            await GeneratorHelper.WriteWithRetries(
+                this.configuration.Session,
                 transaction.FinalizeTransaction(),
                 "writing to server ParameterValueSet " +
                 $"(published value {parameterValue}) " +
                 $"for Parameter \"{parameter.ParameterType.Name} ({parameter.ParameterType.ShortName})\".");
-        }
-
-        /// <summary>
-        /// Write the given <paramref name="operationContainer"/> to the server, retrying on failure.
-        /// </summary>
-        /// <param name="operationContainer">
-        /// The given <see cref="OperationContainer"/>.
-        /// </param>
-        /// <param name="actionDescription">
-        /// The description of the action.
-        /// </param>
-        private async Task WriteWithRetries(OperationContainer operationContainer, string actionDescription)
-        {
-            try
-            {
-                await Policy
-                    .Handle<Exception>()
-                    .RetryAsync(MaxRetryCount, (ex, retryCount) =>
-                    {
-                        this.LogOperationResult(false, actionDescription, ex, retryCount);
-                    })
-                    .ExecuteAsync(async () => await this.configuration.Session.Dal.Write(operationContainer));
-
-                this.LogOperationResult(true, actionDescription);
-            }
-            catch (Exception ex)
-            {
-                this.LogOperationResult(false, actionDescription, ex);
-            }
-        }
-
-        /// <summary>
-        /// Log the result of on operation.
-        /// </summary>
-        /// <param name="success">
-        /// The operation success.
-        /// </param>
-        /// <param name="actionDescription">
-        /// The description of the action.
-        /// </param>
-        /// <param name="exception">
-        /// Optionally, the <see cref="Exception"/> which caused the operation to fail.
-        /// </param>
-        /// <param name="retryCount">
-        /// Optionally, the retry count of the failed operation.
-        /// </param>
-        private void LogOperationResult(
-            bool success,
-            string actionDescription,
-            Exception exception = null,
-            int? retryCount = null)
-        {
-            var sb = new StringBuilder();
-            
-            sb.Append(success ? "Succeeded" : "Failed");
-            sb.Append(" ");
-
-            if (retryCount != null)
-            {
-                sb.Append($"(retry count {retryCount})");
-                sb.Append(" ");
-            }
-
-            sb.Append(actionDescription);
-            sb.Append(" ");
-            
-            this.NotifyMessage(sb.ToString(),
-                success ? (LogVerbosity?) null : LogVerbosity.Error,
-                exception);
         }
     }
 }

@@ -32,10 +32,9 @@ namespace StressGenerator.Utils
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
-    using Common.Events;
 
     /// <summary>
-    /// Helper class for creating iteration <see cref="Iteration"/> for test purposes
+    /// Helper class for creating EngineeringModelSetup <see cref="EngineeringModelSetup"/> for test purposes
     /// </summary>
     internal static class EngineeringModelSetupGenerator
     {
@@ -78,11 +77,11 @@ namespace StressGenerator.Utils
                     Guid.NewGuid(),
                     session.Assembler.Cache,
                     session.Credentials.Uri)
-                    {
-                        Name = $"{modelName} MODEL RDL",
-                        ShortName = $"{modelName} MRDL",
-                        RequiredRdl = siteDirectory.SiteReferenceDataLibrary.FirstOrDefault()
-                    };
+                {
+                    Name = $"{modelName} MODEL RDL",
+                    ShortName = $"{modelName} MRDL",
+                    RequiredRdl = siteDirectory.SiteReferenceDataLibrary.FirstOrDefault()
+                };
                 engineeringModelSetup.RequiredRdl.Add(modelReferenceDataLibrary);
             }
             else
@@ -121,47 +120,31 @@ namespace StressGenerator.Utils
             SiteDirectory siteDirectory,
             SiteDirectory siteDirectoryCloned)
         {
-            try
-            {
-                var transactionContext = TransactionContextResolver.ResolveContext(siteDirectory);
-                var operationContainer = new OperationContainer(transactionContext.ContextRoute());
+            var transactionContext = TransactionContextResolver.ResolveContext(siteDirectory);
+            var operationContainer = new OperationContainer(transactionContext.ContextRoute());
 
-                operationContainer.AddOperation(new Operation(
-                    siteDirectory.ToDto(), 
-                    siteDirectoryCloned.ToDto(),
-                    OperationKind.Update));
+            operationContainer.AddOperation(new Operation(
+                siteDirectory.ToDto(),
+                siteDirectoryCloned.ToDto(),
+                OperationKind.Update));
+            operationContainer.AddOperation(new Operation(
+                null,
+                engineeringModelSetup.ToDto(),
+                OperationKind.Create));
+
+            if (engineeringModelSetup.RequiredRdl.Count != 0)
+            {
                 operationContainer.AddOperation(new Operation(
                     null,
-                    engineeringModelSetup.ToDto(),
+                    engineeringModelSetup.RequiredRdl.FirstOrDefault()?.ToDto(),
                     OperationKind.Create));
-
-                if (engineeringModelSetup.RequiredRdl.Count != 0)
-                {
-                    operationContainer.AddOperation(new Operation(
-                        null,
-                        engineeringModelSetup.RequiredRdl.FirstOrDefault()?.ToDto(),
-                        OperationKind.Create));
-                }
-
-                await session.Dal.Write(operationContainer);
-
-                CDPMessageBus.Current.SendMessage(new LogEvent
-                {
-                    Message = $"Successfully generated EngineeringModelSetup {engineeringModelSetup.Name} ({engineeringModelSetup.ShortName}).",
-                    Verbosity = LogVerbosity.Info
-                });
             }
-            catch (Exception ex)
-            {
-                CDPMessageBus.Current.SendMessage(new LogEvent
-                {
-                    Message = $"Cannot generate EngineeringModelSetup {engineeringModelSetup.Name} ({engineeringModelSetup.ShortName}). Exception: {ex.Message}",
-                    Exception = ex,
-                    Verbosity = LogVerbosity.Error
-                });
 
-                engineeringModelSetup = null;
-            }
+            await GeneratorHelper.WriteWithRetries(
+                session,
+                operationContainer,
+                "writing to server EngineeringModelSetup " +
+                $"\"{engineeringModelSetup.Name} ({engineeringModelSetup.ShortName})\".");
 
             return engineeringModelSetup;
         }
@@ -177,34 +160,26 @@ namespace StressGenerator.Utils
         /// </param>
         public static async Task Delete(ISession session, EngineeringModelSetup engineeringModelSetup)
         {
-            try
-            {
-                var siteDirectory = session.RetrieveSiteDirectory();
-                var siteDirectoryCloned = siteDirectory.Clone(true);
+            var siteDirectory = session.RetrieveSiteDirectory();
+            var siteDirectoryCloned = siteDirectory.Clone(true);
 
-                var transactionContext = TransactionContextResolver.ResolveContext(siteDirectory);
-                var operationContainer = new OperationContainer(transactionContext.ContextRoute());
+            var transactionContext = TransactionContextResolver.ResolveContext(siteDirectory);
+            var operationContainer = new OperationContainer(transactionContext.ContextRoute());
 
-                operationContainer.AddOperation(new Operation(
-                    siteDirectory.ToDto(),
-                    siteDirectoryCloned.ToDto(),
-                    OperationKind.Update));
-                operationContainer.AddOperation(new Operation(
-                    null,
-                    engineeringModelSetup.ToDto(),
-                    OperationKind.Delete));
+            operationContainer.AddOperation(new Operation(
+                siteDirectory.ToDto(),
+                siteDirectoryCloned.ToDto(),
+                OperationKind.Update));
+            operationContainer.AddOperation(new Operation(
+                null,
+                engineeringModelSetup.ToDto(),
+                OperationKind.Delete));
 
-                await session.Dal.Write(operationContainer);
-            }
-            catch (Exception ex)
-            {
-                CDPMessageBus.Current.SendMessage(new LogEvent
-                {
-                    Message = $"Cannot delete EngineeringModelSetup {engineeringModelSetup.Name} ({engineeringModelSetup.ShortName}). Exception: {ex.Message}",
-                    Exception = ex,
-                    Verbosity = LogVerbosity.Error
-                });
-            }
+            await GeneratorHelper.WriteWithRetries(
+                session,
+                operationContainer,
+                "deleting from server EngineeringModelSetup " +
+                $"\"{engineeringModelSetup.Name} ({engineeringModelSetup.ShortName})\".");
         }
     }
 }
