@@ -43,13 +43,11 @@ namespace StressGenerator.Tests
     using Utils;
     using ViewModels;
     using DomainOfExpertise = CDP4Common.SiteDirectoryData.DomainOfExpertise;
-    using ElementDefinition = CDP4Common.EngineeringModelData.ElementDefinition;
     using EngineeringModel = CDP4Common.EngineeringModelData.EngineeringModel;
     using EngineeringModelSetup = CDP4Common.SiteDirectoryData.EngineeringModelSetup;
     using Iteration = CDP4Common.EngineeringModelData.Iteration;
     using IterationSetup = CDP4Common.SiteDirectoryData.IterationSetup;
     using ModelReferenceDataLibrary = CDP4Common.SiteDirectoryData.ModelReferenceDataLibrary;
-    using Parameter = CDP4Common.EngineeringModelData.Parameter;
     using Participant = CDP4Common.SiteDirectoryData.Participant;
     using Person = CDP4Common.SiteDirectoryData.Person;
     using QuantityKind = CDP4Common.SiteDirectoryData.QuantityKind;
@@ -191,15 +189,6 @@ namespace StressGenerator.Tests
                 EngineeringModelSetup = this.engineeringModelSetup
             };
             this.engineeringModel.Iteration.Add(this.iteration);
-
-            var ed1 = new ElementDefinition(Guid.NewGuid(), null, null);
-            var param1 = new Parameter(Guid.NewGuid(), null, null)
-            {
-                ParameterType = this.quantityKindParamType
-            };
-
-            ed1.Parameter.Add(param1);
-            this.iteration.Element.Add(ed1);
 
             this.engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.session.Object.Assembler.Cache,
                     this.session.Object.Credentials.Uri)
