@@ -129,7 +129,7 @@ namespace StressGenerator.Utils
         /// <summary>
         /// Generate test objects in the engineering model.
         /// </summary>
-        public async Task GenerateTestObjects()
+        public async Task Generate()
         {
             if (this.configuration == null)
             {
@@ -179,22 +179,14 @@ namespace StressGenerator.Utils
 
             // Generate and write ParameterValueSets
             await this.GenerateAndWriteParameterValueSets(generatedElementsList);
-
-            await session.Refresh();
         }
 
         /// <summary>
         /// Cleanup test objects.
         /// </summary>
-        public async Task CleanUpTestObjects()
+        public async Task CleanUp()
         {
             var session = this.configuration.Session;
-
-            if (this.configuration.TestModelSetup == null)
-            {
-                this.NotifyMessage("EngineeringModelSetup is not initialized.", LogVerbosity.Error);
-                return;
-            }
 
             if (this.configuration.DeleteModel)
             {
@@ -294,8 +286,8 @@ namespace StressGenerator.Utils
                 }
 
                 var elementDefinition = ElementDefinitionGenerator.Create(
-                    $"{configuration.ElementName}#{number:D3}",
-                    $"{configuration.ElementShortName}#{number:D3}",
+                    $"{configuration.ElementName} #{number:D3}",
+                    $"{configuration.ElementShortName} #{number:D3}",
                     clonedIteration,
                     this.configuration.Session.ActivePerson.DefaultDomain);
 
@@ -446,13 +438,6 @@ namespace StressGenerator.Utils
             var parameterValue = (valueConfigPair.Value + elementIndex).ToString(CultureInfo.InvariantCulture);
             var valueSetClone = ParameterGenerator.UpdateValueSets(parameter.ValueSets,
                 parameterSwitchKind, parameterValue);
-
-            if (valueSetClone == null)
-            {
-                this.NotifyMessage(
-                    $"ValueSets is null for parameter {parameter.ParameterType.Name} ({parameter.ParameterType.ShortName})");
-                return;
-            }
 
             try
             {

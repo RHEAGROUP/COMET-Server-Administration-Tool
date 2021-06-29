@@ -37,7 +37,7 @@ namespace StressGenerator.ViewModels
         /// <summary>
         /// Stress generator models prefix
         /// </summary>
-        public const string ModelPrefix = "StressTester_TemporaryTestModel";
+        public const string ModelPrefix = "StressGenerator";
 
         /// <summary>
         /// Generic RDL short name
@@ -167,7 +167,6 @@ namespace StressGenerator.ViewModels
         public StressGeneratorConfiguration(ISession session)
         {
             this.Session = session;
-            this.TestObjectsNumber = 5;
 
             this.ElementName = GenericElementName;
             this.ElementShortName = GenericElementShortName;

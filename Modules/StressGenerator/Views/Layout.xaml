@@ -19,7 +19,6 @@
     <dxlc:LayoutGroup.DataContext>
         <viewModels:StressGeneratorViewModel />
     </dxlc:LayoutGroup.DataContext>
-
     <GroupBox Header="Connection" Margin="0" Height="340">
         <Grid HorizontalAlignment="Left">
             <Grid.RowDefinitions>
@@ -83,8 +82,7 @@
                     Width="250" />
                 <ComboBox
                     IsEnabled="{Binding Path=LoginSuccessfully}"
-                    Visibility="{Binding Path=ModeOpenOrOverwrite, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}"
-                    ItemsSource="{Binding Path=EngineeringModelSetupList, Mode=OneTime}"
+                    ItemsSource="{Binding Path=EngineeringModelSetupList, UpdateSourceTrigger=PropertyChanged}"
                     SelectedValue="{Binding Path=SelectedEngineeringModelSetup, Mode=TwoWay}"
                     Width="250"
                     FontSize="12"
@@ -106,7 +104,7 @@
                 Content="Source model" />
             <ComboBox
                 IsEnabled="{Binding Path=SourceModelIsEnabled}"
-                ItemsSource="{Binding Path=SourceEngineeringModelSetupList, Mode=OneTime}"
+                ItemsSource="{Binding Path=SourceEngineeringModelSetupList, UpdateSourceTrigger=PropertyChanged}"
                 SelectedValue="{Binding Path=SelectedSourceEngineeringModelSetup, Mode=TwoWay}"
                 Grid.Row="3"
                 Grid.Column="1"
@@ -130,8 +128,9 @@
 
                 <Image Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left"
                        Source="{dx:DXImage Image=Info_16x16.png}" />
-                <TextBlock Grid.Row="0" Grid.Column="1" MaxWidth="320" HorizontalAlignment="Left" Margin="5" TextWrapping="Wrap">
-                    For safety, the short name of the engineering model must start with 'StressTester_TemporaryTestModel'.
+                <TextBlock Grid.Row="0" Grid.Column="1" MaxWidth="320" HorizontalAlignment="Left" Margin="5"
+                           TextWrapping="Wrap"
+                           Text="{Binding ModelPrefixInformation, Mode=OneTime}">
                 </TextBlock>
             </Grid>
         </Grid>

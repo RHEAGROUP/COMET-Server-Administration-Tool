@@ -293,6 +293,9 @@ namespace StressGenerator.ViewModels
         /// </summary>
         private bool modeCreate;
 
+        /// <summary>
+        /// Gets or sets operating mode flag
+        /// </summary>
         public bool ModeCreate
         {
             get => this.modeCreate;
@@ -300,21 +303,13 @@ namespace StressGenerator.ViewModels
         }
 
         /// <summary>
-        /// Backing field for the <see cref="ModeOpenOrOverwrite"/> property
-        /// </summary>
-        private bool modeOpenOrOverwrite;
-
-        public bool ModeOpenOrOverwrite
-        {
-            get => this.modeOpenOrOverwrite;
-            private set => this.RaiseAndSetIfChanged(ref this.modeOpenOrOverwrite, value);
-        }
-
-        /// <summary>
         /// Backing field for the <see cref="SourceModelIsEnabled"/> property
         /// </summary>
         private bool sourceModelIsEnabled;
 
+        /// <summary>
+        /// Gets or sets source model flag
+        /// </summary>
         public bool SourceModelIsEnabled
         {
             get => this.sourceModelIsEnabled;
@@ -326,11 +321,19 @@ namespace StressGenerator.ViewModels
         /// </summary>
         private string newModelName;
 
+        /// <summary>
+        /// Gets or sets new model name
+        /// </summary>
         public string NewModelName
         {
             get => this.newModelName;
             set => this.RaiseAndSetIfChanged(ref this.newModelName, value);
         }
+
+        /// <summary>
+        /// Get model prefix information
+        /// </summary>
+        public string ModelPrefixInformation => $"For safety, the short name of the engineering model must start with '{StressGeneratorConfiguration.ModelPrefix}'";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StressGeneratorViewModel"/> class
@@ -341,6 +344,9 @@ namespace StressGenerator.ViewModels
             this.AddSubscriptions();
         }
 
+        /// <summary>
+        /// Add model subscriptions
+        /// </summary>
         private void AddSubscriptions()
         {
             this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(StressGeneratorMessageHandler);
@@ -375,27 +381,25 @@ namespace StressGenerator.ViewModels
 
                     this.LoginSuccessfully = true;
                     this.SelectedOperationMode = SupportedOperationModes.Open;
-                    this.BindEngineeringModels();
+                    this.EngineeringModelSetupList = this.GetEngineeringModelSetupList(true);
                 });
 
             this.WhenAnyValue(
                     vm => vm.SelectedOperationMode)
                 .Subscribe((mode) =>
                 {
+                    this.SourceModelIsEnabled = mode != SupportedOperationModes.Open;
+
                     switch (mode)
                     {
                         case SupportedOperationModes.Open:
-                            this.ModeOpenOrOverwrite = true;
                             this.ModeCreate = false;
-                            this.SourceModelIsEnabled = false;
                             break;
                         case SupportedOperationModes.Create:
                         case SupportedOperationModes.CreateOverwrite:
-                            this.ModeOpenOrOverwrite = true;
                             this.ModeCreate = mode == SupportedOperationModes.Create;
-                            this.SourceModelIsEnabled = true;
                             this.SelectedEngineeringModelSetup = null;
-                            this.BindSourceEngineeringModels();
+                            this.SourceEngineeringModelSetupList = this.GetEngineeringModelSetupList();
                             break;
                         default:
                             throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
@@ -410,8 +414,20 @@ namespace StressGenerator.ViewModels
             this.stressGenerator.NotifyMessageEvent += StressGeneratorMessageHandler;
         }
 
+        /// <summary>
+        /// Set properties for this model
+        /// </summary>
         private void SetProperties()
         {
+            this.EngineeringModelSetupList = new ReactiveList<EngineeringModelSetup>
+            {
+                ChangeTrackingEnabled = true
+            };
+            this.SourceEngineeringModelSetupList = new ReactiveList<EngineeringModelSetup>
+            {
+                ChangeTrackingEnabled = true
+            };
+
             this.TimeInterval = StressGeneratorConfiguration.MinTimeInterval;
             this.TestObjectsNumber = StressGeneratorConfiguration.MinNumberOfTestObjects;
             this.ElementName = StressGeneratorConfiguration.GenericElementName;
@@ -419,9 +435,8 @@ namespace StressGenerator.ViewModels
             this.EngineeringModelSetupList = new ReactiveList<EngineeringModelSetup>();
             this.SourceEngineeringModelSetupList = new ReactiveList<EngineeringModelSetup>();
             this.ModeCreate = false;
-            this.ModeOpenOrOverwrite = false;
             this.SourceModelIsEnabled = false;
-            this.NewModelName = "StressTester_TemporaryTestModel";
+            this.NewModelName = StressGeneratorConfiguration.ModelPrefix;
         }
 
         /// <summary>
@@ -445,9 +460,9 @@ namespace StressGenerator.ViewModels
                 DeleteModel = this.DeleteModel
             });
 
-            await this.stressGenerator.GenerateTestObjects();
+            await this.stressGenerator.Generate();
 
-            await this.stressGenerator.CleanUpTestObjects();
+            await this.stressGenerator.CleanUp();
         }
 
         /// <summary>
@@ -464,33 +479,15 @@ namespace StressGenerator.ViewModels
         /// <summary>
         /// Bind engineering models to the reactive list
         /// </summary>
-        private void BindEngineeringModels()
+        /// <param name="filterPrefix">Boolean flag that specify if should be filtered</param>
+        /// <returns>Reactive list <see cref="ReactiveList{EngineeringModelSetup}"/></returns>
+        private ReactiveList<EngineeringModelSetup> GetEngineeringModelSetupList(bool? filterPrefix = null)
         {
             var siteDirectory = this.SourceViewModel.ServerSession.RetrieveSiteDirectory();
 
-            this.EngineeringModelSetupList.Clear();
+            var modelSetups = filterPrefix.HasValue ? siteDirectory.Model.Where(m => m.Name.StartsWith(StressGeneratorConfiguration.ModelPrefix)).OrderBy(m => m.Name) : siteDirectory.Model.OrderBy(m => m.Name);
 
-            foreach (var modelSetup in siteDirectory.Model
-                .Where(m => m.Name.StartsWith(StressGeneratorConfiguration.ModelPrefix)).OrderBy(m => m.Name))
-            {
-                this.EngineeringModelSetupList.Add(modelSetup);
-            }
-        }
-
-        /// <summary>
-        /// Bind engineering models to the reactive list
-        /// </summary>
-        private void BindSourceEngineeringModels()
-        {
-            // Retrieve SiteDirectory
-            var siteDirectory = this.SourceViewModel.ServerSession.RetrieveSiteDirectory();
-
-            this.SourceEngineeringModelSetupList.Clear();
-
-            foreach (var modelSetup in siteDirectory.Model.OrderBy(m => m.Name))
-            {
-                this.SourceEngineeringModelSetupList.Add(modelSetup);
-            }
+            return new ReactiveList<EngineeringModelSetup>(modelSetups);
         }
     }
 }
