@@ -427,6 +427,8 @@ namespace Migration.ViewModels
                 ? parameterSubscription.StateDependence.ActualState
                 : new List<ActualFiniteState> { null };
 
+            if (options == null) return;
+
             foreach (var option in options)
             {
                 foreach (var actualFiniteState in actualFiniteStates)
@@ -439,7 +441,9 @@ namespace Migration.ViewModels
                     {
                         parameterSubscription.ValueSet.Add(new ParameterSubscriptionValueSet
                         {
-                            SubscribedValueSet = parameterOrOverrideBase.QueryParameterBaseValueSet(option, actualFiniteState) as ParameterValueSetBase
+                            SubscribedValueSet =
+                                parameterOrOverrideBase.QueryParameterBaseValueSet(option, actualFiniteState) as
+                                    ParameterValueSetBase
                         });
                     }
                 }

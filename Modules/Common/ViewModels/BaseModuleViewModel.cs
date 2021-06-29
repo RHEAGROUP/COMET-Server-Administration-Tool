@@ -97,7 +97,6 @@ namespace Common.ViewModels
             });
         }
 
-        // TODO #81 Unify output messages mechanism inside SAT solution
         /// <summary>
         /// Add text message to the output panel
         /// </summary>
