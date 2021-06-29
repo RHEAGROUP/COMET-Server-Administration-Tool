@@ -181,6 +181,11 @@ namespace Migration.ViewModels
                 var exception = operationEvent.Exception;
                 var logLevel = operationEvent.Verbosity;
 
+                if (operationEvent.Type != this.GetType())
+                {
+                    return;
+                }
+
                 if (operationEvent.Exception != null)
                 {
                     message += $"\n\tException: {exception.Message}";

@@ -43,6 +43,7 @@ namespace Migration.Utils
     using CDP4JsonFileDal;
     using Common.Events;
     using Common.ViewModels.PlainObjects;
+    using ViewModels;
 
     /// <summary>
     /// The purpose of this class is to implement migration specif operations such as: import, export, pack
@@ -97,7 +98,8 @@ namespace Migration.Utils
             {
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
-                    Message = "Please select source session."
+                    Message = "Please select source session.",
+                    Type = typeof(MigrationViewModel)
                 });
 
                 return false;
@@ -107,7 +109,8 @@ namespace Migration.Utils
             {
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
-                    Message = "Please select model(s) to migrate."
+                    Message = "Please select model(s) to migrate.",
+                    Type = typeof(MigrationViewModel)
                 });
 
                 return false;
@@ -115,12 +118,14 @@ namespace Migration.Utils
 
             CDPMessageBus.Current.SendMessage(new LogEvent
             {
-                Message = "Import operation start"
+                Message = "Import operation start",
+                Type = typeof(MigrationViewModel)
             });
 
             CDPMessageBus.Current.SendMessage(new LogEvent
             {
-                Message = $"Retrieving SiteDirectory from {this.SourceSession.DataSourceUri}..."
+                Message = $"Retrieving SiteDirectory from {this.SourceSession.DataSourceUri}...",
+                Type = typeof(MigrationViewModel)
             });
 
             var siteDirectory = this.SourceSession.RetrieveSiteDirectory();
@@ -195,28 +200,32 @@ namespace Migration.Utils
                     {
                         CDPMessageBus.Current.SendMessage(new LogEvent
                         {
-                            Message = $"Read iteration {iterationCount} success: {iterationDescription}"
+                            Message = $"Read iteration {iterationCount} success: {iterationDescription}",
+                            Type = typeof(MigrationViewModel)
                         });
                     }
 
                     var elapsed = stopwatch.Elapsed;
                     CDPMessageBus.Current.SendMessage(new LogEvent
                     {
-                        Message = $"    Read {finishedIterationSetups} iterations in: {elapsed}"
+                        Message = $"    Read {finishedIterationSetups} iterations in: {elapsed}",
+                        Type = typeof(MigrationViewModel)
                     });
 
                     var remainingIterationSetups = totalIterationSetups - finishedIterationSetups;
                     var remaining = new TimeSpan(elapsed.Ticks / finishedIterationSetups * remainingIterationSetups);
                     CDPMessageBus.Current.SendMessage(new LogEvent
                     {
-                        Message = $"    Remaining {remainingIterationSetups} iterations read estimate: {remaining}"
+                        Message = $"    Remaining {remainingIterationSetups} iterations read estimate: {remaining}",
+                        Type = typeof(MigrationViewModel)
                     });
                 }
             }
 
             CDPMessageBus.Current.SendMessage(new LogEvent
             {
-                Message = "Import operation end"
+                Message = "Import operation end",
+                Type = typeof(MigrationViewModel)
             });
 
             return true;
@@ -237,7 +246,8 @@ namespace Migration.Utils
             {
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
-                    Message = "Please select the target session."
+                    Message = "Please select the target session.",
+                    Type = typeof(MigrationViewModel)
                 });
 
                 return false;
@@ -250,7 +260,8 @@ namespace Migration.Utils
 
             CDPMessageBus.Current.SendMessage(new LogEvent
             {
-                Message = "Export operation start"
+                Message = "Export operation start",
+                Type = typeof(MigrationViewModel)
             });
 
             var targetUrl = $"{this.TargetSession.DataSourceUri}Data/Import";
@@ -281,7 +292,8 @@ namespace Migration.Utils
                 {
                     Message = "Please select the target session.",
                     Exception = ex,
-                    Verbosity = LogVerbosity.Error
+                    Verbosity = LogVerbosity.Error,
+                    Type = typeof(MigrationViewModel)
                 });
                 success = false;
             }
@@ -296,7 +308,8 @@ namespace Migration.Utils
 
             CDPMessageBus.Current.SendMessage(new LogEvent
             {
-                Message = "Export operation end"
+                Message = "Export operation end",
+                Type = typeof(MigrationViewModel)
             });
 
             return success;
@@ -342,7 +355,8 @@ namespace Migration.Utils
 
             CDPMessageBus.Current.SendMessage(new LogEvent
             {
-                Message = $"Server status response {task.Result.StatusCode}"
+                Message = $"Server status response {task.Result.StatusCode}",
+                Type = typeof(MigrationViewModel)
             });
 
             var success = task.Result.IsSuccessStatusCode;
@@ -351,14 +365,16 @@ namespace Migration.Utils
             {
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
-                    Message = "Finished pushing data"
+                    Message = "Finished pushing data",
+                    Type = typeof(MigrationViewModel)
                 });
             }
             else
             {
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
-                    Message = "Unable to push data. Server returned error. Please check server logs."
+                    Message = "Unable to push data. Server returned error. Please check server logs.",
+                    Type = typeof(MigrationViewModel)
                 });
             }
 
@@ -387,7 +403,8 @@ namespace Migration.Utils
                     CDPMessageBus.Current.SendMessage(new LogEvent
                     {
                         Message = "Unable to find selected migration file.",
-                        Verbosity = LogVerbosity.Warn
+                        Verbosity = LogVerbosity.Warn,
+                        Type = typeof(MigrationViewModel)
                     });
 
                     return false;
@@ -408,7 +425,8 @@ namespace Migration.Utils
                     {
                         Message = "Could not add migration.json file.",
                         Exception = ex,
-                        Verbosity = LogVerbosity.Error
+                        Verbosity = LogVerbosity.Error,
+                        Type = typeof(MigrationViewModel)
                     });
 
                     return false;
@@ -417,7 +435,8 @@ namespace Migration.Utils
 
             CDPMessageBus.Current.SendMessage(new LogEvent
             {
-                Message = "Pack operation start"
+                Message = "Pack operation start",
+                Type = typeof(MigrationViewModel)
             });
 
             var operationContainers = new List<OperationContainer>();
@@ -448,7 +467,8 @@ namespace Migration.Utils
                 {
                     Message = "Could not pack data.",
                     Exception = ex,
-                    Verbosity = LogVerbosity.Error
+                    Verbosity = LogVerbosity.Error,
+                    Type = typeof(MigrationViewModel)
                 });
                 success = false;
             }
@@ -459,7 +479,8 @@ namespace Migration.Utils
 
             CDPMessageBus.Current.SendMessage(new LogEvent
             {
-                Message = "Pack operation end"
+                Message = "Pack operation end",
+                Type = typeof(MigrationViewModel)
             });
 
             return success;
