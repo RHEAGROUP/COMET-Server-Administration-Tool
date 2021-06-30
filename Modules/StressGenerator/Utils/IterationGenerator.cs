@@ -38,7 +38,7 @@ namespace StressGenerator.Utils
     internal static class IterationGenerator
     {
         /// <summary>
-        /// Create a new instance of <see cref="Iteration"/>.
+        /// Open last <see cref="Iteration"/> of the given <paramref name="modelSetup"/>.
         /// </summary>
         /// <param name="session">
         /// Server <see cref="ISession"/>
@@ -49,7 +49,7 @@ namespace StressGenerator.Utils
         /// <returns>
         /// An <see cref="Iteration"/>.
         /// </returns>
-        public static async Task<Iteration> Create(ISession session, EngineeringModelSetup modelSetup)
+        public static async Task<Iteration> OpenLastIteration(ISession session, EngineeringModelSetup modelSetup)
         {
             var model = new EngineeringModel(
                 modelSetup.EngineeringModelIid,
@@ -87,7 +87,7 @@ namespace StressGenerator.Utils
         /// <returns>
         /// True if iteration references the required <see cref="ReferenceDataLibrary"/>, false otherwise.
         /// </returns>
-        public static bool CheckIfIterationReferencesGenericRdl(Iteration iteration)
+        public static bool IterationReferencesGenericRdl(Iteration iteration)
         {
             var model = iteration.Container as EngineeringModel;
             var modelRdl = model?.EngineeringModelSetup.RequiredRdl.FirstOrDefault();

@@ -38,8 +38,9 @@
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 x:Name="LoginSource"
-                ServerTypes="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type dxlc:LayoutGroup}},
-                                                        Path=DataContext.StressGeneratorTargetServerTypes}" />
+                ServerTypes="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                     AncestorType={x:Type dxlc:LayoutGroup}},
+                                                                     Path=DataContext.StressGeneratorTargetServerTypes}" />
             <!-- Mode -->
             <dxlc:LayoutItemLabel
                 Grid.Row="1"
@@ -71,7 +72,8 @@
             <StackPanel Margin="0"
                         Grid.Row="2"
                         Grid.Column="1"
-                        HorizontalAlignment="Left" MaxHeight="30">
+                        HorizontalAlignment="Left"
+                        MaxHeight="30">
                 <dxe:TextEdit
                     IsEnabled="{Binding Path=LoginSuccessfully}"
                     Visibility="{Binding Path=ModeCreate, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}"
@@ -126,9 +128,13 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <Image Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left"
+                <Image Grid.Row="0" Grid.Column="0"
+                       HorizontalAlignment="Left"
                        Source="{dx:DXImage Image=Info_16x16.png}" />
-                <TextBlock Grid.Row="0" Grid.Column="1" MaxWidth="320" HorizontalAlignment="Left" Margin="5"
+                <TextBlock Grid.Row="0" Grid.Column="1"
+                           MaxWidth="320"
+                           HorizontalAlignment="Left"
+                           Margin="5"
                            TextWrapping="Wrap"
                            Text="{Binding ModelPrefixInformation, Mode=OneTime}">
                 </TextBlock>
@@ -160,7 +166,9 @@
                 Content="Time interval(s)" />
             <dxe:TextEdit
                 Text="{Binding Path=TimeInterval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                Mask="\d+" MaskType="RegEx" MaskUseAsDisplayFormat="True"
+                Mask="\d+"
+                MaskType="RegEx"
+                MaskUseAsDisplayFormat="True"
                 Grid.Row="0"
                 Grid.Column="1"
                 Height="Auto"

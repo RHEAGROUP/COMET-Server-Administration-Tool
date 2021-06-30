@@ -98,10 +98,14 @@ namespace Common.ViewModels
         }
 
         /// <summary>
-        /// Add text message to the output panel
+        /// Add a text message to the output panel.
         /// </summary>
-        /// <param name="message">The text message</param>
-        /// <param name="logLevel"></param>
+        /// <param name="message">
+        /// The text message.
+        /// </param>
+        /// <param name="logLevel">
+        /// The <see cref="LogVerbosity"/>.
+        /// </param>
         protected void OperationMessageHandler(string message, LogVerbosity? logLevel = null)
         {
             if (string.IsNullOrEmpty(message)) return;

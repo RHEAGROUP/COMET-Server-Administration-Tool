@@ -25,6 +25,7 @@
 
 namespace StressGenerator.ViewModels
 {
+    using System;
     using System.Collections.Generic;
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
@@ -136,29 +137,29 @@ namespace StressGenerator.ViewModels
         public bool DeleteModel { get; set; }
 
         /// <summary>
-        /// Currently open server session
+        /// Currently open server <see cref="ISession"/>.
         /// </summary>
         public ISession Session { get; }
 
         /// <summary>
-        /// EngineeringModelSetup used for stress test <see cref="EngineeringModelSetup"/>
+        /// <see cref="EngineeringModelSetup"/> iid used for stress test.
         /// </summary>
-        public EngineeringModelSetup TestModelSetup { get; set; }
+        public Guid TestModelSetupIid { get; set; }
 
         /// <summary>
-        /// EngineeringModelSetup name used for stress test
+        /// <see cref="EngineeringModelSetup"/> name used for stress test.
         /// </summary>
         public string TestModelSetupName { get; set; }
 
         /// <summary>
-        /// Source EngineeringModelSetup for the TestModelSetup
+        /// Source <see cref="EngineeringModelSetup"/> for the TestModelSetup.
         /// </summary>
         public EngineeringModelSetup SourceModelSetup { get; set; }
 
         /// <summary>
-        /// Supported mode <see cref="SupportedOperationModes"/>
+        /// Supported operation mode.
         /// </summary>
-        public SupportedOperationModes OperationMode { get; set; }
+        public SupportedOperationMode OperationMode { get; set; }
 
         /// <summary>
         /// Initialize a new instance of <see cref="StressGeneratorConfiguration" />

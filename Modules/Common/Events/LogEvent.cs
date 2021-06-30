@@ -58,7 +58,7 @@ namespace Common.Events
         public Exception Exception { get; set; }
 
         /// <summary>
-        /// Exception that will be logged <see cref="Type"/>
+        /// <see cref="System.Type"/> of the source ViewModel.
         /// </summary>
         public Type Type { get; set; }
     }

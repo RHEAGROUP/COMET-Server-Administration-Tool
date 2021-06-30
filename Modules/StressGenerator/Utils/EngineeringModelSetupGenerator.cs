@@ -34,12 +34,12 @@ namespace StressGenerator.Utils
     using CDP4Dal;
 
     /// <summary>
-    /// Helper class for creating EngineeringModelSetup <see cref="EngineeringModelSetup"/> for test purposes
+    /// Helper class for creating <see cref="EngineeringModelSetup"/>s
     /// </summary>
     internal static class EngineeringModelSetupGenerator
     {
         /// <summary>
-        /// Create a new instance of <see cref="Iteration" />
+        /// Create a new instance of <see cref="Iteration"/>
         /// </summary>
         /// <param name="session">
         /// Server session <see cref="ISession"/>
@@ -91,7 +91,7 @@ namespace StressGenerator.Utils
 
             siteDirectoryCloned.Model.Add(engineeringModelSetup);
 
-            engineeringModelSetup = await Write(session, engineeringModelSetup, siteDirectory, siteDirectoryCloned);
+            await Write(session, engineeringModelSetup, siteDirectory, siteDirectoryCloned);
 
             return engineeringModelSetup;
         }
@@ -111,10 +111,7 @@ namespace StressGenerator.Utils
         /// <param name="siteDirectoryCloned">
         /// Cloned site directory used for creating write transaction <see cref="SiteDirectory"/>
         /// </param>
-        /// <returns>
-        /// An instance of <see cref="EngineeringModelSetup"/>
-        /// </returns>
-        private static async Task<EngineeringModelSetup> Write(
+        private static async Task Write(
             ISession session,
             EngineeringModelSetup engineeringModelSetup,
             SiteDirectory siteDirectory,
@@ -136,31 +133,37 @@ namespace StressGenerator.Utils
             {
                 operationContainer.AddOperation(new Operation(
                     null,
-                    engineeringModelSetup.RequiredRdl.FirstOrDefault()?.ToDto(),
+                    engineeringModelSetup.RequiredRdl.First().ToDto(),
                     OperationKind.Create));
             }
 
-            await GeneratorHelper.WriteWithRetries(
+            await WriteHelper.WriteWithRetries(
                 session,
                 operationContainer,
                 "writing to server EngineeringModelSetup " +
                 $"\"{engineeringModelSetup.Name} ({engineeringModelSetup.ShortName})\".");
-
-            return engineeringModelSetup;
         }
 
         /// <summary>
-        /// Delete an existing EngineeringModelSetup
+        /// Delete an existing <see cref="EngineeringModelSetup"/>.
         /// </summary>
         /// <param name="session">
-        /// Server session <see cref="ISession"/>
+        /// Server <see cref="ISession"/>.
         /// </param>
-        /// <param name="engineeringModelSetup">
-        /// The EngineeringModelSetup <see cref="EngineeringModelSetup"/>
+        /// <param name="engineeringModelSetupIid">
+        /// The <see cref="EngineeringModelSetup"/> iid.
         /// </param>
-        public static async Task Delete(ISession session, EngineeringModelSetup engineeringModelSetup)
+        public static async Task Delete(ISession session, Guid engineeringModelSetupIid)
         {
             var siteDirectory = session.RetrieveSiteDirectory();
+            var engineeringModelSetup = siteDirectory.Model
+                .SingleOrDefault(ems => ems.Iid == engineeringModelSetupIid);
+
+            if (engineeringModelSetup == null)
+            {
+                return;
+            }
+
             var siteDirectoryCloned = siteDirectory.Clone(true);
 
             var transactionContext = TransactionContextResolver.ResolveContext(siteDirectory);
@@ -175,7 +178,7 @@ namespace StressGenerator.Utils
                 engineeringModelSetup.ToDto(),
                 OperationKind.Delete));
 
-            await GeneratorHelper.WriteWithRetries(
+            await WriteHelper.WriteWithRetries(
                 session,
                 operationContainer,
                 "deleting from server EngineeringModelSetup " +
