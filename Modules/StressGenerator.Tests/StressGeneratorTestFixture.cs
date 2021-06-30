@@ -319,11 +319,17 @@ namespace StressGenerator.Tests
         [Test]
         public void VerifyThatStressGeneratorFailedIfSessionHasNoOpenIteration()
         {
+            // setup test before open so updated objects are read
             this.siteDirectory.Model.Remove(this.engineeringModelSetup.Iid);
 
+            // open session
             this.session.Open();
 
+            // verify
+            var initialObjectsCount = this.sessionThings.Values.Count;
+
             Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
+            Assert.AreEqual(initialObjectsCount, this.sessionThings.Values.Count);
         }
 
         [Test]
@@ -362,6 +368,22 @@ namespace StressGenerator.Tests
             Assert.AreEqual(
                 StressGeneratorConfiguration.MinNumberOfTestObjects,
                 this.sessionThings.Values.OfType<ParameterValueSet>().Count());
+        }
+
+        [Test]
+        public void VerifyThatStressGeneratorFailedIfModelDoesNotReferenceGenericRdl()
+        {
+            // setup test before open so updated objects are read
+            this.siteReferenceDataLibrary.ShortName = "Random_RDL";
+
+            // open session
+            this.session.Open();
+
+            // verify
+            var initialObjectsCount = this.sessionThings.Values.Count;
+
+            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
+            Assert.AreEqual(initialObjectsCount, this.sessionThings.Values.Count);
         }
 
         [Test]
@@ -428,7 +450,7 @@ namespace StressGenerator.Tests
             Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
 
             var engineeringModelSetups = this.sessionThings.Values.OfType<EngineeringModelSetup>().ToList();
-            Assert.AreEqual(1, engineeringModelSetups.Count());
+            Assert.AreEqual(1, engineeringModelSetups.Count);
 
             var newEngineeringModelSetup = engineeringModelSetups.Single();
             Assert.AreEqual(this.engineeringModelSetup.Name, newEngineeringModelSetup.Name);
