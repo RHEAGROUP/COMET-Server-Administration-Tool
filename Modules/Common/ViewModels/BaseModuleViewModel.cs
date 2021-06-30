@@ -58,7 +58,7 @@ namespace Common.ViewModels
         /// <summary>
         /// Set model properties
         /// </summary>
-        public virtual void SetProperties()
+        protected virtual void SetProperties()
         {
         }
 
@@ -102,7 +102,7 @@ namespace Common.ViewModels
         /// </summary>
         /// <param name="message">The text message</param>
         /// <param name="logLevel"></param>
-        public void OperationMessageHandler(string message, LogVerbosity? logLevel = null)
+        protected void OperationMessageHandler(string message, LogVerbosity? logLevel = null)
         {
             if (string.IsNullOrEmpty(message)) return;
 

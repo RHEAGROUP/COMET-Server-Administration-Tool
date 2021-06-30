@@ -338,7 +338,9 @@ namespace StressGenerator.ViewModels
         {
             base.AddSubscriptions();
 
-            this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(StressGeneratorMessageHandler);
+            this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(_ => {
+                OperationMessageHandler(this.SourceViewModel.Output);
+            });
 
             var canExecuteStress = this.WhenAnyValue(
                 vm => vm.SourceViewModel.LoginSuccessfully,
@@ -404,7 +406,7 @@ namespace StressGenerator.ViewModels
         /// <summary>
         /// Set properties for this model
         /// </summary>
-        public override void SetProperties()
+        protected override void SetProperties()
         {
             base.SetProperties();
 
@@ -452,17 +454,6 @@ namespace StressGenerator.ViewModels
             await this.stressGenerator.Generate();
 
             await this.stressGenerator.CleanUp();
-        }
-
-        /// <summary>
-        /// Add text message to the output panel
-        /// </summary>
-        /// <param name="message">The text message</param>
-        private void StressGeneratorMessageHandler(string message)
-        {
-            if (string.IsNullOrEmpty(message)) return;
-
-            this.Output += $"{DateTime.Now:HH:mm:ss} {message}{Environment.NewLine}";
         }
 
         /// <summary>
