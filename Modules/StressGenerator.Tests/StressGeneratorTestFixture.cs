@@ -304,6 +304,14 @@ namespace StressGenerator.Tests
             Assert.AreEqual(
                 StressGeneratorConfiguration.MaxNumberOfTestObjects,
                 configuration.TestObjectsNumber);
+
+            var randomValidValue = new Random().Next(
+                StressGeneratorConfiguration.MinNumberOfTestObjects,
+                StressGeneratorConfiguration.MaxNumberOfTestObjects);
+            configuration.TestObjectsNumber = randomValidValue;
+            Assert.AreEqual(
+                randomValidValue,
+                configuration.TestObjectsNumber);
         }
 
         [Test]
