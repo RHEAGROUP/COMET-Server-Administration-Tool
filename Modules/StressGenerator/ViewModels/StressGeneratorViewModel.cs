@@ -339,7 +339,7 @@ namespace StressGenerator.ViewModels
             base.AddSubscriptions();
 
             this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(_ => {
-                OperationMessageHandler(this.SourceViewModel.Output);
+                this.OperationMessageHandler(this.SourceViewModel.Output);
             });
 
             var canExecuteStress = this.WhenAnyValue(

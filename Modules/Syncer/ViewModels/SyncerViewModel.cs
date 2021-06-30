@@ -176,10 +176,11 @@ namespace Syncer.ViewModels
             base.AddSubscriptions();
 
             this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(_ => {
-                OperationMessageHandler(this.SourceViewModel.Output);
+                this.OperationMessageHandler(this.SourceViewModel.Output);
             });
+
             this.WhenAnyValue(vm => vm.TargetViewModel.Output).Subscribe(_ => {
-                OperationMessageHandler(this.TargetViewModel.Output);
+                this.OperationMessageHandler(this.TargetViewModel.Output);
             });
 
             this.WhenAnyValue(vm => vm.SourceViewModel.LoginSuccessfully).Subscribe(
