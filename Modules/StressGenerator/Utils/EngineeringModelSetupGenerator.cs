@@ -140,7 +140,7 @@ namespace StressGenerator.Utils
                     OperationKind.Create));
             }
 
-            await GeneratorHelper.WriteWithRetries(
+            await WriteHelper.WriteWithRetries(
                 session,
                 operationContainer,
                 "writing to server EngineeringModelSetup " +
@@ -175,7 +175,7 @@ namespace StressGenerator.Utils
                 engineeringModelSetup.ToDto(),
                 OperationKind.Delete));
 
-            await GeneratorHelper.WriteWithRetries(
+            await WriteHelper.WriteWithRetries(
                 session,
                 operationContainer,
                 "deleting from server EngineeringModelSetup " +

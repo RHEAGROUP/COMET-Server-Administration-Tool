@@ -1,6 +1,5 @@
-﻿
-// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="GeneratorHelper.cs" company="RHEA System S.A.">
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="WriteHelper.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
@@ -35,7 +34,10 @@ namespace StressGenerator.Utils
     using Polly;
     using ViewModels;
 
-    internal static class GeneratorHelper
+    /// <summary>
+    /// Helper class for writing operations to the server.
+    /// </summary>
+    internal static class WriteHelper
     {
         /// <summary>
         /// The maximum retry count for a write operation.

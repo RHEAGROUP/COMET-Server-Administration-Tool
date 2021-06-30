@@ -426,7 +426,7 @@ namespace StressGenerator.Utils
                     OperationKind.Create));
             }
 
-            await GeneratorHelper.WriteWithRetries(
+            await WriteHelper.WriteWithRetries(
                 this.configuration.Session,
                 operationContainer,
                 "writing to server ElementDefinition " +
@@ -462,7 +462,7 @@ namespace StressGenerator.Utils
             var transaction = new ThingTransaction(transactionContext);
             transaction.CreateOrUpdate(valueSetClone);
 
-            await GeneratorHelper.WriteWithRetries(
+            await WriteHelper.WriteWithRetries(
                 this.configuration.Session,
                 transaction.FinalizeTransaction(),
                 "writing to server ParameterValueSet " +
