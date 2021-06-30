@@ -38,7 +38,7 @@ namespace Syncer.ViewModels
     /// <summary>
     /// The view-model for the Syncer tool
     /// </summary>
-    public class SyncerViewModel : ReactiveObject
+    public class SyncerViewModel : BaseModuleViewModel
     {
         /// <summary>
         /// Gets data source server type
@@ -146,20 +146,6 @@ namespace Syncer.ViewModels
         public ReactiveCommand<Unit> SyncCommand { get; }
 
         /// <summary>
-        /// Backing field for the the <see cref="Output"/> messages property
-        /// </summary>
-        private string output;
-
-        /// <summary>
-        /// Gets or sets operation output messages
-        /// </summary>
-        public string Output
-        {
-            get => this.output;
-            set => this.RaiseAndSetIfChanged(ref this.output, value);
-        }
-
-        /// <summary>
         /// The <see cref="SyncerFactory"/> used to build the helper sync classes
         /// </summary>
         private readonly SyncerFactory syncerFactory = SyncerFactory.GetInstance();
@@ -185,10 +171,17 @@ namespace Syncer.ViewModels
         /// <summary>
         /// Add subscription to the login view models
         /// </summary>
-        public void AddSubscriptions()
+        public override void AddSubscriptions()
         {
-            this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(UpdateOutput);
-            this.WhenAnyValue(vm => vm.TargetViewModel.Output).Subscribe(UpdateOutput);
+            base.AddSubscriptions();
+
+            this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(_ => {
+                this.OperationMessageHandler(this.SourceViewModel.Output);
+            });
+
+            this.WhenAnyValue(vm => vm.TargetViewModel.Output).Subscribe(_ => {
+                this.OperationMessageHandler(this.TargetViewModel.Output);
+            });
 
             this.WhenAnyValue(vm => vm.SourceViewModel.LoginSuccessfully).Subscribe(
                 (sourceLoggedIn) =>
@@ -201,19 +194,6 @@ namespace Syncer.ViewModels
                     this.DomainOfExpertiseViewModel =
                         new DomainOfExpertiseViewModel(this.SourceViewModel.ServerSession);
                 });
-        }
-
-        /// <summary>
-        /// Add a text message to the output panel
-        /// </summary>
-        /// <param name="message">
-        /// The text message
-        /// </param>
-        private void UpdateOutput(string message)
-        {
-            if (string.IsNullOrEmpty(message)) return;
-
-            this.Output += $"{DateTime.Now:HH:mm:ss} {message}{Environment.NewLine}";
         }
 
         /// <summary>
@@ -246,17 +226,17 @@ namespace Syncer.ViewModels
                         .Select(r => r.Thing.Iid);
                     break;
                 default:
-                    throw new InvalidOperationException($"The SelectedThingType has an invalid value");
+                    throw new InvalidOperationException("The SelectedThingType has an invalid value");
             }
 
             try
             {
                 await syncer.Sync(selectedIids);
-                UpdateOutput("Sync successful");
+                this.OperationMessageHandler("Sync successful");
             }
             catch (Exception e)
             {
-                UpdateOutput(e.Message);
+                this.OperationMessageHandler(e.Message);
             }
         }
     }

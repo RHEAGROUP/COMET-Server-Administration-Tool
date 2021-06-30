@@ -58,7 +58,7 @@ namespace Common.ViewModels
         /// <summary>
         /// Set model properties
         /// </summary>
-        public virtual void SetProperties()
+        protected virtual void SetProperties()
         {
         }
 
@@ -106,7 +106,7 @@ namespace Common.ViewModels
         /// <param name="logLevel">
         /// The <see cref="LogVerbosity"/>.
         /// </param>
-        public void OperationMessageHandler(string message, LogVerbosity? logLevel = null)
+        protected void OperationMessageHandler(string message, LogVerbosity? logLevel = null)
         {
             if (string.IsNullOrEmpty(message)) return;
 
