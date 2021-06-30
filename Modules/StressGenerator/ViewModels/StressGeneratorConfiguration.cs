@@ -25,6 +25,7 @@
 
 namespace StressGenerator.ViewModels
 {
+    using System;
     using System.Collections.Generic;
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
@@ -141,9 +142,9 @@ namespace StressGenerator.ViewModels
         public ISession Session { get; }
 
         /// <summary>
-        /// EngineeringModelSetup used for stress test <see cref="EngineeringModelSetup"/>.
+        /// <see cref="EngineeringModelSetup"/> iid used for stress test.
         /// </summary>
-        public EngineeringModelSetup TestModelSetup { get; set; }
+        public Guid TestModelSetupIid { get; set; }
 
         /// <summary>
         /// <see cref="EngineeringModelSetup"/> name used for stress test.

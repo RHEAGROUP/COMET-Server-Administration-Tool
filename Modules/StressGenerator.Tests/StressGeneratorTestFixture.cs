@@ -31,8 +31,6 @@ namespace StressGenerator.Tests
     using System.Threading;
     using System.Threading.Tasks;
     using CDP4Common.DTO;
-    using CDP4Common.EngineeringModelData;
-    using CDP4Common.Types;
     using CDP4Dal;
     using CDP4Dal.DAL;
     using CDP4Dal.Operations;
@@ -40,20 +38,7 @@ namespace StressGenerator.Tests
     using Common.ViewModels;
     using Moq;
     using NUnit.Framework;
-    using Utils;
     using ViewModels;
-    using DomainOfExpertise = CDP4Common.SiteDirectoryData.DomainOfExpertise;
-    using EngineeringModel = CDP4Common.EngineeringModelData.EngineeringModel;
-    using EngineeringModelSetup = CDP4Common.SiteDirectoryData.EngineeringModelSetup;
-    using Iteration = CDP4Common.EngineeringModelData.Iteration;
-    using IterationSetup = CDP4Common.SiteDirectoryData.IterationSetup;
-    using ModelReferenceDataLibrary = CDP4Common.SiteDirectoryData.ModelReferenceDataLibrary;
-    using Participant = CDP4Common.SiteDirectoryData.Participant;
-    using Person = CDP4Common.SiteDirectoryData.Person;
-    using QuantityKind = CDP4Common.SiteDirectoryData.QuantityKind;
-    using SimpleQuantityKind = CDP4Common.SiteDirectoryData.SimpleQuantityKind;
-    using SiteDirectory = CDP4Common.SiteDirectoryData.SiteDirectory;
-    using SiteReferenceDataLibrary = CDP4Common.SiteDirectoryData.SiteReferenceDataLibrary;
 
     /// <summary>
     /// Suite of tests for the <see cref="StressGeneratorViewModel" />
@@ -61,42 +46,13 @@ namespace StressGenerator.Tests
     [TestFixture]
     public class StressGeneratorTestFixture
     {
-        [SetUp]
-        public void Setup()
-        {
-            this.dal = new Mock<IDal>();
-            this.dal.SetupProperty(d => d.Session);
-            this.assembler = new Assembler(this.credentials.Uri);
-
-            AppSettingsHandler.Settings = new AppSettings
-            {
-                SavedUris = new List<string>()
-            };
-
-            this.session = new Mock<ISession>();
-            this.session.Setup(x => x.Dal).Returns(this.dal.Object);
-            this.session.Setup(x => x.Credentials).Returns(this.credentials);
-            this.session.Setup(x => x.Assembler).Returns(this.assembler);
-
-            this.generatedThings = new Dictionary<Guid, Thing>();
-            this.modifiedThings = new Dictionary<Guid, Thing>();
-
-            this.InitSessionThings();
-
-            this.InitDalOperations();
-            this.session.Setup(s => s.Dal).Returns(this.dal.Object);
-
-            this.InitViewModel();
-        }
-
         private readonly Credentials credentials = new Credentials(
             "John",
             "Doe",
             new Uri("http://www.rheagroup.com/"));
 
-        private Mock<ISession> session;
+        private ISession session;
         private Mock<IDal> dal;
-        private Assembler assembler;
 
         private Mock<ILoginViewModel> sourceViewModel;
         private StressGeneratorViewModel stressGeneratorViewModel;
@@ -116,133 +72,131 @@ namespace StressGenerator.Tests
         private IterationSetup iterationSetup;
 
         private Dictionary<Guid, Thing> sessionThings;
-        private Dictionary<Guid, Thing> generatedThings;
-        private Dictionary<Guid, Thing> modifiedThings;
+
+        [SetUp]
+        public void Setup()
+        {
+            this.dal = new Mock<IDal>();
+            this.dal.SetupProperty(d => d.Session);
+            this.session = new Session(this.dal.Object, credentials);
+
+            AppSettingsHandler.Settings = new AppSettings
+            {
+                SavedUris = new List<string>()
+            };
+
+            this.InitSessionThings();
+
+            this.InitDalOperations();
+
+            this.InitViewModel();
+        }
 
         private void InitSessionThings()
         {
             // Site Directory
-            this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.session.Object.Assembler.Cache,
-                this.session.Object.Credentials.Uri);
+            this.siteDirectory = new SiteDirectory(Guid.NewGuid(), 0);
 
-            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.session.Object.Assembler.Cache,
-                this.session.Object.Credentials.Uri)
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), 0)
             {
                 Name = "domain"
             };
-            this.siteDirectory.Domain.Add(this.domain);
+            this.siteDirectory.Domain.Add(this.domain.Iid);
 
-            this.person = new Person(Guid.NewGuid(), this.session.Object.Assembler.Cache,
-                this.session.Object.Credentials.Uri)
+            this.person = new Person(Guid.NewGuid(), 0)
             {
                 ShortName = this.credentials.UserName,
                 GivenName = this.credentials.UserName,
                 Password = this.credentials.Password,
-                DefaultDomain = this.domain,
+                DefaultDomain = this.domain.Iid,
                 IsActive = true
             };
-            this.siteDirectory.Person.Add(this.person);
+            this.siteDirectory.Person.Add(this.person.Iid);
 
-            this.participant =
-                new Participant(Guid.NewGuid(), this.session.Object.Assembler.Cache,
-                    this.session.Object.Credentials.Uri) {Person = this.person};
-            this.participant.Domain.Add(this.domain);
+            this.participant = new Participant(Guid.NewGuid(), 0)
+            {
+                Person = this.person.Iid
+            };
+            this.participant.Domain.Add(this.domain.Iid);
 
             // Site Rld
-            this.siteReferenceDataLibrary =
-                new SiteReferenceDataLibrary(Guid.NewGuid(), this.session.Object.Assembler.Cache,
-                    this.session.Object.Credentials.Uri)
-                {
-                    ShortName = "Generic_RDL"
-                };
-            this.quantityKindParamType = new SimpleQuantityKind(Guid.NewGuid(), this.session.Object.Assembler.Cache,
-                this.session.Object.Credentials.Uri)
+            this.siteReferenceDataLibrary = new SiteReferenceDataLibrary(Guid.NewGuid(), 0)
+            {
+                ShortName = "Generic_RDL"
+            };
+            this.quantityKindParamType = new SimpleQuantityKind(Guid.NewGuid(), 0)
             {
                 Name = "m",
                 ShortName = "m"
             };
-            this.siteReferenceDataLibrary.ParameterType.Add(this.quantityKindParamType);
+            this.siteReferenceDataLibrary.ParameterType.Add(this.quantityKindParamType.Iid);
 
             // Model Rdl
-            this.modelReferenceDataLibrary =
-                new ModelReferenceDataLibrary(Guid.NewGuid(), this.session.Object.Assembler.Cache,
-                    this.session.Object.Credentials.Uri)
-                {
-                    RequiredRdl = this.siteReferenceDataLibrary
-                };
-            this.siteDirectory.SiteReferenceDataLibrary.Add(this.siteReferenceDataLibrary);
+            this.modelReferenceDataLibrary = new ModelReferenceDataLibrary(Guid.NewGuid(), 0)
+            {
+                RequiredRdl = this.siteReferenceDataLibrary.Iid
+            };
+            this.siteDirectory.SiteReferenceDataLibrary.Add(this.siteReferenceDataLibrary.Iid);
 
             // Iteration
-            this.iteration = new Iteration(Guid.NewGuid(), this.session.Object.Assembler.Cache,
-                this.session.Object.Credentials.Uri);
-            this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.session.Object.Assembler.Cache,
-                this.session.Object.Credentials.Uri)
+            this.iteration = new Iteration(Guid.NewGuid(), 0);
+            this.iterationSetup = new IterationSetup(Guid.NewGuid(), 0)
             {
                 IterationIid = this.iteration.Iid
             };
-            this.iteration.IterationSetup = this.iterationSetup;
+            this.iteration.IterationSetup = this.iterationSetup.Iid;
 
             // Engineering Model & Setup
-            this.engineeringModel = new EngineeringModel(Guid.NewGuid(), this.session.Object.Assembler.Cache,
-                this.session.Object.Credentials.Uri)
-            {
-                EngineeringModelSetup = this.engineeringModelSetup
-            };
-            this.engineeringModel.Iteration.Add(this.iteration);
+            this.engineeringModel = new EngineeringModel(Guid.NewGuid(), 0);
+            this.engineeringModel.Iteration.Add(this.iteration.Iid);
 
-            this.engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.session.Object.Assembler.Cache,
-                    this.session.Object.Credentials.Uri)
-                {EngineeringModelIid = this.engineeringModel.Iid};
-            this.engineeringModelSetup.RequiredRdl.Add(this.modelReferenceDataLibrary);
-            this.engineeringModelSetup.IterationSetup.Add(this.iterationSetup);
-            this.engineeringModelSetup.Participant.Add(this.participant);
-            this.siteDirectory.Model.Add(this.engineeringModelSetup);
+            this.engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), 0)
+            {
+                EngineeringModelIid = this.engineeringModel.Iid
+            };
+            this.engineeringModel.EngineeringModelSetup = this.engineeringModelSetup.Iid;
+            this.engineeringModelSetup.RequiredRdl.Add(this.modelReferenceDataLibrary.Iid);
+            this.engineeringModelSetup.IterationSetup.Add(this.iterationSetup.Iid);
+            this.engineeringModelSetup.Participant.Add(this.participant.Iid);
+            this.siteDirectory.Model.Add(this.engineeringModelSetup.Iid);
 
             this.sessionThings = new Dictionary<Guid, Thing>
             {
-                {this.siteDirectory.Iid, this.siteDirectory.ToDto()},
-                {this.domain.Iid, this.domain.ToDto()},
-                {this.person.Iid, this.person.ToDto()},
-                {this.participant.Iid, this.participant.ToDto()},
-                {this.siteReferenceDataLibrary.Iid, this.siteReferenceDataLibrary.ToDto()},
-                {this.quantityKindParamType.Iid, this.quantityKindParamType.ToDto()},
-                {this.modelReferenceDataLibrary.Iid, this.modelReferenceDataLibrary.ToDto()},
-                {this.engineeringModelSetup.Iid, this.engineeringModelSetup.ToDto()},
-                {this.iteration.Iid, this.iteration.ToDto()},
-                {this.iterationSetup.Iid, this.iterationSetup.ToDto()},
-                {this.engineeringModel.Iid, this.engineeringModel.ToDto()}
+                { this.siteDirectory.Iid, this.siteDirectory },
+                { this.domain.Iid, this.domain },
+                { this.person.Iid, this.person },
+                { this.participant.Iid, this.participant },
+                { this.siteReferenceDataLibrary.Iid, this.siteReferenceDataLibrary },
+                { this.quantityKindParamType.Iid, this.quantityKindParamType },
+                { this.modelReferenceDataLibrary.Iid, this.modelReferenceDataLibrary },
+                { this.engineeringModelSetup.Iid, this.engineeringModelSetup },
+                { this.iteration.Iid, this.iteration },
+                { this.iterationSetup.Iid, this.iterationSetup },
+                { this.engineeringModel.Iid, this.engineeringModel }
             };
-
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.siteDirectory.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.siteDirectory));
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.domain.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.domain));
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.person.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.person));
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.participant.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.participant));
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.siteReferenceDataLibrary.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.siteReferenceDataLibrary));
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.quantityKindParamType.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.quantityKindParamType));
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.modelReferenceDataLibrary.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.modelReferenceDataLibrary));
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.engineeringModelSetup.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.engineeringModelSetup));
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.iteration));
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.iterationSetup.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.iterationSetup));
-            this.session.Object.Assembler.Cache.TryAdd(new CacheKey(this.engineeringModel.Iid, null), new Lazy<CDP4Common.CommonData.Thing>(() => this.engineeringModel));
-
-            this.session = new Mock<ISession>();
-            this.session.Setup(s => s.Assembler).Returns(this.assembler);
-            this.session.Setup(s => s.Credentials).Returns(this.credentials);
-            this.session.Setup(s => s.ActivePerson).Returns(this.person);
-            this.session.Setup(s => s.RetrieveSiteDirectory()).Returns(this.siteDirectory);
         }
 
         private void InitDalOperations()
         {
-            this.dal.Setup(x => x.Open(this.credentials, It.IsAny<CancellationToken>()))
-                .Returns<Credentials, CancellationToken>(
-                    (dalCredentials, dalCancellationToken) =>
-                    {
-                        var result = this.sessionThings.Values.ToList() as IEnumerable<Thing>;
-                        return Task.FromResult(result);
-                    });
+            this.dal
+                .Setup(x => x.Open(this.credentials, It.IsAny<CancellationToken>()))
+                .Returns<Credentials, CancellationToken>((dalCredentials, cancellationToken) =>
+                {
+                    var result = this.sessionThings.Values.ToList() as IEnumerable<Thing>;
+                    return Task.FromResult(result);
+                });
 
-            this.dal.Setup(x => x.Write(It.IsAny<OperationContainer>(), It.IsAny<IEnumerable<string>>()))
+            // basic mock needed for session.Refresh()
+            this.dal
+                .Setup(x => x.Read(It.IsAny<Thing>(), It.IsAny<CancellationToken>(), It.IsAny<IQueryAttributes>()))
+                .Returns<Thing, CancellationToken, IQueryAttributes>((thing, cancellationToken, queryAttributes) =>
+                {
+                    var result = this.sessionThings.Values.ToList() as IEnumerable<Thing>;
+                    return Task.FromResult(result);
+                });
+
+            this.dal
+                .Setup(x => x.Write(It.IsAny<OperationContainer>(), It.IsAny<IEnumerable<string>>()))
                 .Returns<OperationContainer, IEnumerable<string>>(async (operationContainer, files) =>
                 {
                     foreach (var operation in operationContainer.Operations)
@@ -252,59 +206,62 @@ namespace StressGenerator.Tests
                         switch (operation.OperationKind)
                         {
                             case OperationKind.Create:
-                                if (!this.generatedThings.ContainsKey(operationThing.Iid))
+                                this.sessionThings.Add(operationThing.Iid, operationThing);
+
+                                if (operationThing is EngineeringModelSetup newModelSetup)
                                 {
-                                    this.generatedThings[operationThing.Iid] = operationThing;
-
-                                    if (operationThing is CDP4Common.DTO.EngineeringModelSetup newModelSetup)
+                                    // create EngineeringModel
+                                    var newModel = new EngineeringModel(newModelSetup.EngineeringModelIid, 0)
                                     {
-                                        // Add iteration & iterationSetup
-                                        var newIteration = new Iteration(
-                                            Guid.NewGuid(),
-                                            this.session.Object.Assembler.Cache,
-                                            this.session.Object.Credentials.Uri);
-                                        var newIterationSetup = new IterationSetup(
-                                            Guid.NewGuid(),
-                                            this.session.Object.Assembler.Cache,
-                                            this.session.Object.Credentials.Uri)
-                                        {
-                                            IterationIid = this.iteration.Iid
-                                        };
-                                        this.iteration.IterationSetup = this.iterationSetup;
+                                        EngineeringModelSetup = newModelSetup.Iid,
+                                    };
+                                    this.sessionThings.Add(newModel.Iid, newModel);
 
-                                        this.session.Object.Assembler.Cache.TryAdd(
-                                            new CacheKey(newIteration.Iid, null),
-                                            new Lazy<CDP4Common.CommonData.Thing>(() => newIteration));
+                                    // create Participant
+                                    var newParticipant = new Participant(Guid.NewGuid(), 0)
+                                    {
+                                        Person = this.person.Iid
+                                    };
+                                    newParticipant.Domain.Add(this.domain.Iid);
+                                    newModelSetup.Participant.Add(newParticipant.Iid);
+                                    this.sessionThings.Add(newParticipant.Iid, newParticipant);
 
-                                        this.session.Object.Assembler.Cache.TryAdd(
-                                            new CacheKey(newIterationSetup.Iid, null),
-                                            new Lazy<CDP4Common.CommonData.Thing>(() => newIterationSetup));
+                                    // create Iteration
+                                    var newIteration = new Iteration(Guid.NewGuid(), 0);
+                                    newModel.Iteration.Add(newIteration.Iid);
+                                    this.sessionThings.Add(newIteration.Iid, newIteration);
 
-                                        newModelSetup.IterationSetup.Add(iterationSetup.Iid);
-                                    }
+                                    // create IterationSetup
+                                    var newIterationSetup = new IterationSetup(Guid.NewGuid(), 0)
+                                    {
+                                        IterationIid = newIteration.Iid
+                                    };
+                                    this.sessionThings.Add(newIterationSetup.Iid, newIterationSetup);
+                                    newIteration.IterationSetup = newIterationSetup.Iid;
+
+                                    newModelSetup.IterationSetup.Add(newIterationSetup.Iid);
+                                }
+
+                                if (operationThing is Parameter newParameter)
+                                {
+                                    var newValueSet = new ParameterValueSet(Guid.NewGuid(), 0);
+                                    this.sessionThings.Add(newValueSet.Iid, newValueSet);
+
+                                    newParameter.ValueSet.Add(newValueSet.Iid);
                                 }
 
                                 break;
                             case OperationKind.Update:
-                                if (!this.modifiedThings.ContainsKey(operationThing.Iid))
-                                {
-                                    this.modifiedThings[operationThing.Iid] = operationThing;
-                                }
+                                this.sessionThings[operationThing.Iid] = operationThing;
 
                                 break;
 
                             case OperationKind.Delete:
-                                if (this.generatedThings.ContainsKey(operationThing.Iid))
-                                {
-                                    this.generatedThings.Remove(operationThing.Iid);
-                                }
+                                this.sessionThings.Remove(operationThing.Iid);
 
                                 break;
                         }
                     }
-
-                    await this.session.Object.Assembler.Synchronize(this.generatedThings.Values.ToList());
-                    await this.session.Object.Assembler.Synchronize(this.modifiedThings.Values.ToList());
 
                     return await Task.FromResult((IEnumerable<Thing>)new List<Thing>());
                 });
@@ -312,19 +269,12 @@ namespace StressGenerator.Tests
 
         private void InitViewModel()
         {
-            this.sourceViewModel = new Mock<ILoginViewModel>
-            {
-                Object =
-                {
-                    SelectedDataSource = DataSource.CDP4,
-                    UserName = this.credentials.UserName,
-                    Password = this.credentials.Password,
-                    Uri = this.credentials.Uri.ToString(),
-                    ServerSession = this.session.Object
-                }
-            };
-
-            this.sourceViewModel.Setup(s => s.ServerSession).Returns(this.session.Object);
+            this.sourceViewModel = new Mock<ILoginViewModel>();
+            this.sourceViewModel.Setup(x => x.SelectedDataSource).Returns(DataSource.CDP4);
+            this.sourceViewModel.Setup(x => x.UserName).Returns(this.credentials.UserName);
+            this.sourceViewModel.Setup(x => x.Password).Returns(this.credentials.Password);
+            this.sourceViewModel.Setup(x => x.Uri).Returns(this.credentials.Uri.ToString());
+            this.sourceViewModel.Setup(x => x.ServerSession).Returns(this.session);
 
             this.stressGeneratorViewModel = new StressGeneratorViewModel
             {
@@ -333,34 +283,21 @@ namespace StressGenerator.Tests
                 TestObjectsNumber = StressGeneratorConfiguration.MinNumberOfTestObjects,
                 ElementName = StressGeneratorConfiguration.GenericElementName,
                 ElementShortName = StressGeneratorConfiguration.GenericElementShortName,
-                SelectedEngineeringModelSetup = this.engineeringModelSetup
-            };
-        }
-
-        [Test]
-        public void VerifyThatStressGeneratorFailedIfSessionHasNoActivePerson()
-        {
-            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
-
-            // No iteration will be modified
-            Assert.AreEqual(0, this.modifiedThings.Count);
-
-            // No element definition will be added
-            Assert.AreEqual(0, this.generatedThings.Count);
+                SelectedEngineeringModelSetup = new CDP4Common.SiteDirectoryData.EngineeringModelSetup(
+                    this.engineeringModelSetup.Iid,
+                    null,
+                    null)
+        };
         }
 
         [Test]
         public void VerifyThatStressGeneratorFailedIfSessionHasNoOpenIteration()
         {
-            this.session.Setup(x => x.ActivePerson).Returns(this.person);
+            this.siteDirectory.Model.Remove(this.engineeringModelSetup.Iid);
+
+            this.session.Open();
 
             Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
-
-            // No iteration will be modified
-            Assert.AreEqual(0, this.modifiedThings.Count);
-
-            // No element definition will be added
-            Assert.AreEqual(0, this.generatedThings.Count);
         }
 
         [Test]
@@ -371,114 +308,69 @@ namespace StressGenerator.Tests
             Assert.AreEqual(StressGeneratorConfiguration.MinNumberOfTestObjects, this.stressGeneratorViewModel.TestObjectsNumber);
             Assert.AreEqual(StressGeneratorConfiguration.GenericElementName, this.stressGeneratorViewModel.ElementName);
             Assert.AreEqual(StressGeneratorConfiguration.GenericElementShortName, this.stressGeneratorViewModel.ElementShortName);
-            Assert.AreEqual(this.engineeringModelSetup, this.stressGeneratorViewModel.SelectedEngineeringModelSetup);
+            Assert.AreEqual(this.engineeringModelSetup.Iid, this.stressGeneratorViewModel.SelectedEngineeringModelSetup.Iid);
             Assert.AreEqual(SupportedOperationMode.Open, this.stressGeneratorViewModel.SelectedOperationMode);
             Assert.AreEqual(StressGeneratorConfiguration.ModelPrefix, this.stressGeneratorViewModel.NewModelName);
         }
 
         [Test]
-        public void VerifyThatStressGeneratorPropertiesAreSetsWithMinimumNumberOfTestObjects()
+        public void VerifyThatStressGeneratorWorksInOpenMode()
         {
             this.stressGeneratorViewModel.TestObjectsNumber = short.MinValue;
 
-            this.assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null),
-                new Lazy<CDP4Common.CommonData.Thing>(() => this.iteration));
-            this.session.Setup(x => x.ActivePerson).Returns(this.person);
-            this.session.Setup(x => x.OpenIterations).Returns(
-                new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-                {
-                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
-                });
+            this.session.Open();
 
             Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
 
-            // Iteration will be modified
-            Assert.AreEqual(1, this.modifiedThings.Count);
+            Assert.AreEqual(
+                StressGeneratorConfiguration.MinNumberOfTestObjects,
+                this.sessionThings.Values.OfType<ElementDefinition>().Count());
 
-            // Five element definition and five parameters will be added
-            Assert.AreEqual(10, this.generatedThings.Count);
-        }
+            Assert.AreEqual(
+                StressGeneratorConfiguration.MinNumberOfTestObjects,
+                this.sessionThings.Values.OfType<Parameter>().Count());
 
-        [Test]
-        public void VerifyThatStressGeneratorDeleteCreatedTestModel()
-        {
-            var initialObjectsNumber = this.sessionThings.Count;
-
-            this.session.Setup(x => x.ActivePerson).Returns(this.person);
-            this.session.Setup(x => x.OpenIterations).Returns(
-                new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-                {
-                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
-                });
-            this.stressGeneratorViewModel.SelectedOperationMode = SupportedOperationMode.Create;
-            this.stressGeneratorViewModel.DeleteModel = true;
-
-            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
-
-            Assert.AreEqual(initialObjectsNumber, this.generatedThings.Count);
-        }
-
-        [Test]
-        public void VerifyThatStressGeneratorWorksInOpenMode()
-        {
-            this.assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null),
-                new Lazy<CDP4Common.CommonData.Thing>(() => this.iteration));
-            this.session.Setup(x => x.ActivePerson).Returns(this.person);
-            this.session.Setup(x => x.OpenIterations).Returns(
-                new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-                {
-                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
-                });
-
-            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
-
-            // Iteration was modified
-            Assert.AreEqual(1, this.modifiedThings.Count);
-
-            // Five element definition and five parameters will be added
-            Assert.AreEqual(this.stressGeneratorViewModel.TestObjectsNumber * 2, this.generatedThings.Count);
+            Assert.AreEqual(
+                StressGeneratorConfiguration.MinNumberOfTestObjects,
+                this.sessionThings.Values.OfType<ParameterValueSet>().Count());
         }
 
         [Test]
         public void VerifyThatStressGeneratorWorksInCreateMode()
         {
-            this.session.Setup(x => x.ActivePerson).Returns(this.person);
-            this.session.Setup(x => x.OpenIterations).Returns(
-                new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-                {
-                    {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
-                });
             this.stressGeneratorViewModel.SelectedOperationMode = SupportedOperationMode.Create;
+
+            this.session.Open();
 
             Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
 
-            // SiteDirectory and iterations was modified
-            Assert.AreEqual(2, this.modifiedThings.Count);
+            Assert.AreEqual(2, this.sessionThings.Values.OfType<EngineeringModelSetup>().Count());
 
-            // New EngineeringModelSetup was created
-            Assert.AreEqual(1, this.generatedThings.Values.Count(t => t.ClassKind == CDP4Common.CommonData.ClassKind.EngineeringModelSetup));
+            Assert.AreEqual(
+                StressGeneratorConfiguration.MinNumberOfTestObjects,
+                this.sessionThings.Values.OfType<ElementDefinition>().Count());
 
-            // New Iteration was created
-            Assert.AreEqual(1, this.generatedThings.Values.Count(t => t.ClassKind == CDP4Common.CommonData.ClassKind.ModelReferenceDataLibrary));
+            Assert.AreEqual(
+                StressGeneratorConfiguration.MinNumberOfTestObjects,
+                this.sessionThings.Values.OfType<Parameter>().Count());
 
-            // Five element definition and five parameters will be added
-            Assert.AreEqual(this.stressGeneratorViewModel.TestObjectsNumber, this.generatedThings.Values.Count(t => t.ClassKind == CDP4Common.CommonData.ClassKind.ElementDefinition));
-            Assert.AreEqual(this.stressGeneratorViewModel.TestObjectsNumber, this.generatedThings.Values.Count(t => t.ClassKind == CDP4Common.CommonData.ClassKind.Parameter));
+            Assert.AreEqual(
+                StressGeneratorConfiguration.MinNumberOfTestObjects,
+                this.sessionThings.Values.OfType<ParameterValueSet>().Count());
         }
 
         [Test]
-        public void VerifyThatParameterGeneratorValueSetBaseUpdates()
+        public void VerifyThatStressGeneratorDeleteCreatedTestModel()
         {
-            var valueSet = new List<IValueSet>()
-            {
-                new CDP4Common.EngineeringModelData.ParameterValueSet(Guid.NewGuid(), null, null)
-            };
+            this.stressGeneratorViewModel.SelectedOperationMode = SupportedOperationMode.Create;
+            this.stressGeneratorViewModel.DeleteModel = true;
 
-            var clone = ParameterGenerator.UpdateValueSets(valueSet, ParameterSwitchKind.MANUAL, "1");
+            this.session.Open();
 
-            Assert.NotNull(clone);
+            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
 
-            Assert.AreEqual("{\"1\"}", clone.Manual.ToString());
+            Assert.AreEqual(1, this.sessionThings.Values.OfType<EngineeringModelSetup>().Count());
+            Assert.IsTrue(this.sessionThings.ContainsKey(this.engineeringModelSetup.Iid));
         }
     }
 }

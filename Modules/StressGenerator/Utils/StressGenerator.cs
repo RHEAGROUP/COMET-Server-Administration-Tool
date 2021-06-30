@@ -105,27 +105,31 @@ namespace StressGenerator.Utils
             {
                 if (this.configuration.OperationMode == SupportedOperationMode.CreateOverwrite)
                 {
-                    await EngineeringModelSetupGenerator.Delete(session, this.configuration.TestModelSetup);
+                    await EngineeringModelSetupGenerator.Delete(session, this.configuration.TestModelSetupIid);
 
                     await session.Refresh();
                 }
 
                 // Generate and write EngineeringModelSetup
-                var engineeringModelSetup = await EngineeringModelSetupGenerator.Create(session, this.configuration.TestModelSetupName, this.configuration.SourceModelSetup);
+                var engineeringModelSetup = await EngineeringModelSetupGenerator.Create(
+                    session,
+                    this.configuration.TestModelSetupName,
+                    this.configuration.SourceModelSetup);
 
                 await session.Refresh();
 
-                this.configuration.TestModelSetup = session.Assembler.Cache.Select(x => x.Value)
-                    .Select(lazy => lazy.Value).OfType<EngineeringModelSetup>()
-                    .SingleOrDefault(em => em.Iid == engineeringModelSetup?.Iid);
+                this.configuration.TestModelSetupIid = engineeringModelSetup.Iid;
             }
 
-            if (this.configuration.TestModelSetup == null)
+            var testModelSetup = session.RetrieveSiteDirectory().Model
+                .SingleOrDefault(ems => ems.Iid == this.configuration.TestModelSetupIid);
+
+            if (testModelSetup == null)
             {
                 return;
             }
 
-            var iteration = await this.ReadIteration(this.configuration.TestModelSetup);
+            var iteration = await this.ReadIteration(testModelSetup);
 
             if (iteration == null)
             {
@@ -150,7 +154,7 @@ namespace StressGenerator.Utils
             {
                 await EngineeringModelSetupGenerator.Delete(
                     this.configuration.Session,
-                    this.configuration.TestModelSetup);
+                    this.configuration.TestModelSetupIid);
             }
 
             CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent
@@ -181,7 +185,7 @@ namespace StressGenerator.Utils
                     Type = typeof(StressGeneratorViewModel)
                 });
 
-                iteration = await IterationGenerator.Create(this.configuration.Session, engineeringModelSetup);
+                iteration = await IterationGenerator.OpenLastIteration(this.configuration.Session, engineeringModelSetup);
 
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
@@ -330,7 +334,7 @@ namespace StressGenerator.Utils
             }
 
             var index = 0;
-            foreach (var elementDefinition in generatedIteration.Element)
+            foreach (var elementDefinition in generatedIteration.Element.ToList())
             {
                 // Write value sets only for the generated elements
                 if (generatedElementsList.All(el => el.Iid != elementDefinition.Iid))
@@ -345,7 +349,7 @@ namespace StressGenerator.Utils
                     Type = typeof(StressGeneratorViewModel)
                 });
 
-                foreach (var parameter in elementDefinition.Parameter)
+                foreach (var parameter in elementDefinition.Parameter.ToList())
                 {
                     await WriteParametersValueSets(parameter, index);
                 }
@@ -443,7 +447,7 @@ namespace StressGenerator.Utils
         /// <param name="elementIndex">
         /// The <see cref="ElementDefinition"/> index (used to see different parameter values).
         /// </param>
-        private async Task WriteParametersValueSets(ParameterBase parameter, int elementIndex)
+        private async Task WriteParametersValueSets(Parameter parameter, int elementIndex)
         {
             var valueConfigPair = StressGeneratorConfiguration.ParamValueConfig
                 .FirstOrDefault(pvc => pvc.Key == parameter.ParameterType.ShortName);
@@ -451,12 +455,7 @@ namespace StressGenerator.Utils
                 ? ParameterSwitchKind.MANUAL
                 : ParameterSwitchKind.REFERENCE;
             var parameterValue = (valueConfigPair.Value + elementIndex).ToString(CultureInfo.InvariantCulture);
-            var valueSetClone = ParameterGenerator.UpdateValueSets(parameter.ValueSets, parameterSwitchKind, parameterValue);
-
-            if (valueSetClone == null)
-            {
-                return;
-            }
+            var valueSetClone = ParameterGenerator.UpdateValueSets(parameter.ValueSet, parameterSwitchKind, parameterValue);
 
             var transactionContext = TransactionContextResolver.ResolveContext(valueSetClone);
             var transaction = new ThingTransaction(transactionContext);

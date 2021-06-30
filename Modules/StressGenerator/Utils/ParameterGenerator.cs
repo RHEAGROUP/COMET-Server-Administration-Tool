@@ -58,15 +58,26 @@ namespace StressGenerator.Utils
         }
 
         /// <summary>
-        /// Clone existing value sets and update its values
+        /// Clone existing <paramref name="parameterValueSets"/> and update its values
         /// </summary>
-        /// <param name="parameterValueSet">New value set value <see cref="IEnumerable{IValueSet}"/></param>
-        /// <param name="parameterValueSwitch">New value switch value <see cref="ParameterSwitchKind"/></param>
-        /// <param name="parameterValue">New value represented as string</param>
-        /// <returns>The value set that will be cloned <see cref="ParameterValueSetBase" /></returns>
-        public static ParameterValueSetBase UpdateValueSets(IEnumerable<IValueSet> parameterValueSet, ParameterSwitchKind parameterValueSwitch, string parameterValue)
+        /// <param name="parameterValueSets">
+        /// The given <see cref="ParameterValueSet"/>s
+        /// </param>
+        /// <param name="parameterValueSwitch">
+        /// New <see cref="ParameterValueSetBase.ValueSwitch"/> value
+        /// </param>
+        /// <param name="parameterValue">
+        /// New value represented as string
+        /// </param>
+        /// <returns>
+        /// The cloned <see cref="ParameterValueSet"/>
+        /// </returns>
+        public static ParameterValueSet UpdateValueSets(
+            IEnumerable<ParameterValueSet> parameterValueSets,
+            ParameterSwitchKind parameterValueSwitch,
+            string parameterValue)
         {
-            var valueSetClone = ((ParameterValueSet)parameterValueSet.FirstOrDefault())?.Clone(false);
+            var valueSetClone = parameterValueSets.FirstOrDefault()?.Clone(false);
 
             if (valueSetClone == null) return null;
 

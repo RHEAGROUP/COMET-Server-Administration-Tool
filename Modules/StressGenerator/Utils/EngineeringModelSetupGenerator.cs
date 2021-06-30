@@ -145,17 +145,25 @@ namespace StressGenerator.Utils
         }
 
         /// <summary>
-        /// Delete an existing EngineeringModelSetup
+        /// Delete an existing <see cref="EngineeringModelSetup"/>.
         /// </summary>
         /// <param name="session">
-        /// Server session <see cref="ISession"/>
+        /// Server <see cref="ISession"/>.
         /// </param>
-        /// <param name="engineeringModelSetup">
-        /// The EngineeringModelSetup <see cref="EngineeringModelSetup"/>
+        /// <param name="engineeringModelSetupIid">
+        /// The <see cref="EngineeringModelSetup"/> iid.
         /// </param>
-        public static async Task Delete(ISession session, EngineeringModelSetup engineeringModelSetup)
+        public static async Task Delete(ISession session, Guid engineeringModelSetupIid)
         {
             var siteDirectory = session.RetrieveSiteDirectory();
+            var engineeringModelSetup = siteDirectory.Model
+                .SingleOrDefault(ems => ems.Iid == engineeringModelSetupIid);
+
+            if (engineeringModelSetup == null)
+            {
+                return;
+            }
+
             var siteDirectoryCloned = siteDirectory.Clone(true);
 
             var transactionContext = TransactionContextResolver.ResolveContext(siteDirectory);
