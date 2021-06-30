@@ -127,7 +127,7 @@ namespace StressGenerator.Utils
                 return;
             }
 
-            var iteration = await this.ReadIteration(testModelSetup);
+            var iteration = await this.ReadLastIteration(testModelSetup);
 
             if (iteration == null)
             {
@@ -170,7 +170,7 @@ namespace StressGenerator.Utils
         /// <returns>
         /// An <see cref="Iteration"/>, or null if the <see cref="Iteration"/> cannot be created.
         /// </returns>
-        private async Task<Iteration> ReadIteration(EngineeringModelSetup engineeringModelSetup)
+        private async Task<Iteration> ReadLastIteration(EngineeringModelSetup engineeringModelSetup)
         {
             Iteration iteration;
 
@@ -204,7 +204,7 @@ namespace StressGenerator.Utils
                 return null;
             }
 
-            if (IterationGenerator.CheckIfIterationReferencesGenericRdl(iteration))
+            if (IterationGenerator.IterationReferencesGenericRdl(iteration))
             {
                 return iteration;
             }

@@ -87,7 +87,7 @@ namespace StressGenerator.Utils
         /// <returns>
         /// True if iteration references the required <see cref="ReferenceDataLibrary"/>, false otherwise.
         /// </returns>
-        public static bool CheckIfIterationReferencesGenericRdl(Iteration iteration)
+        public static bool IterationReferencesGenericRdl(Iteration iteration)
         {
             var model = iteration.Container as EngineeringModel;
             var modelRdl = model?.EngineeringModelSetup.RequiredRdl.FirstOrDefault();
