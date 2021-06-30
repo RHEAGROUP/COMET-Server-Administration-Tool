@@ -101,8 +101,14 @@ namespace StressGenerator.Utils
             if (this.configuration.OperationMode == SupportedOperationMode.Create ||
                 this.configuration.OperationMode == SupportedOperationMode.CreateOverwrite)
             {
+                var newModelName = this.configuration.TestModelSetupName;
+
                 if (this.configuration.OperationMode == SupportedOperationMode.CreateOverwrite)
                 {
+                    newModelName = session.RetrieveSiteDirectory().Model
+                        .Single(ems => ems.Iid == this.configuration.TestModelSetupIid)
+                        .Name;
+                    
                     await EngineeringModelSetupGenerator.Delete(session, this.configuration.TestModelSetupIid);
 
                     await session.Refresh();
@@ -111,7 +117,7 @@ namespace StressGenerator.Utils
                 // Generate and write EngineeringModelSetup
                 var engineeringModelSetup = await EngineeringModelSetupGenerator.Create(
                     session,
-                    this.configuration.TestModelSetupName,
+                    newModelName,
                     this.configuration.SourceModelSetup);
 
                 await session.Refresh();
