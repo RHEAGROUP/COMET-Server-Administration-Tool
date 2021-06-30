@@ -91,7 +91,7 @@ namespace StressGenerator.Utils
 
             siteDirectoryCloned.Model.Add(engineeringModelSetup);
 
-            engineeringModelSetup = await Write(session, engineeringModelSetup, siteDirectory, siteDirectoryCloned);
+            await Write(session, engineeringModelSetup, siteDirectory, siteDirectoryCloned);
 
             return engineeringModelSetup;
         }
@@ -111,10 +111,7 @@ namespace StressGenerator.Utils
         /// <param name="siteDirectoryCloned">
         /// Cloned site directory used for creating write transaction <see cref="SiteDirectory"/>
         /// </param>
-        /// <returns>
-        /// An instance of <see cref="EngineeringModelSetup"/>
-        /// </returns>
-        private static async Task<EngineeringModelSetup> Write(
+        private static async Task Write(
             ISession session,
             EngineeringModelSetup engineeringModelSetup,
             SiteDirectory siteDirectory,
@@ -145,8 +142,6 @@ namespace StressGenerator.Utils
                 operationContainer,
                 "writing to server EngineeringModelSetup " +
                 $"\"{engineeringModelSetup.Name} ({engineeringModelSetup.ShortName})\".");
-
-            return engineeringModelSetup;
         }
 
         /// <summary>
