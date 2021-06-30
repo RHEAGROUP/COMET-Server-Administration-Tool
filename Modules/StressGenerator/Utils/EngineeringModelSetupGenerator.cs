@@ -133,7 +133,7 @@ namespace StressGenerator.Utils
             {
                 operationContainer.AddOperation(new Operation(
                     null,
-                    engineeringModelSetup.RequiredRdl.FirstOrDefault()?.ToDto(),
+                    engineeringModelSetup.RequiredRdl.First().ToDto(),
                     OperationKind.Create));
             }
 
