@@ -100,10 +100,10 @@ namespace StressGenerator.Utils
 
             var session = this.configuration.Session;
 
-            if (this.configuration.OperationMode == SupportedOperationModes.Create ||
-                this.configuration.OperationMode == SupportedOperationModes.CreateOverwrite)
+            if (this.configuration.OperationMode == SupportedOperationMode.Create ||
+                this.configuration.OperationMode == SupportedOperationMode.CreateOverwrite)
             {
-                if (this.configuration.OperationMode == SupportedOperationModes.CreateOverwrite)
+                if (this.configuration.OperationMode == SupportedOperationMode.CreateOverwrite)
                 {
                     await EngineeringModelSetupGenerator.Delete(session, this.configuration.TestModelSetup);
 
@@ -148,11 +148,15 @@ namespace StressGenerator.Utils
         {
             if (this.configuration.DeleteModel)
             {
-                await EngineeringModelSetupGenerator.Delete(this.configuration.Session,
+                await EngineeringModelSetupGenerator.Delete(
+                    this.configuration.Session,
                     this.configuration.TestModelSetup);
             }
 
-            CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent {CurrentSession = this.configuration.Session});
+            CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent
+            {
+                CurrentSession = this.configuration.Session
+            });
         }
 
         /// <summary>

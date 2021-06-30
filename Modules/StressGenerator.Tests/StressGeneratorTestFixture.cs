@@ -372,7 +372,7 @@ namespace StressGenerator.Tests
             Assert.AreEqual(StressGeneratorConfiguration.GenericElementName, this.stressGeneratorViewModel.ElementName);
             Assert.AreEqual(StressGeneratorConfiguration.GenericElementShortName, this.stressGeneratorViewModel.ElementShortName);
             Assert.AreEqual(this.engineeringModelSetup, this.stressGeneratorViewModel.SelectedEngineeringModelSetup);
-            Assert.AreEqual(SupportedOperationModes.Open, this.stressGeneratorViewModel.SelectedOperationMode);
+            Assert.AreEqual(SupportedOperationMode.Open, this.stressGeneratorViewModel.SelectedOperationMode);
             Assert.AreEqual(StressGeneratorConfiguration.ModelPrefix, this.stressGeneratorViewModel.NewModelName);
         }
 
@@ -410,7 +410,7 @@ namespace StressGenerator.Tests
                 {
                     {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
                 });
-            this.stressGeneratorViewModel.SelectedOperationMode = SupportedOperationModes.Create;
+            this.stressGeneratorViewModel.SelectedOperationMode = SupportedOperationMode.Create;
             this.stressGeneratorViewModel.DeleteModel = true;
 
             Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
@@ -448,7 +448,7 @@ namespace StressGenerator.Tests
                 {
                     {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
                 });
-            this.stressGeneratorViewModel.SelectedOperationMode = SupportedOperationModes.Create;
+            this.stressGeneratorViewModel.SelectedOperationMode = SupportedOperationMode.Create;
 
             Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
 

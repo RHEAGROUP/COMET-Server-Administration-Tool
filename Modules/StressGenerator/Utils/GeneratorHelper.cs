@@ -45,14 +45,19 @@ namespace StressGenerator.Utils
         /// <summary>
         /// Write the given <paramref name="operationContainer"/> to the server, retrying on failure.
         /// </summary>
-        /// <param name="session"></param>
+        /// <param name="session">
+        /// The <see cref="ISession"/>.
+        /// </param>
         /// <param name="operationContainer">
         /// The given <see cref="OperationContainer"/>.
         /// </param>
         /// <param name="actionDescription">
         /// The description of the action.
         /// </param>
-        public static async Task WriteWithRetries(/*NotifyMessageDelegate notifyMessageDelegate, */ISession session, OperationContainer operationContainer, string actionDescription)
+        public static async Task WriteWithRetries(
+            ISession session,
+            OperationContainer operationContainer,
+            string actionDescription)
         {
             try
             {
@@ -68,7 +73,7 @@ namespace StressGenerator.Utils
             }
             catch (Exception ex)
             {
-                LogOperationResult( false, actionDescription, ex);
+                LogOperationResult(false, actionDescription, ex);
             }
         }
 

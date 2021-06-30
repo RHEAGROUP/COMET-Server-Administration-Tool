@@ -39,7 +39,7 @@ namespace StressGenerator.ViewModels
     /// <summary>
     /// Supported operation modes
     /// </summary>
-    public enum SupportedOperationModes
+    public enum SupportedOperationMode
     {
         Open,
         Create,
@@ -83,12 +83,12 @@ namespace StressGenerator.ViewModels
         /// <summary>
         /// Gets supported operation modes
         /// </summary>
-        public static Dictionary<SupportedOperationModes, string> StressGeneratorModes { get; } =
-            new Dictionary<SupportedOperationModes, string>
+        public static Dictionary<SupportedOperationMode, string> StressGeneratorModes { get; } =
+            new Dictionary<SupportedOperationMode, string>
             {
-                {SupportedOperationModes.Open, SupportedOperationModes.Open.ToString()},
-                {SupportedOperationModes.Create, SupportedOperationModes.Create.ToString()},
-                {SupportedOperationModes.CreateOverwrite, SupportedOperationModes.CreateOverwrite.ToString()}
+                {SupportedOperationMode.Open, SupportedOperationMode.Open.ToString()},
+                {SupportedOperationMode.Create, SupportedOperationMode.Create.ToString()},
+                {SupportedOperationMode.CreateOverwrite, SupportedOperationMode.CreateOverwrite.ToString()}
             };
 
         /// <summary>
@@ -247,14 +247,14 @@ namespace StressGenerator.ViewModels
         public ReactiveCommand<Unit> StressCommand { get; set; }
 
         /// <summary>
-        /// Backing field for the <see cref="SupportedOperationModes"/> property
+        /// Backing field for the <see cref="SupportedOperationMode"/> property
         /// </summary>
-        private SupportedOperationModes selectedOperationMode;
+        private SupportedOperationMode selectedOperationMode;
 
         /// <summary>
-        /// Gets or sets server operation mode value
+        /// Gets or sets the server operation mode value
         /// </summary>
-        public SupportedOperationModes SelectedOperationMode
+        public SupportedOperationMode SelectedOperationMode
         {
             get => this.selectedOperationMode;
             set => this.RaiseAndSetIfChanged(ref this.selectedOperationMode, value);
@@ -266,7 +266,7 @@ namespace StressGenerator.ViewModels
         private bool loginSuccessfully;
 
         /// <summary>
-        /// Gets or sets login successfully flag
+        /// Gets or sets the login successfully flag
         /// </summary>
         public bool LoginSuccessfully
         {
@@ -280,7 +280,7 @@ namespace StressGenerator.ViewModels
         private bool modeCreate;
 
         /// <summary>
-        /// Gets or sets operating mode flag
+        /// Gets or sets the mode create flag
         /// </summary>
         public bool ModeCreate
         {
@@ -294,7 +294,7 @@ namespace StressGenerator.ViewModels
         private bool sourceModelIsEnabled;
 
         /// <summary>
-        /// Gets or sets source model flag
+        /// Gets or sets the source model is enabled flag
         /// </summary>
         public bool SourceModelIsEnabled
         {
@@ -308,7 +308,7 @@ namespace StressGenerator.ViewModels
         private string newModelName;
 
         /// <summary>
-        /// Gets or sets new model name
+        /// Gets or sets the new model name
         /// </summary>
         public string NewModelName
         {
@@ -317,7 +317,7 @@ namespace StressGenerator.ViewModels
         }
 
         /// <summary>
-        /// Get model prefix information
+        /// Get the model prefix information
         /// </summary>
         public string ModelPrefixInformation =>
             $"For safety, the short name of the engineering model must start with '{StressGeneratorConfiguration.ModelPrefix}'";
@@ -369,26 +369,24 @@ namespace StressGenerator.ViewModels
                     if (!success || session == null) return;
 
                     this.LoginSuccessfully = true;
-                    this.SelectedOperationMode = SupportedOperationModes.Open;
+                    this.SelectedOperationMode = SupportedOperationMode.Open;
                     this.EngineeringModelSetupList = this.GetEngineeringModelSetupList(true);
                 });
 
-            this.WhenAnyValue(
-                    vm => vm.SelectedOperationMode)
+            this.WhenAnyValue(vm => vm.SelectedOperationMode)
                 .Subscribe((mode) =>
                 {
-                    this.SourceModelIsEnabled = mode != SupportedOperationModes.Open;
+                    this.SourceModelIsEnabled = mode != SupportedOperationMode.Open;
+                    this.ModeCreate = mode == SupportedOperationMode.Create;
 
                     switch (mode)
                     {
-                        case SupportedOperationModes.Open:
-                            this.ModeCreate = false;
+                        case SupportedOperationMode.Open:
                             break;
-                        case SupportedOperationModes.Create:
-                        case SupportedOperationModes.CreateOverwrite:
-                            this.ModeCreate = mode == SupportedOperationModes.Create;
+                        case SupportedOperationMode.Create:
+                        case SupportedOperationMode.CreateOverwrite:
                             this.SelectedEngineeringModelSetup = null;
-                            this.SourceEngineeringModelSetupList = this.GetEngineeringModelSetupList();
+                            this.SourceEngineeringModelSetupList = this.GetEngineeringModelSetupList(false);
                             break;
                         default:
                             throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
@@ -466,20 +464,27 @@ namespace StressGenerator.ViewModels
         }
 
         /// <summary>
-        /// Bind engineering models to the reactive list
+        /// Bind engineering models to the reactive list.
         /// </summary>
-        /// <param name="filterPrefix">Boolean flag that specify if should be filtered</param>
-        /// <returns>Reactive list <see cref="ReactiveList{EngineeringModelSetup}"/></returns>
-        private ReactiveList<EngineeringModelSetup> GetEngineeringModelSetupList(bool? filterPrefix = null)
+        /// <param name="filterPrefix">
+        /// Boolean flag that specifies whether the model list should be
+        /// filtered by <see cref="StressGeneratorConfiguration.ModelPrefix"/>.
+        /// </param>
+        /// <returns>
+        /// Reactive list <see cref="ReactiveList{T}"/> of <see cref="EngineeringModelSetup"/>.
+        /// </returns>
+        private ReactiveList<EngineeringModelSetup> GetEngineeringModelSetupList(bool filterPrefix)
         {
             var siteDirectory = this.SourceViewModel.ServerSession.RetrieveSiteDirectory();
 
-            var modelSetups = filterPrefix.HasValue
-                ? siteDirectory.Model.Where(m => m.Name.StartsWith(StressGeneratorConfiguration.ModelPrefix))
-                    .OrderBy(m => m.Name)
-                : siteDirectory.Model.OrderBy(m => m.Name);
+            IEnumerable<EngineeringModelSetup> modelSetups = siteDirectory.Model;
 
-            return new ReactiveList<EngineeringModelSetup>(modelSetups);
+            if (filterPrefix)
+            {
+                modelSetups = modelSetups.Where(m => m.Name.StartsWith(StressGeneratorConfiguration.ModelPrefix));
+            }
+
+            return new ReactiveList<EngineeringModelSetup>(modelSetups.OrderBy(m => m.Name));
         }
     }
 }

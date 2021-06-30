@@ -416,18 +416,16 @@ namespace Migration.ViewModels
                     return;
             }
 
-            var iteration = elementDefinition?.Container as Iteration;
+            var iteration = elementDefinition.Container as Iteration;
 
             // Select needed because OrderedItemList iterates to object
             var options = parameterSubscription.IsOptionDependent
-                ? iteration?.Option.Select(x => x)
+                ? iteration.Option.Select(x => x)
                 : new List<Option> { null };
 
             var actualFiniteStates = parameterSubscription.StateDependence != null
                 ? parameterSubscription.StateDependence.ActualState
                 : new List<ActualFiniteState> { null };
-
-            if (options == null) return;
 
             foreach (var option in options)
             {
@@ -441,9 +439,8 @@ namespace Migration.ViewModels
                     {
                         parameterSubscription.ValueSet.Add(new ParameterSubscriptionValueSet
                         {
-                            SubscribedValueSet =
-                                parameterOrOverrideBase.QueryParameterBaseValueSet(option, actualFiniteState) as
-                                    ParameterValueSetBase
+                            SubscribedValueSet = parameterOrOverrideBase
+                                    .QueryParameterBaseValueSet(option, actualFiniteState) as ParameterValueSetBase
                         });
                     }
                 }

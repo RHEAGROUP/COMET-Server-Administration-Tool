@@ -34,12 +34,12 @@ namespace StressGenerator.Utils
     using CDP4Dal;
 
     /// <summary>
-    /// Helper class for creating EngineeringModelSetup <see cref="EngineeringModelSetup"/> for test purposes
+    /// Helper class for creating <see cref="EngineeringModelSetup"/>s
     /// </summary>
     internal static class EngineeringModelSetupGenerator
     {
         /// <summary>
-        /// Create a new instance of <see cref="Iteration" />
+        /// Create a new instance of <see cref="Iteration"/>
         /// </summary>
         /// <param name="session">
         /// Server session <see cref="ISession"/>
