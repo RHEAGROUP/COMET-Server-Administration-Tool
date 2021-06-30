@@ -291,6 +291,22 @@ namespace StressGenerator.Tests
         }
 
         [Test]
+        public void VerifyConfigurationTestObjectNumberLimits()
+        {
+            var configuration = new StressGeneratorConfiguration(this.session);
+
+            configuration.TestObjectsNumber = StressGeneratorConfiguration.MinNumberOfTestObjects - 1;
+            Assert.AreEqual(
+                StressGeneratorConfiguration.MinNumberOfTestObjects,
+                configuration.TestObjectsNumber);
+
+            configuration.TestObjectsNumber = StressGeneratorConfiguration.MaxNumberOfTestObjects + 1;
+            Assert.AreEqual(
+                StressGeneratorConfiguration.MaxNumberOfTestObjects,
+                configuration.TestObjectsNumber);
+        }
+
+        [Test]
         public void VerifyThatStressGeneratorFailedIfSessionHasNoOpenIteration()
         {
             this.siteDirectory.Model.Remove(this.engineeringModelSetup.Iid);
@@ -316,8 +332,6 @@ namespace StressGenerator.Tests
         [Test]
         public void VerifyThatStressGeneratorWorksInOpenMode()
         {
-            this.stressGeneratorViewModel.TestObjectsNumber = short.MinValue;
-
             this.session.Open();
 
             Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
