@@ -31,11 +31,8 @@ namespace Migration.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
-    using CDP4Dal;
-    using Common.Events;
     using Common.ViewModels;
     using Microsoft.Win32;
-    using NLog;
     using ReactiveUI;
     using Utils;
     using Views;
@@ -43,13 +40,8 @@ namespace Migration.ViewModels
     /// <summary>
     /// The view-model for the Migration that lets users to migrate models between different data servers
     /// </summary>
-    public class MigrationViewModel : ReactiveObject
+    public class MigrationViewModel : BaseModuleViewModel
     {
-        /// <summary>
-        /// The NLog logger
-        /// </summary>
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         /// <summary>
         /// Gets data source server type
         /// </summary>
@@ -107,20 +99,6 @@ namespace Migration.ViewModels
         }
 
         /// <summary>
-        /// Backing field for the the output messages <see cref="Output"/>
-        /// </summary>
-        private string output;
-
-        /// <summary>
-        /// Gets or sets operation output messages
-        /// </summary>
-        public string Output
-        {
-            get => this.output;
-            set => this.RaiseAndSetIfChanged(ref this.output, value);
-        }
-
-        /// <summary>
         /// Backing field for the the migration file <see cref="MigrationFile"/>
         /// </summary>
         private string migrationFile;
@@ -147,8 +125,10 @@ namespace Migration.ViewModels
         /// <summary>
         /// Add subscription to the login view models
         /// </summary>
-        public void AddSubscriptions()
+        public override void AddSubscriptions()
         {
+            base.AddSubscriptions();
+
             this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(_ => {
                 OperationMessageHandler(this.SourceViewModel.Output);
             });
@@ -174,29 +154,6 @@ namespace Migration.ViewModels
                 .Subscribe(_ =>
             {
                 this.MigrationFactory.TargetSession = this.TargetViewModel.ServerSession;
-            });
-
-            CDPMessageBus.Current.Listen<LogEvent>().Subscribe((operationEvent) => {
-                var message = operationEvent.Message;
-                var exception = operationEvent.Exception;
-                var logLevel = operationEvent.Verbosity;
-
-                if (operationEvent.Exception != null)
-                {
-                    message += $"\n\tException: {exception.Message}";
-
-                    if (exception.InnerException != null)
-                    {
-                        message += $"\n\tInner exception: {exception.InnerException.Message}";
-                        message += $"\n{exception.InnerException.StackTrace}";
-                    }
-                    else
-                    {
-                        message += $"\n{exception.StackTrace}";
-                    }
-                }
-
-                this.OperationMessageHandler(message, logLevel);
             });
         }
 
@@ -320,37 +277,6 @@ namespace Migration.ViewModels
             }
 
             this.MigrationFactory.Cleanup();
-        }
-
-        /// <summary>
-        /// Add text message to the output panel
-        /// </summary>
-        /// <param name="message">The text message</param>
-        /// <param name="logLevel"></param>
-        private void OperationMessageHandler(string message, LogVerbosity? logLevel = null)
-        {
-            if (string.IsNullOrEmpty(message)) return;
-
-            this.Output += $"{DateTime.Now:HH:mm:ss} {message}{Environment.NewLine}";
-
-            switch (logLevel)
-            {
-                case LogVerbosity.Info:
-                    Logger.Info(message);
-                    break;
-                case LogVerbosity.Warn:
-                    Logger.Warn(message);
-                    break;
-                case LogVerbosity.Debug:
-                    Logger.Debug(message);
-                    break;
-                case LogVerbosity.Error:
-                    Logger.Error(message);
-                    break;
-                default:
-                    Logger.Trace(message);
-                    break;
-            }
         }
     }
 }

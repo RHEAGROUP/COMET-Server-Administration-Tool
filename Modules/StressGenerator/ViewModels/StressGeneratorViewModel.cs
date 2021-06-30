@@ -37,9 +37,19 @@ namespace StressGenerator.ViewModels
     using Utils;
 
     /// <summary>
+    /// Supported operation modes
+    /// </summary>
+    public enum SupportedOperationMode
+    {
+        Open,
+        Create,
+        CreateOverwrite
+    }
+
+    /// <summary>
     /// The view-model for the StressGenerator tool
     /// </summary>
-    public class StressGeneratorViewModel : ReactiveObject
+    public sealed class StressGeneratorViewModel : BaseModuleViewModel
     {
         /// <summary>
         /// The <see cref="StressGenerator"/> used to build the helper sync classes
@@ -71,6 +81,17 @@ namespace StressGenerator.ViewModels
             };
 
         /// <summary>
+        /// Gets supported operation modes
+        /// </summary>
+        public static Dictionary<SupportedOperationMode, string> StressGeneratorModes { get; } =
+            new Dictionary<SupportedOperationMode, string>
+            {
+                {SupportedOperationMode.Open, SupportedOperationMode.Open.ToString()},
+                {SupportedOperationMode.Create, SupportedOperationMode.Create.ToString()},
+                {SupportedOperationMode.CreateOverwrite, SupportedOperationMode.CreateOverwrite.ToString()}
+            };
+
+        /// <summary>
         /// Backing field for the <see cref="SelectedEngineeringModelSetup"/> property
         /// </summary>
         private EngineeringModelSetup selectedEngineeringModelSetup;
@@ -85,17 +106,45 @@ namespace StressGenerator.ViewModels
         }
 
         /// <summary>
+        /// Backing field for the <see cref="SelectedSourceEngineeringModelSetup"/> property
+        /// </summary>
+        private EngineeringModelSetup selectedSourceEngineeringModelSetup;
+
+        /// <summary>
+        /// Gets or sets selected source engineering model
+        /// </summary>
+        public EngineeringModelSetup SelectedSourceEngineeringModelSetup
+        {
+            get => this.selectedSourceEngineeringModelSetup;
+            set => this.RaiseAndSetIfChanged(ref this.selectedSourceEngineeringModelSetup, value);
+        }
+
+        /// <summary>
         /// Backing field for the the <see cref="EngineeringModelSetupList"/> property
         /// </summary>
         private ReactiveList<EngineeringModelSetup> engineeringModelSetupList;
 
         /// <summary>
-        /// Gets or sets domains of expertise
+        /// Gets or sets stress engineering models list
         /// </summary>
         public ReactiveList<EngineeringModelSetup> EngineeringModelSetupList
         {
             get => this.engineeringModelSetupList;
             private set => this.RaiseAndSetIfChanged(ref this.engineeringModelSetupList, value);
+        }
+
+        /// <summary>
+        /// Backing field for the the <see cref="SourceEngineeringModelSetupList"/> property
+        /// </summary>
+        private ReactiveList<EngineeringModelSetup> sourceEngineeringModelSetupList;
+
+        /// <summary>
+        /// Gets or sets source engineering models list for creating stress models
+        /// </summary>
+        public ReactiveList<EngineeringModelSetup> SourceEngineeringModelSetupList
+        {
+            get => this.sourceEngineeringModelSetupList;
+            private set => this.RaiseAndSetIfChanged(ref this.sourceEngineeringModelSetupList, value);
         }
 
         /// <summary>
@@ -169,23 +218,23 @@ namespace StressGenerator.ViewModels
         }
 
         /// <summary>
-        /// Backing field for the the <see cref="Output"/> messages property
+        /// Backing field for the the <see cref="DeleteModel"/> messages property
         /// </summary>
-        private string output;
+        private bool deleteModel;
 
         /// <summary>
-        /// Gets or sets operation output messages
+        /// Gets or sets a flag that trigger deleting of all elements in the engineering model.
         /// </summary>
-        public string Output
+        public bool DeleteModel
         {
-            get => this.output;
-            set => this.RaiseAndSetIfChanged(ref this.output, value);
+            get => this.deleteModel;
+            set => this.RaiseAndSetIfChanged(ref this.deleteModel, value);
         }
 
         /// <summary>
         /// Out property for the <see cref="CanStress"/> property
         /// </summary>
-        private readonly ObservableAsPropertyHelper<bool> canStress;
+        private ObservableAsPropertyHelper<bool> canStress;
 
         /// <summary>
         /// Gets a value indicating whether a stress operation can start
@@ -195,18 +244,101 @@ namespace StressGenerator.ViewModels
         /// <summary>
         /// Gets the server sync command
         /// </summary>
-        public ReactiveCommand<Unit> StressCommand { get; }
+        public ReactiveCommand<Unit> StressCommand { get; set; }
+
+        /// <summary>
+        /// Backing field for the <see cref="SupportedOperationMode"/> property
+        /// </summary>
+        private SupportedOperationMode selectedOperationMode;
+
+        /// <summary>
+        /// Gets or sets the server operation mode value
+        /// </summary>
+        public SupportedOperationMode SelectedOperationMode
+        {
+            get => this.selectedOperationMode;
+            set => this.RaiseAndSetIfChanged(ref this.selectedOperationMode, value);
+        }
+
+        /// <summary>
+        /// Backing field for the <see cref="LoginSuccessfully"/> property
+        /// </summary>
+        private bool loginSuccessfully;
+
+        /// <summary>
+        /// Gets or sets the login successfully flag
+        /// </summary>
+        public bool LoginSuccessfully
+        {
+            get => this.loginSuccessfully;
+            private set => this.RaiseAndSetIfChanged(ref this.loginSuccessfully, value);
+        }
+
+        /// <summary>
+        /// Backing field for the <see cref="ModeCreate"/> property
+        /// </summary>
+        private bool modeCreate;
+
+        /// <summary>
+        /// Gets or sets the mode create flag
+        /// </summary>
+        public bool ModeCreate
+        {
+            get => this.modeCreate;
+            private set => this.RaiseAndSetIfChanged(ref this.modeCreate, value);
+        }
+
+        /// <summary>
+        /// Backing field for the <see cref="SourceModelIsEnabled"/> property
+        /// </summary>
+        private bool sourceModelIsEnabled;
+
+        /// <summary>
+        /// Gets or sets the source model is enabled flag
+        /// </summary>
+        public bool SourceModelIsEnabled
+        {
+            get => this.sourceModelIsEnabled;
+            private set => this.RaiseAndSetIfChanged(ref this.sourceModelIsEnabled, value);
+        }
+
+        /// <summary>
+        /// Backing field for the <see cref="NewModelName"/> property
+        /// </summary>
+        private string newModelName;
+
+        /// <summary>
+        /// Gets or sets the new model name
+        /// </summary>
+        public string NewModelName
+        {
+            get => this.newModelName;
+            set => this.RaiseAndSetIfChanged(ref this.newModelName, value);
+        }
+
+        /// <summary>
+        /// Get the model prefix information
+        /// </summary>
+        public string ModelPrefixInformation =>
+            $"For safety, the short name of the engineering model must start with '{StressGeneratorConfiguration.ModelPrefix}'";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StressGeneratorViewModel"/> class
         /// </summary>
         public StressGeneratorViewModel()
         {
-            this.TimeInterval = StressGeneratorConfiguration.MinTimeInterval;
-            this.TestObjectsNumber = StressGeneratorConfiguration.MinNumberOfTestObjects;
-            this.ElementName = "Element";
-            this.ElementShortName = "ED";
-            this.EngineeringModelSetupList = new ReactiveList<EngineeringModelSetup>();
+            this.SetProperties();
+            this.AddSubscriptions();
+        }
+
+        /// <summary>
+        /// Add model subscriptions
+        /// </summary>
+        public override void AddSubscriptions()
+        {
+            base.AddSubscriptions();
+
+            this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(StressGeneratorMessageHandler);
 
             var canExecuteStress = this.WhenAnyValue(
                 vm => vm.SourceViewModel.LoginSuccessfully,
@@ -215,35 +347,76 @@ namespace StressGenerator.ViewModels
                 vm => vm.ElementName,
                 vm => vm.ElementShortName,
                 vm => vm.SelectedEngineeringModelSetup,
-                (sourceLoggedIn, timeInterval, testObjectsNumber, name, shortName, modelSetup) =>
+                vm => vm.NewModelName,
+                (sourceLoggedIn, interval, objectsNumber, name, shortName, modelSetup, modelName) =>
                     sourceLoggedIn &&
-                    timeInterval >= StressGeneratorConfiguration.MinTimeInterval &&
-                    testObjectsNumber >= StressGeneratorConfiguration.MinNumberOfTestObjects &&
-                    testObjectsNumber <= StressGeneratorConfiguration.MaxNumberOfTestObjects &&
+                    interval >= StressGeneratorConfiguration.MinTimeInterval &&
+                    objectsNumber >= StressGeneratorConfiguration.MinNumberOfTestObjects &&
+                    objectsNumber <= StressGeneratorConfiguration.MaxNumberOfTestObjects &&
                     !string.IsNullOrEmpty(name) &&
                     !string.IsNullOrEmpty(shortName) &&
-                    modelSetup != null);
+                    (modelSetup != null || !string.IsNullOrEmpty(modelName)));
 
             canExecuteStress.ToProperty(this, vm => vm.CanStress, out this.canStress);
 
-            this.WhenAnyValue(vm => vm.SourceViewModel.LoginSuccessfully, vm => vm.SourceViewModel.ServerSession)
-                .Subscribe(
-                    delegate(Tuple<bool, ISession> tuple)
-                    {
-                        var (success, session) = tuple;
+            this.WhenAnyValue(
+                    vm => vm.SourceViewModel.LoginSuccessfully,
+                    vm => vm.SourceViewModel.ServerSession)
+                .Subscribe(delegate(Tuple<bool, ISession> tuple)
+                {
+                    var (success, session) = tuple;
 
-                        if (success && session != null)
-                        {
-                            this.BindEngineeringModels(session.RetrieveSiteDirectory());
-                        }
-                    });
+                    if (!success || session == null) return;
+
+                    this.LoginSuccessfully = true;
+                    this.SelectedOperationMode = SupportedOperationMode.Open;
+                    this.EngineeringModelSetupList = this.GetEngineeringModelSetupList(true);
+                });
+
+            this.WhenAnyValue(vm => vm.SelectedOperationMode)
+                .Subscribe((mode) =>
+                {
+                    this.SourceModelIsEnabled = mode != SupportedOperationMode.Open;
+                    this.ModeCreate = mode == SupportedOperationMode.Create;
+
+                    if (mode == SupportedOperationMode.CreateOverwrite)
+                    {
+                        this.SelectedEngineeringModelSetup = null;
+                        this.SourceEngineeringModelSetupList = this.GetEngineeringModelSetupList(false);
+                    }
+                });
 
             this.StressCommand = ReactiveCommand.CreateAsyncTask(
                 canExecuteStress,
                 _ => this.ExecuteStressCommand(),
                 RxApp.MainThreadScheduler);
+        }
 
-            this.stressGenerator.NotifyMessageEvent += StressGeneratorMessageHandler;
+        /// <summary>
+        /// Set properties for this model
+        /// </summary>
+        public override void SetProperties()
+        {
+            base.SetProperties();
+
+            this.EngineeringModelSetupList = new ReactiveList<EngineeringModelSetup>
+            {
+                ChangeTrackingEnabled = true
+            };
+            this.SourceEngineeringModelSetupList = new ReactiveList<EngineeringModelSetup>
+            {
+                ChangeTrackingEnabled = true
+            };
+
+            this.TimeInterval = StressGeneratorConfiguration.MinTimeInterval;
+            this.TestObjectsNumber = StressGeneratorConfiguration.MinNumberOfTestObjects;
+            this.ElementName = StressGeneratorConfiguration.GenericElementName;
+            this.ElementShortName = StressGeneratorConfiguration.GenericElementShortName;
+            this.EngineeringModelSetupList = new ReactiveList<EngineeringModelSetup>();
+            this.SourceEngineeringModelSetupList = new ReactiveList<EngineeringModelSetup>();
+            this.ModeCreate = false;
+            this.SourceModelIsEnabled = false;
+            this.NewModelName = StressGeneratorConfiguration.ModelPrefix;
         }
 
         /// <summary>
@@ -254,14 +427,22 @@ namespace StressGenerator.ViewModels
         /// </returns>
         private async Task ExecuteStressCommand()
         {
-            this.stressGenerator.Init(new StressGeneratorConfiguration(
-                this.SourceViewModel.ServerSession,
-                this.TimeInterval,
-                this.TestObjectsNumber,
-                this.ElementName,
-                this.ElementShortName,
-                this.DeleteAllElements));
-            await this.stressGenerator.GenerateTestObjects(this.SelectedEngineeringModelSetup);
+            this.stressGenerator.Init(new StressGeneratorConfiguration(this.SourceViewModel.ServerSession)
+            {
+                TimeInterval = this.TimeInterval * 1000,
+                OperationMode = this.SelectedOperationMode,
+                TestModelSetupName = this.NewModelName,
+                TestModelSetupIid = this.SelectedEngineeringModelSetup?.Iid ?? Guid.Empty,
+                SourceModelSetup = this.SelectedSourceEngineeringModelSetup,
+                ElementName = this.ElementName.Trim(),
+                ElementShortName = this.ElementShortName.Trim().Replace(" ", "_"),
+                DeleteAllElements = this.DeleteAllElements,
+                DeleteModel = this.DeleteModel
+            });
+
+            await this.stressGenerator.Generate();
+
+            await this.stressGenerator.CleanUp();
         }
 
         /// <summary>
@@ -276,16 +457,27 @@ namespace StressGenerator.ViewModels
         }
 
         /// <summary>
-        /// Bind engineering models to the reactive list
+        /// Bind engineering models to the reactive list.
         /// </summary>
-        /// <param name="siteDirectory">The <see cref="SiteDirectory"/> top container</param>
-        private void BindEngineeringModels(SiteDirectory siteDirectory)
+        /// <param name="filterPrefix">
+        /// Boolean flag that specifies whether the model list should be
+        /// filtered by <see cref="StressGeneratorConfiguration.ModelPrefix"/>.
+        /// </param>
+        /// <returns>
+        /// Reactive list <see cref="ReactiveList{T}"/> of <see cref="EngineeringModelSetup"/>.
+        /// </returns>
+        private ReactiveList<EngineeringModelSetup> GetEngineeringModelSetupList(bool filterPrefix)
         {
-            this.EngineeringModelSetupList.Clear();
-            foreach (var modelSetup in siteDirectory.Model.Where(m => m.Name.StartsWith("Stresser")).OrderBy(m => m.Name))
+            var siteDirectory = this.SourceViewModel.ServerSession.RetrieveSiteDirectory();
+
+            IEnumerable<EngineeringModelSetup> modelSetups = siteDirectory.Model;
+
+            if (filterPrefix)
             {
-                this.EngineeringModelSetupList.Add(modelSetup);
+                modelSetups = modelSetups.Where(m => m.Name.StartsWith(StressGeneratorConfiguration.ModelPrefix));
             }
+
+            return new ReactiveList<EngineeringModelSetup>(modelSetups.OrderBy(m => m.Name));
         }
     }
 }

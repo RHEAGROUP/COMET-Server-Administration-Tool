@@ -142,7 +142,11 @@ namespace Migration.ViewModels
         {
             if (this.migrationSourceSession is null)
             {
-                CDPMessageBus.Current.SendMessage(new LogEvent { Message = "The source session is not defined" });
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = "The source session is not defined",
+                    Type = typeof(MigrationViewModel)
+                });
                 return;
             }
 
@@ -179,7 +183,11 @@ namespace Migration.ViewModels
         {
             this.IsBusy = true;
 
-            CDPMessageBus.Current.SendMessage(new LogEvent { Message = "Fixing the cardinality errors for the selected models..." });
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = "Fixing the cardinality errors for the selected models...",
+                Type = typeof(MigrationViewModel)
+            });
 
             // these should be traversed in bottom-up containment order (?), but for now reverse also works
             foreach (var rowError in this.Errors.OrderBy(e => e.Thing.ClassKind.ToString()).Reverse())
@@ -198,15 +206,16 @@ namespace Migration.ViewModels
             this.Errors.AddRange(d);
 
             CDPMessageBus.Current.SendMessage(this.Errors.Count == 0
-                ? new LogEvent { Message = "The cardinality errors have been successfully fixed" }
-                : new LogEvent { Message = "The cardinality errors have not been fixed" });
+                ? new LogEvent { Message = "The cardinality errors have been successfully fixed", Type = typeof(MigrationViewModel) }
+                : new LogEvent { Message = "The cardinality errors have not been fixed", Type = typeof(MigrationViewModel) });
 
             // log not fixed errors
             foreach (var rowError in this.errors)
             {
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
-                    Message = $"Could not fix POCO error: {Environment.NewLine}{rowError}"
+                    Message = $"Could not fix POCO error: {Environment.NewLine}{rowError}",
+                    Type = typeof(MigrationViewModel)
                 });
             }
 
@@ -333,7 +342,7 @@ namespace Migration.ViewModels
         /// <summary>
         /// Ensure only exactly one <see cref="ParameterSubscriptionValueSet"/> exists
         /// for each <see cref="Option"/> and <see cref="ActualFiniteState"/>.
-        /// NOTE: Duplicate code needed because <see cref="ParameterSubscriptionValueSet"/> is not 
+        /// NOTE: Duplicate code needed because <see cref="ParameterSubscriptionValueSet"/> is not
         /// a subclass of <see cref="ParameterValueSetBase"/>.
         /// </summary>
         /// <param name="parameterSubscription">
@@ -386,7 +395,7 @@ namespace Migration.ViewModels
         private static void AddMissingValueSets(ParameterSubscription parameterSubscription)
         {
             var parameterOrOverrideBase = parameterSubscription.Container as ParameterOrOverrideBase;
-            ElementDefinition elementDefinition = null;
+            ElementDefinition elementDefinition;
 
             switch (parameterOrOverrideBase)
             {
@@ -401,7 +410,8 @@ namespace Migration.ViewModels
                     CDPMessageBus.Current.SendMessage(new LogEvent
                     {
                         Message = $"ParameterOrOverrideBase is neither a Parameter nor a ParameterOverride: " +
-                                  $"{PocoErrorRowViewModel.GetPath(parameterOrOverrideBase)}"
+                                  $"{PocoErrorRowViewModel.GetPath(parameterOrOverrideBase)}",
+                        Type = typeof(MigrationViewModel)
                     });
                     return;
             }
@@ -429,7 +439,8 @@ namespace Migration.ViewModels
                     {
                         parameterSubscription.ValueSet.Add(new ParameterSubscriptionValueSet
                         {
-                            SubscribedValueSet = parameterOrOverrideBase.QueryParameterBaseValueSet(option, actualFiniteState) as ParameterValueSetBase
+                            SubscribedValueSet = parameterOrOverrideBase
+                                    .QueryParameterBaseValueSet(option, actualFiniteState) as ParameterValueSetBase
                         });
                     }
                 }

@@ -275,20 +275,14 @@ namespace Common.ViewModels
             {
                 if (!loginFailed) return;
 
-                CDPMessageBus.Current.SendMessage(new LogEvent
-                {
-                    Message = $"Cannot log in to {this.Uri} ({ServerTypes[SelectedDataSource]}) data-source"
-                });
+                this.Output = $"Cannot log in to {this.Uri} ({ServerTypes[SelectedDataSource]}) data-source";
             });
 
             this.WhenAnyValue(vm => vm.LoginSuccessfully).Subscribe(loginSuccessfully =>
             {
                 if (!loginSuccessfully) return;
 
-                CDPMessageBus.Current.SendMessage(new LogEvent
-                {
-                    Message = $"Successfully logged in to {this.Uri} ({ServerTypes[SelectedDataSource]}) data-source"
-                });
+                this.Output = $"Successfully logged in to {this.Uri} ({ServerTypes[SelectedDataSource]}) data-source";
             });
 
             this.WhenAnyValue(vm => vm.SelectedDataSource).Subscribe(_ =>
@@ -383,10 +377,8 @@ namespace Common.ViewModels
             {
                 if (this.IsSessionOpen(this.Uri, this.UserName, this.Password))
                 {
-                    CDPMessageBus.Current.SendMessage(new LogEvent
-                    {
-                        Message = "The user is already logged on this server. Closing the session."
-                    });
+                    this.Output = "The user is already logged on this server. Closing the session.";
+
                     await this.ServerSession.Close();
                 }
 
@@ -408,12 +400,7 @@ namespace Common.ViewModels
             }
             catch (Exception ex)
             {
-                CDPMessageBus.Current.SendMessage(new LogEvent
-                {
-                    Message = "Cannot execute login. Exception occurs.",
-                    Exception = ex,
-                    Verbosity = LogVerbosity.Error
-                });
+                this.Output = $"Cannot execute login. Exception: {ex.Message} {ex.StackTrace}";
 
                 this.LoginFailed = true;
             }
@@ -427,10 +414,7 @@ namespace Common.ViewModels
         [ExcludeFromCodeCoverage]
         private async Task ExecuteLogout(ISession currentSession)
         {
-            CDPMessageBus.Current.SendMessage(new LogEvent
-            {
-                Message = $"Successfully logged out from {currentSession.DataSourceUri} data-source"
-            });
+            this.Output = $"Successfully logged out from {currentSession.DataSourceUri} data-source";
 
             await currentSession.Close();
 
