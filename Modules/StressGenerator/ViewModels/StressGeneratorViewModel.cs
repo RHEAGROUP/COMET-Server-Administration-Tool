@@ -379,17 +379,10 @@ namespace StressGenerator.ViewModels
                     this.SourceModelIsEnabled = mode != SupportedOperationMode.Open;
                     this.ModeCreate = mode == SupportedOperationMode.Create;
 
-                    switch (mode)
+                    if (mode == SupportedOperationMode.CreateOverwrite)
                     {
-                        case SupportedOperationMode.Open:
-                            break;
-                        case SupportedOperationMode.Create:
-                        case SupportedOperationMode.CreateOverwrite:
-                            this.SelectedEngineeringModelSetup = null;
-                            this.SourceEngineeringModelSetupList = this.GetEngineeringModelSetupList(false);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
+                        this.SelectedEngineeringModelSetup = null;
+                        this.SourceEngineeringModelSetupList = this.GetEngineeringModelSetupList(false);
                     }
                 });
 
