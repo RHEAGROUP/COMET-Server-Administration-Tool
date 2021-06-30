@@ -79,8 +79,6 @@ namespace StressGenerator.Utils
             this.configuration = config;
         }
 
-        // TODO #81 Unify output messages mechanism inside SAT solution
-
         /// <summary>
         /// Generate test objects in the engineering model.
         /// </summary>
