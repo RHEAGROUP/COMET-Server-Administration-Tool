@@ -82,11 +82,11 @@ namespace StressGenerator.Utils
             if (valueSetClone == null) return null;
 
             valueSetClone.ValueSwitch = parameterValueSwitch;
-            valueSetClone.Manual = new ValueArray<string>(new List<string> {parameterValue});
-            valueSetClone.Computed = new ValueArray<string>(new List<string> {parameterValue});
-            valueSetClone.Reference = new ValueArray<string>(new List<string> {parameterValue});
-            valueSetClone.Formula = new ValueArray<string>(new List<string> {parameterValue});
-            valueSetClone.Published = new ValueArray<string>(new List<string> {parameterValue});
+            valueSetClone.Manual = new ValueArray<string>(new List<string> { parameterValue });
+            valueSetClone.Computed = new ValueArray<string>(new List<string> { parameterValue });
+            valueSetClone.Reference = new ValueArray<string>(new List<string> { parameterValue });
+            valueSetClone.Formula = new ValueArray<string>(new List<string> { parameterValue });
+            valueSetClone.Published = new ValueArray<string>(new List<string> { parameterValue });
 
             return valueSetClone;
         }
