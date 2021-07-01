@@ -25,7 +25,6 @@
 
 namespace StressGenerator.ViewModels
 {
-    using System;
     using System.Collections.Generic;
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
