@@ -79,7 +79,7 @@ namespace StressGenerator.ViewModels
             new KeyValuePair<string, double>("mass_margin", 10),
             new KeyValuePair<string, double>("P_on", 33.5),
             new KeyValuePair<string, double>("P_stby", 5.7),
-            new KeyValuePair<string, double>("V", 15.7)
+            new KeyValuePair<string, double>("Vol", 15.7)
         };
 
         /// <summary>
@@ -142,9 +142,9 @@ namespace StressGenerator.ViewModels
         public ISession Session { get; }
 
         /// <summary>
-        /// <see cref="EngineeringModelSetup"/> iid used for stress test.
+        /// <see cref="EngineeringModelSetup"/> used for stress test.
         /// </summary>
-        public Guid TestModelSetupIid { get; set; }
+        public EngineeringModelSetup TestModelSetup { get; set; }
 
         /// <summary>
         /// <see cref="EngineeringModelSetup"/> name used for stress test.
