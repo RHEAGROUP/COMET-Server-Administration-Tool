@@ -125,6 +125,62 @@ namespace Migration.ViewModels
         public bool CanMigrate => this.canMigrate.Value;
 
         /// <summary>
+        /// Backing field for the the <see cref="CleanUpFiles"/> property
+        /// </summary>
+        private bool cleanUpFiles;
+
+        /// <summary>
+        /// Gets or sets clean up flag
+        /// </summary>
+        public bool CleanUpFiles
+        {
+            get => this.cleanUpFiles;
+            set => this.RaiseAndSetIfChanged(ref this.cleanUpFiles, value);
+        }
+
+        /// <summary>
+        /// Backing field for the the <see cref="SkipReadAndValidation"/> property
+        /// </summary>
+        private bool skipReadAndValidation;
+
+        /// <summary>
+        /// Gets or sets skip read & validation flag
+        /// </summary>
+        public bool SkipReadAndValidation
+        {
+            get => this.skipReadAndValidation;
+            set => this.RaiseAndSetIfChanged(ref this.skipReadAndValidation, value);
+        }
+
+        /// <summary>
+        /// Backing field for the the <see cref="CanSkipReadAndValidation"/> property
+        /// </summary>
+        private bool canSkipReadAndValidation;
+
+        /// <summary>
+        /// Enable or Disable read & validation process
+        /// </summary>
+        public bool CanSkipReadAndValidation
+        {
+            get => this.canSkipReadAndValidation;
+            set => this.RaiseAndSetIfChanged(ref this.canSkipReadAndValidation, value);
+        }
+
+        /// <summary>
+        /// Backing field for the the <see cref="IsCleanUpVisible"/> property
+        /// </summary>
+        private bool isCleanUpVisible;
+
+        /// <summary>
+        /// Gets or sets visibility flag for cleanup controls
+        /// </summary>
+        public bool IsCleanUpVisible
+        {
+            get => this.isCleanUpVisible;
+            set => this.RaiseAndSetIfChanged(ref this.isCleanUpVisible, value);
+        }
+
+        /// <summary>
         /// Add subscription to the login view models
         /// </summary>
         public override void AddSubscriptions()
@@ -133,32 +189,46 @@ namespace Migration.ViewModels
 
             CDPMessageBus.Current.Listen<FlushLogEvent>().Subscribe(_ => this.Output = string.Empty);
 
-            this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(_ => {
-                OperationMessageHandler(this.SourceViewModel.Output);
-            });
-            this.WhenAnyValue(vm => vm.TargetViewModel.Output).Subscribe(_ => {
-                OperationMessageHandler(this.TargetViewModel.Output);
-            });
+            this.WhenAnyValue(vm => vm.SourceViewModel.Output)
+                .Subscribe(_ =>
+                {
+                    OperationMessageHandler(this.SourceViewModel.Output);
+                });
+
+            this.WhenAnyValue(vm => vm.TargetViewModel.Output).Subscribe(_ =>
+                {
+                    OperationMessageHandler(this.TargetViewModel.Output);
+                });
 
             this.WhenAnyValue(
-                vm => vm.SourceViewModel.LoginSuccessfully,
-                vm => vm.SourceViewModel.ServerSession,
-                (loginSuccessfully, dataSourceSession) => loginSuccessfully && dataSourceSession != null)
+                    vm => vm.SourceViewModel.LoginSuccessfully,
+                    vm => vm.SourceViewModel.ServerSession,
+                    (loginSuccessfully, dataSourceSession) => loginSuccessfully && dataSourceSession != null)
                 .Where(canContinue => canContinue)
-                .Subscribe(_ =>
-            {
-                this.MigrationFactory.SourceSession = this.SourceViewModel.ServerSession;
-            });
+                .Subscribe(_ => { this.MigrationFactory.SourceSession = this.SourceViewModel.ServerSession; });
 
             this.WhenAnyValue(
-                vm => vm.TargetViewModel.LoginSuccessfully,
-                vm => vm.TargetViewModel.ServerSession,
-                (loginSuccessfully, dataSourceSession) => loginSuccessfully && dataSourceSession != null)
+                    vm => vm.SourceViewModel.LoginSuccessfully)
+                .Subscribe(delegate(bool loginSuccessfully) { this.IsCleanUpVisible = loginSuccessfully; });
+
+            this.WhenAnyValue(
+                    vm => vm.SourceViewModel.SelectedDataSource,
+                    vm => vm.SourceViewModel.LoginSuccessfully)
+                .Subscribe(delegate(Tuple<DataSource, bool> tuple)
+                {
+                    var (selectedDataSource, loginSuccessfully) = tuple;
+                    this.CanSkipReadAndValidation = selectedDataSource == DataSource.JSON && loginSuccessfully;
+                });
+
+            this.WhenAnyValue(
+                    vm => vm.TargetViewModel.LoginSuccessfully,
+                    vm => vm.TargetViewModel.ServerSession,
+                    (loginSuccessfully, dataSourceSession) => loginSuccessfully && dataSourceSession != null)
                 .Where(canContinue => canContinue)
                 .Subscribe(_ =>
-            {
-                this.MigrationFactory.TargetSession = this.TargetViewModel.ServerSession;
-            });
+                {
+                    this.MigrationFactory.TargetSession = this.TargetViewModel.ServerSession;
+                });
         }
 
         /// <summary>
@@ -194,6 +264,8 @@ namespace Migration.ViewModels
             });
 
             this.FileIsChecked = false;
+            this.CleanUpFiles = true;
+            this.CanSkipReadAndValidation = false;
 
             this.MigrationFactory = new Migration();
 
@@ -238,36 +310,45 @@ namespace Migration.ViewModels
         /// <returns>The <see cref="Task"/></returns>
         private async Task ExecuteMigration()
         {
-            var result = await this.MigrationFactory.ImportData(this.SourceViewModel?.EngineeringModels);
+            bool result;
 
-            if (!result)
+            if (!this.CanSkipReadAndValidation)
             {
-                this.OperationMessageHandler("Migration import of data failed");
-                return;
-            }
+                result = await this.MigrationFactory.ImportData(this.SourceViewModel?.EngineeringModels);
 
-            // Pop a wizard with POCO errors for whole session
-            if (Application.Current != null)
-            {
-                var fixCardinalityDialog = new FixCardinalityErrorsDialog
+                if (!result)
                 {
-                    DataContext = new FixCardinalityErrorsDialogViewModel(this.MigrationFactory.SourceSession)
-                };
-                var dialogResult = fixCardinalityDialog.ShowDialog();
+                    this.OperationMessageHandler("Migration import of data failed");
+                    return;
+                }
 
-                if (dialogResult != true)
+                // Pop a wizard with POCO errors for whole session
+                if (Application.Current != null)
                 {
-                    this.OperationMessageHandler("Migration canceled");
+                    var fixCardinalityDialog = new FixCardinalityErrorsDialog
+                    {
+                        DataContext = new FixCardinalityErrorsDialogViewModel(this.MigrationFactory.SourceSession)
+                    };
+                    var dialogResult = fixCardinalityDialog.ShowDialog();
+
+                    if (dialogResult != true)
+                    {
+                        this.OperationMessageHandler("Migration canceled");
+                        return;
+                    }
+                }
+
+                result = await this.MigrationFactory.PackData(this.MigrationFile);
+
+                if (!result)
+                {
+                    this.OperationMessageHandler("Migration pack of data failed");
                     return;
                 }
             }
-
-            result = await this.MigrationFactory.PackData(this.MigrationFile);
-
-            if (!result)
+            else
             {
-                this.OperationMessageHandler("Migration pack of data failed");
-                return;
+                System.IO.File.Copy(this.SourceViewModel.Uri, Migration.ArchiveFileName, true);
             }
 
             if (Application.Current != null)
@@ -280,7 +361,10 @@ namespace Migration.ViewModels
                 }
             }
 
-            this.MigrationFactory.Cleanup();
+            if (this.CleanUpFiles)
+            {
+                this.MigrationFactory.Cleanup();
+            }
         }
     }
 }

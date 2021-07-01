@@ -53,7 +53,7 @@ namespace Migration.Utils
         /// <summary>
         /// Annex C3 Zip archive file name
         /// </summary>
-        private static readonly string ArchiveFileName = $"{AppDomain.CurrentDomain.BaseDirectory}\\Import\\Annex-C3.zip";
+        public static readonly string ArchiveFileName = $"{AppDomain.CurrentDomain.BaseDirectory}\\Import\\Annex-C3.zip";
 
         /// <summary>
         /// Annex C3 Migration file name
@@ -75,12 +75,10 @@ namespace Migration.Utils
         /// </summary>
         public Migration()
         {
-            if (Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\Import"))
+            if (!Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\Import"))
             {
-                Directory.Delete($"{AppDomain.CurrentDomain.BaseDirectory}\\Import", true);
+                Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}\\Import");
             }
-
-            Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}\\Import");
         }
 
         /// <summary>
