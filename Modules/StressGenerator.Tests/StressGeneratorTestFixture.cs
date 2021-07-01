@@ -289,6 +289,11 @@ namespace StressGenerator.Tests
                     this.engineeringModelSetup.Iid,
                     null,
                     null)
+                {
+                    EngineeringModelIid = this.engineeringModel.Iid,
+                    Name = StressGeneratorConfiguration.ModelPrefix + "_UnitTest",
+                    ShortName = StressGeneratorConfiguration.ModelPrefix + "_UnitTest"
+                }
             };
         }
 

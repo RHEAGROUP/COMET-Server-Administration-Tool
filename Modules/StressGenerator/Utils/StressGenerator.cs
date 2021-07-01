@@ -106,10 +106,10 @@ namespace StressGenerator.Utils
                 if (this.configuration.OperationMode == SupportedOperationMode.CreateOverwrite)
                 {
                     newModelName = session.RetrieveSiteDirectory().Model
-                        .Single(ems => ems.Iid == this.configuration.TestModelSetupIid)
+                        .Single(ems => ems.Iid == this.configuration.TestModelSetup.Iid)
                         .Name;
                     
-                    await EngineeringModelSetupGenerator.Delete(session, this.configuration.TestModelSetupIid);
+                    await EngineeringModelSetupGenerator.Delete(session, this.configuration.TestModelSetup.Iid);
 
                     await session.Refresh();
                 }
@@ -122,11 +122,11 @@ namespace StressGenerator.Utils
 
                 await session.Refresh();
 
-                this.configuration.TestModelSetupIid = engineeringModelSetup.Iid;
+                this.configuration.TestModelSetup = engineeringModelSetup;
             }
 
             var testModelSetup = session.RetrieveSiteDirectory().Model
-                .SingleOrDefault(ems => ems.Iid == this.configuration.TestModelSetupIid);
+                .SingleOrDefault(ems => ems.Iid == this.configuration.TestModelSetup.Iid);
 
             if (testModelSetup == null)
             {
@@ -158,7 +158,7 @@ namespace StressGenerator.Utils
             {
                 await EngineeringModelSetupGenerator.Delete(
                     this.configuration.Session,
-                    this.configuration.TestModelSetupIid);
+                    this.configuration.TestModelSetup.Iid);
             }
 
             CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent

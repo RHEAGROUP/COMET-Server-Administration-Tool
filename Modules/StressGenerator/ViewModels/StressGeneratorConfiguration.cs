@@ -142,9 +142,9 @@ namespace StressGenerator.ViewModels
         public ISession Session { get; }
 
         /// <summary>
-        /// <see cref="EngineeringModelSetup"/> iid used for stress test.
+        /// <see cref="EngineeringModelSetup"/> used for stress test.
         /// </summary>
-        public Guid TestModelSetupIid { get; set; }
+        public EngineeringModelSetup TestModelSetup { get; set; }
 
         /// <summary>
         /// <see cref="EngineeringModelSetup"/> name used for stress test.

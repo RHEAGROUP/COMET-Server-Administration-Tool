@@ -434,7 +434,7 @@ namespace StressGenerator.ViewModels
                 TimeInterval = this.TimeInterval * 1000,
                 OperationMode = this.SelectedOperationMode,
                 TestModelSetupName = this.NewModelName,
-                TestModelSetupIid = this.SelectedEngineeringModelSetup?.Iid ?? Guid.Empty,
+                TestModelSetup = this.SelectedEngineeringModelSetup,
                 SourceModelSetup = this.SelectedSourceEngineeringModelSetup,
                 ElementName = this.ElementName.Trim(),
                 ElementShortName = this.ElementShortName.Trim().Replace(" ", "_"),
