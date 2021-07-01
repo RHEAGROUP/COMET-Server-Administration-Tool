@@ -31,6 +31,8 @@ namespace Migration.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+    using CDP4Dal;
+    using Common.Events;
     using Common.ViewModels;
     using Microsoft.Win32;
     using ReactiveUI;
@@ -128,6 +130,8 @@ namespace Migration.ViewModels
         public override void AddSubscriptions()
         {
             base.AddSubscriptions();
+
+            CDPMessageBus.Current.Listen<FlushLogEvent>().Subscribe(_ => this.Output = string.Empty);
 
             this.WhenAnyValue(vm => vm.SourceViewModel.Output).Subscribe(_ => {
                 OperationMessageHandler(this.SourceViewModel.Output);
