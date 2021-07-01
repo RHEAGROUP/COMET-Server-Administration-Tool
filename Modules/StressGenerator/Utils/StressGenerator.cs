@@ -130,6 +130,15 @@ namespace StressGenerator.Utils
 
             if (testModelSetup == null)
             {
+                CDPMessageBus.Current.SendMessage(new LogEvent
+                {
+                    Message = $"Could not find test EngineeringModelSetup {this.configuration.TestModelSetup.ShortName} " +
+                              $"({this.configuration.TestModelSetup.ShortName}) " +
+                              $"with iid {this.configuration.TestModelSetup.Iid}.",
+                    Verbosity = LogVerbosity.Error,
+                    Type = typeof(StressGeneratorViewModel)
+                });
+
                 return;
             }
 
@@ -160,6 +169,13 @@ namespace StressGenerator.Utils
                     this.configuration.Session,
                     this.configuration.TestModelSetup.Iid);
             }
+
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = "Finished StressGenerator run.",
+                Verbosity = LogVerbosity.Info,
+                Type = typeof(StressGeneratorViewModel)
+            });
 
             CDPMessageBus.Current.SendMessage(new LogoutAndLoginEvent
             {
@@ -193,7 +209,8 @@ namespace StressGenerator.Utils
 
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
-                    Message = $"Successfully loaded EngineeringModel {engineeringModelSetup.ShortName} (Iteration {iteration.IterationSetup?.IterationNumber}).",
+                    Message = $"Successfully loaded EngineeringModel {engineeringModelSetup.ShortName} " +
+                              $"(Iteration {iteration.IterationSetup?.IterationNumber}).",
                     Verbosity = LogVerbosity.Info,
                     Type = typeof(StressGeneratorViewModel)
                 });
@@ -202,7 +219,8 @@ namespace StressGenerator.Utils
             {
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
-                    Message = $"Invalid iteration. Engineering model {engineeringModelSetup.ShortName} must contain at least one active iteration. Exception: {exception.Message}",
+                    Message = $"Could not open last iteration for EngineeringModelSetup {engineeringModelSetup.ShortName}. " +
+                              $"Exception: {exception.Message}",
                     Verbosity = LogVerbosity.Error,
                     Type = typeof(StressGeneratorViewModel)
                 });
