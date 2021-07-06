@@ -298,6 +298,23 @@ namespace StressGenerator.Tests
         }
 
         [Test]
+        public void VerifyModelPrefixInformation()
+        {
+            Assert.IsTrue(this.stressGeneratorViewModel.ModelPrefixInformation
+                .Contains(StressGeneratorConfiguration.ModelPrefix));
+        }
+
+        [Test]
+        public void VerifyTestObjectsNumberInformation()
+        {
+            Assert.IsTrue(this.stressGeneratorViewModel.TestObjectsNumberInformation
+                .Contains(StressGeneratorConfiguration.MinNumberOfTestObjects.ToString()));
+
+            Assert.IsTrue(this.stressGeneratorViewModel.TestObjectsNumberInformation
+                .Contains(StressGeneratorConfiguration.MaxNumberOfTestObjects.ToString()));
+        }
+
+        [Test]
         public void VerifyConfigurationTestObjectNumberLimits()
         {
             var configuration = new StressGeneratorConfiguration(this.session);
