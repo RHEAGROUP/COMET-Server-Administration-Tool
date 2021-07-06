@@ -154,6 +154,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
             <!-- Time interval -->
@@ -185,7 +186,8 @@
                 FontSize="12"
                 Content="Test objects number" />
             <dxe:TextEdit
-                Mask="\d+" MaskType="RegEx" MaskUseAsDisplayFormat="True"
+                Mask="\d+"
+                MaskType="RegEx"
                 Text="{Binding Path=TestObjectsNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Grid.Row="1"
                 Grid.Column="1"
@@ -193,7 +195,22 @@
                 Margin="5"
                 FontSize="12"
                 Width="250" />
-
+            <StackPanel
+                Visibility="{Binding Path=IsTestObjectsNumberInvalid,
+                                     Converter={dxmvvm:BooleanToVisibilityConverter},
+                                     UpdateSourceTrigger=PropertyChanged}"
+                Orientation="Horizontal"
+                Grid.Row="1"
+                Grid.Column="2"
+                HorizontalAlignment="Left">
+                <Image
+                    HorizontalAlignment="Left"
+                    Source="{dx:DXImage Image=Cancel_16x16.png}" />
+                <TextBlock
+                    Text="{Binding TestObjectsNumberInformation, Mode=OneTime}"
+                    VerticalAlignment="Center"
+                    Margin="5" />
+            </StackPanel>
             <!-- Element name -->
             <dxlc:LayoutItemLabel
                 Grid.Row="2"

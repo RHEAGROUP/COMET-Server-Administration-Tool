@@ -21,10 +21,10 @@
     <dxlc:LayoutGroup.DataContext>
         <viewModels:MigrationViewModel />
     </dxlc:LayoutGroup.DataContext>
-    <TextBlock TextWrapping="Wrap" Height="50" Background="LightYellow" Padding="5">
+    <TextBlock TextWrapping="Wrap" Height="40" Background="LightYellow" Padding="5">
         Warning: Migrating a server is potentially a very dangerous operation. The data on the Target server will be entirely erased in the process; thus it is recommended to only migrate to fresh new installations.
     </TextBlock>
-    <GroupBox Header="Source" Height="360">
+    <GroupBox Header="Source" Height="380">
         <StackPanel Margin="0" HorizontalAlignment="Stretch">
             <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
@@ -39,6 +39,8 @@
                 <StackPanel Grid.Row="0" Grid.Column="0">
                     <Grid HorizontalAlignment="Stretch">
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
@@ -83,10 +85,15 @@
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
+                        <CheckBox Grid.Row="4" Grid.Column="0"
+                                  Margin="5"
+                                  IsEnabled="{Binding Path=CanSkipReadAndValidation}"
+                                  IsChecked="{Binding Path=SkipReadAndValidation}"
+                                  Content="Skip read and validation process" />
                     </Grid>
                 </StackPanel>
 
-                <StackPanel Grid.Row="0" Grid.Column="1" Width="540">
+                <StackPanel Grid.Row="0" Grid.Column="1">
                     <views:ServerInfo
                         LoginSuccessfully="{Binding Path=LoginSuccessfully,
                                                     UpdateSourceTrigger=PropertyChanged}"
@@ -96,6 +103,22 @@
                                              Converter={dxmvvm:BooleanToVisibilityConverter},
                                              UpdateSourceTrigger=PropertyChanged}"
                         DataContext="{Binding SourceViewModel}" />
+                    <CheckBox
+                        IsChecked="{Binding Path=CleanUpFiles}"
+                        Visibility="{Binding Path=IsCleanUpVisible,
+                                             Converter={dxmvvm:BooleanToVisibilityConverter},
+                                             UpdateSourceTrigger=PropertyChanged}"
+                        Content="Clean up migration files" />
+                    <TextBlock
+                        Visibility="{Binding Path=IsCleanUpVisible,
+                                             Converter={dxmvvm:BooleanToVisibilityConverter},
+                                             UpdateSourceTrigger=PropertyChanged}"
+                        TextWrapping="Wrap"
+                        Background="LightYellow"
+                        Padding="5"
+                        HorizontalAlignment="Left">
+                        Warning: Keeping the migration files between two consecutive running sessions might result in outdated migration data
+                    </TextBlock>
                 </StackPanel>
             </Grid>
         </StackPanel>

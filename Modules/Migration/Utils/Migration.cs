@@ -53,7 +53,7 @@ namespace Migration.Utils
         /// <summary>
         /// Annex C3 Zip archive file name
         /// </summary>
-        private static readonly string ArchiveFileName = $"{AppDomain.CurrentDomain.BaseDirectory}\\Import\\Annex-C3.zip";
+        public static readonly string ArchiveFileName = $"{AppDomain.CurrentDomain.BaseDirectory}\\Import\\Annex-C3.zip";
 
         /// <summary>
         /// Annex C3 Migration file name
@@ -75,12 +75,10 @@ namespace Migration.Utils
         /// </summary>
         public Migration()
         {
-            if (Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\Import"))
+            if (!Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\Import"))
             {
-                Directory.Delete($"{AppDomain.CurrentDomain.BaseDirectory}\\Import", true);
+                Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}\\Import");
             }
-
-            Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}\\Import");
         }
 
         /// <summary>
@@ -193,7 +191,8 @@ namespace Migration.Utils
                         {
                             Message = $"Read iteration {iterationCount} failed: {iterationDescription}",
                             Exception = exception,
-                            Verbosity = LogVerbosity.Error
+                            Verbosity = LogVerbosity.Error,
+                            Type = typeof(MigrationViewModel)
                         });
                     }
                     else
@@ -270,7 +269,7 @@ namespace Migration.Utils
             {
                 Message = $"Pushing data to {targetUrl}.{Environment.NewLine}" +
                           $"    Please note that this operation takes a long time and there is no progress user feedback.",
-                Verbosity = LogVerbosity.Info
+                Type = typeof(MigrationViewModel)
             });
 
             try
@@ -396,6 +395,8 @@ namespace Migration.Utils
             var success = true;
             List<string> extensionFiles = null;
 
+            CDPMessageBus.Current.SendMessage(new FlushLogEvent());
+
             if (!string.IsNullOrEmpty(migrationFile))
             {
                 if (!System.IO.File.Exists(migrationFile))
@@ -418,6 +419,12 @@ namespace Migration.Utils
                         System.IO.File.Delete(MigrationFileName);
                     }
                     System.IO.File.Copy(migrationFile, MigrationFileName);
+
+                    CDPMessageBus.Current.SendMessage(new LogEvent
+                    {
+                        Message = "Added migration.json file.",
+                        Type = typeof(MigrationViewModel)
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -435,7 +442,7 @@ namespace Migration.Utils
 
             CDPMessageBus.Current.SendMessage(new LogEvent
             {
-                Message = "Pack operation start",
+                Message = "Pack operation started.",
                 Type = typeof(MigrationViewModel)
             });
 
@@ -456,6 +463,12 @@ namespace Migration.Utils
             var zipCredentials = new Credentials(this.SourceSession.Credentials.UserName, this.TargetSession.Credentials.Password, new Uri(ArchiveFileName));
             // NOTE zipSession needed because JsonFileDal.Write uses the credentials from the Session
             var zipSession = new Session(zipDal, zipCredentials);
+
+            CDPMessageBus.Current.SendMessage(new LogEvent
+            {
+                Message = "Writing Annex C.3 file.",
+                Type = typeof(MigrationViewModel)
+            });
 
             try
             {
@@ -479,7 +492,7 @@ namespace Migration.Utils
 
             CDPMessageBus.Current.SendMessage(new LogEvent
             {
-                Message = "Pack operation end",
+                Message = "Pack operation ended.",
                 Type = typeof(MigrationViewModel)
             });
 
