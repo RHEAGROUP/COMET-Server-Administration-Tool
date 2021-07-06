@@ -196,7 +196,7 @@
                 FontSize="12"
                 Width="250" />
             <StackPanel
-                Visibility="{Binding Path=IsTestObjectsNumberValid,
+                Visibility="{Binding Path=IsTestObjectsNumberInvalid,
                                      Converter={dxmvvm:BooleanToVisibilityConverter},
                                      UpdateSourceTrigger=PropertyChanged}"
                 Orientation="Horizontal"

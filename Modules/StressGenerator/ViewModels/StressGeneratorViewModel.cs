@@ -176,17 +176,17 @@ namespace StressGenerator.ViewModels
         }
 
         /// <summary>
-        /// Backing field for the <see cref="IsTestObjectsNumberValid"/> property
+        /// Backing field for the <see cref="IsTestObjectsNumberInvalid"/> property
         /// </summary>
-        private bool isTestObjectsNumberValid;
+        private bool isTestObjectsNumberInvalid;
 
         /// <summary>
         /// Gets or sets the validity for the test objects number valid
         /// </summary>
-        public bool IsTestObjectsNumberValid
+        public bool IsTestObjectsNumberInvalid
         {
-            get => this.isTestObjectsNumberValid;
-            set => this.RaiseAndSetIfChanged(ref this.isTestObjectsNumberValid, value);
+            get => this.isTestObjectsNumberInvalid;
+            set => this.RaiseAndSetIfChanged(ref this.isTestObjectsNumberInvalid, value);
         }
 
         /// <summary>
@@ -364,8 +364,8 @@ namespace StressGenerator.ViewModels
 
             this.WhenAnyValue(vm => vm.TestObjectsNumber).Subscribe(objectsNumber =>
             {
-                this.IsTestObjectsNumberValid = objectsNumber < StressGeneratorConfiguration.MinNumberOfTestObjects ||
-                                                objectsNumber > StressGeneratorConfiguration.MaxNumberOfTestObjects;
+                this.isTestObjectsNumberInvalid = objectsNumber < StressGeneratorConfiguration.MinNumberOfTestObjects ||
+                                                  objectsNumber > StressGeneratorConfiguration.MaxNumberOfTestObjects;
             });
 
             var canExecuteStress = this.WhenAnyValue(

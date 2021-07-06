@@ -315,6 +315,21 @@ namespace StressGenerator.Tests
         }
 
         [Test]
+        public void VerifyIsTestObjectsNumberValid()
+        {
+            this.stressGeneratorViewModel.TestObjectsNumber = StressGeneratorConfiguration.MinNumberOfTestObjects - 1;
+            Assert.IsTrue(this.stressGeneratorViewModel.IsTestObjectsNumberInvalid);
+
+            this.stressGeneratorViewModel.TestObjectsNumber = StressGeneratorConfiguration.MaxNumberOfTestObjects + 1;
+            Assert.IsTrue(this.stressGeneratorViewModel.IsTestObjectsNumberInvalid);
+
+            this.stressGeneratorViewModel.TestObjectsNumber = new Random().Next(
+                StressGeneratorConfiguration.MinNumberOfTestObjects,
+                StressGeneratorConfiguration.MaxNumberOfTestObjects);
+            Assert.IsFalse(this.stressGeneratorViewModel.IsTestObjectsNumberInvalid);
+        }
+
+        [Test]
         public void VerifyConfigurationTestObjectNumberLimits()
         {
             var configuration = new StressGeneratorConfiguration(this.session);
