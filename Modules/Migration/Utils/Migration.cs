@@ -422,7 +422,7 @@ namespace Migration.Utils
 
                     CDPMessageBus.Current.SendMessage(new LogEvent
                     {
-                        Message = "Add migration.json file.",
+                        Message = "Added migration.json file.",
                         Type = typeof(MigrationViewModel)
                     });
                 }
@@ -442,7 +442,7 @@ namespace Migration.Utils
 
             CDPMessageBus.Current.SendMessage(new LogEvent
             {
-                Message = "Pack operation start",
+                Message = "Pack operation started.",
                 Type = typeof(MigrationViewModel)
             });
 
@@ -492,7 +492,7 @@ namespace Migration.Utils
 
             CDPMessageBus.Current.SendMessage(new LogEvent
             {
-                Message = "Pack operation end",
+                Message = "Pack operation ended.",
                 Type = typeof(MigrationViewModel)
             });
 

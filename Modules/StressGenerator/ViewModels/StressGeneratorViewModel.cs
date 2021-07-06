@@ -342,7 +342,6 @@ namespace StressGenerator.ViewModels
         public string TestObjectsNumberInformation =>
             $"The number of the test objects should be between {StressGeneratorConfiguration.MinNumberOfTestObjects} and {StressGeneratorConfiguration.MaxNumberOfTestObjects}.";
 
-
         /// <summary>
         /// Initializes a new instance of the <see cref="StressGeneratorViewModel"/> class
         /// </summary>

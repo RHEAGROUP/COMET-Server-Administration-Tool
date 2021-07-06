@@ -195,9 +195,21 @@
                 Margin="5"
                 FontSize="12"
                 Width="250" />
-            <StackPanel Visibility="{Binding Path=IsTestObjectsNumberValid, Converter={dxmvvm:BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}" Orientation="Horizontal" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left">
-                <Image HorizontalAlignment="Left" Source="{dx:DXImage Image=Cancel_16x16.png}" />
-                <TextBlock Text="{Binding TestObjectsNumberInformation, Mode=OneTime}" VerticalAlignment="Center" Margin="5"></TextBlock>
+            <StackPanel
+                Visibility="{Binding Path=IsTestObjectsNumberValid,
+                                     Converter={dxmvvm:BooleanToVisibilityConverter},
+                                     UpdateSourceTrigger=PropertyChanged}"
+                Orientation="Horizontal"
+                Grid.Row="1"
+                Grid.Column="2"
+                HorizontalAlignment="Left">
+                <Image
+                    HorizontalAlignment="Left"
+                    Source="{dx:DXImage Image=Cancel_16x16.png}" />
+                <TextBlock
+                    Text="{Binding TestObjectsNumberInformation, Mode=OneTime}"
+                    VerticalAlignment="Center"
+                    Margin="5" />
             </StackPanel>
             <!-- Element name -->
             <dxlc:LayoutItemLabel

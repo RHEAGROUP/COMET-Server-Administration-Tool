@@ -190,26 +190,26 @@ namespace Migration.ViewModels
             CDPMessageBus.Current.Listen<FlushLogEvent>().Subscribe(_ => this.Output = string.Empty);
 
             this.WhenAnyValue(vm => vm.SourceViewModel.Output)
-                .Subscribe(_ =>
-                {
-                    OperationMessageHandler(this.SourceViewModel.Output);
-                });
+                .Subscribe(_ => OperationMessageHandler(this.SourceViewModel.Output));
 
-            this.WhenAnyValue(vm => vm.TargetViewModel.Output).Subscribe(_ =>
-                {
-                    OperationMessageHandler(this.TargetViewModel.Output);
-                });
+            this.WhenAnyValue(vm => vm.TargetViewModel.Output)
+                .Subscribe(_ => OperationMessageHandler(this.TargetViewModel.Output));
 
             this.WhenAnyValue(
                     vm => vm.SourceViewModel.LoginSuccessfully,
                     vm => vm.SourceViewModel.ServerSession,
                     (loginSuccessfully, dataSourceSession) => loginSuccessfully && dataSourceSession != null)
                 .Where(canContinue => canContinue)
-                .Subscribe(_ => { this.MigrationFactory.SourceSession = this.SourceViewModel.ServerSession; });
+                .Subscribe(_ =>
+                {
+                    this.MigrationFactory.SourceSession = this.SourceViewModel.ServerSession;
+                });
 
-            this.WhenAnyValue(
-                    vm => vm.SourceViewModel.LoginSuccessfully)
-                .Subscribe(delegate(bool loginSuccessfully) { this.IsCleanUpVisible = loginSuccessfully; });
+            this.WhenAnyValue(vm => vm.SourceViewModel.LoginSuccessfully)
+                .Subscribe(delegate(bool loginSuccessfully)
+                {
+                    this.IsCleanUpVisible = loginSuccessfully;
+                });
 
             this.WhenAnyValue(
                     vm => vm.SourceViewModel.SelectedDataSource,
@@ -307,16 +307,11 @@ namespace Migration.ViewModels
         /// <summary>
         /// Executes migration command
         /// </summary>
-        /// <returns>The <see cref="Task"/></returns>
         private async Task ExecuteMigration()
         {
-            bool result;
-
             if (!this.CanSkipReadAndValidation)
             {
-                result = await this.MigrationFactory.ImportData(this.SourceViewModel?.EngineeringModels);
-
-                if (!result)
+                if (!await this.MigrationFactory.ImportData(this.SourceViewModel?.EngineeringModels))
                 {
                     this.OperationMessageHandler("Migration import of data failed");
                     return;
@@ -338,9 +333,7 @@ namespace Migration.ViewModels
                     }
                 }
 
-                result = await this.MigrationFactory.PackData(this.MigrationFile);
-
-                if (!result)
+                if (!await this.MigrationFactory.PackData(this.MigrationFile))
                 {
                     this.OperationMessageHandler("Migration pack of data failed");
                     return;
@@ -353,9 +346,7 @@ namespace Migration.ViewModels
 
             if (Application.Current != null)
             {
-                result = await this.MigrationFactory.ExportData();
-
-                if (!result)
+                if (!await this.MigrationFactory.ExportData())
                 {
                     this.OperationMessageHandler("Migration export failed");
                 }

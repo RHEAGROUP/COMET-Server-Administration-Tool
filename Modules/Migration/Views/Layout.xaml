@@ -49,7 +49,8 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <common:Login Grid.Row="0" Grid.Column="0" x:Name="LoginSource" />
+                        <common:Login Grid.Row="0" Grid.Column="0"
+                                      x:Name="LoginSource" />
                         <CheckBox Grid.Row="1" Grid.Column="0"
                             IsChecked="{Binding Path=FileIsChecked}"
                             Margin="5"
@@ -84,7 +85,8 @@
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
-                        <CheckBox Grid.Row="4" Grid.Column="0" Margin="5"
+                        <CheckBox Grid.Row="4" Grid.Column="0"
+                                  Margin="5"
                                   IsEnabled="{Binding Path=CanSkipReadAndValidation}"
                                   IsChecked="{Binding Path=SkipReadAndValidation}"
                                   Content="Skip read and validation process" />
@@ -111,8 +113,11 @@
                         Visibility="{Binding Path=IsCleanUpVisible,
                                              Converter={dxmvvm:BooleanToVisibilityConverter},
                                              UpdateSourceTrigger=PropertyChanged}"
-                        TextWrapping="Wrap" Background="LightYellow" Padding="5" HorizontalAlignment="Left">
-                        Warning: Keeping the migration files between two consecutive running sessions might result outdated migrations data
+                        TextWrapping="Wrap"
+                        Background="LightYellow"
+                        Padding="5"
+                        HorizontalAlignment="Left">
+                        Warning: Keeping the migration files between two consecutive running sessions might result in outdated migration data
                     </TextBlock>
                 </StackPanel>
             </Grid>
