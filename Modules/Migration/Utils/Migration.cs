@@ -514,7 +514,7 @@ namespace Migration.Utils
             var client = new HttpClient
             {
                 BaseAddress = credentials.Uri,
-                // TODO #70 Add user manual for the migration process
+                // TODO #70 Add user progress feedback for the server seeding process
                 Timeout = Timeout.InfiniteTimeSpan
             };
 
