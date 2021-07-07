@@ -459,11 +459,6 @@ namespace Migration.Utils
                 operationContainers.Add(operationContainer);
             }
 
-            var zipDal = new JsonFileDal(new Version("1.0.0"));
-            var zipCredentials = new Credentials(this.SourceSession.Credentials.UserName, this.TargetSession.Credentials.Password, new Uri(ArchiveFileName));
-            // NOTE zipSession needed because JsonFileDal.Write uses the credentials from the Session
-            var zipSession = new Session(zipDal, zipCredentials);
-
             CDPMessageBus.Current.SendMessage(new LogEvent
             {
                 Message = "Writing Annex C.3 file.",
@@ -472,7 +467,14 @@ namespace Migration.Utils
 
             try
             {
-                await zipDal.Write(operationContainers, extensionFiles);
+                // write using underlying Dal because Session does not currently expose Write(List<OperationContainer>)
+                await new Session(
+                        new JsonFileDal(new Version("1.0.0")),
+                        new Credentials(
+                            this.SourceSession.Credentials.UserName,
+                            this.TargetSession.Credentials.Password,
+                            new Uri(ArchiveFileName)))
+                    .Dal.Write(operationContainers, extensionFiles);
             }
             catch (Exception ex)
             {
