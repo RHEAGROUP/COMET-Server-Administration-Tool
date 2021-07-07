@@ -127,7 +127,7 @@ namespace Migration.Tests
 
             this.sourceViewModel.Setup(x => x.EngineeringModels).Returns(selectedEngineeringModels);
 
-            Assert.DoesNotThrow(() => this.migrationViewModel.MigrateCommand.Execute(null));
+            await Task.Run(() => this.migrationViewModel.MigrateCommand.Execute(null));
         }
 
         [Test]
