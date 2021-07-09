@@ -169,15 +169,6 @@ namespace Migration.Utils
 
                     model.Iteration.Add(iteration);
 
-                    Exception exception = null;
-                    try
-                    {
-                        await this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain, false);
-                    }
-                    catch (Exception e)
-                    {
-                        exception = e;
-                    }
 
                     finishedIterationSetups++;
                     finishedModelIterationSetups++;
@@ -185,21 +176,23 @@ namespace Migration.Utils
                     var iterationCount = $"{finishedIterationSetups}/{totalIterationSetups} ({finishedModelIterationSetups}/{totalModelIterationSetups})";
                     var iterationDescription = $"'{modelSetup.Name}'.'{iterationSetup.IterationIid}'";
 
-                    if (exception != null)
+                    try
+                    {
+                        await this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain, false);
+
+                        CDPMessageBus.Current.SendMessage(new LogEvent
+                        {
+                            Message = $"Read iteration {iterationCount} success: {iterationDescription}",
+                            Type = typeof(MigrationViewModel)
+                        });
+                    }
+                    catch (Exception ex)
                     {
                         CDPMessageBus.Current.SendMessage(new LogEvent
                         {
                             Message = $"Read iteration {iterationCount} failed: {iterationDescription}",
-                            Exception = exception,
+                            Exception = ex,
                             Verbosity = LogVerbosity.Error,
-                            Type = typeof(MigrationViewModel)
-                        });
-                    }
-                    else
-                    {
-                        CDPMessageBus.Current.SendMessage(new LogEvent
-                        {
-                            Message = $"Read iteration {iterationCount} success: {iterationDescription}",
                             Type = typeof(MigrationViewModel)
                         });
                     }
