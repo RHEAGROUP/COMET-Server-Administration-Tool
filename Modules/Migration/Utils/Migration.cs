@@ -130,7 +130,7 @@ namespace Migration.Utils
 
             if (siteDirectory == null)
             {
-                await this.SourceSession.Open();
+                await this.SourceSession.Open(false);
                 siteDirectory = this.SourceSession.RetrieveSiteDirectory();
             }
 
@@ -172,7 +172,7 @@ namespace Migration.Utils
                     Exception exception = null;
                     try
                     {
-                        await this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain);
+                        await this.SourceSession.Read(iteration, this.SourceSession.ActivePerson.DefaultDomain, false);
                     }
                     catch (Exception e)
                     {
@@ -254,7 +254,7 @@ namespace Migration.Utils
 
             if (this.TargetSession.RetrieveSiteDirectory() is null)
             {
-                await this.TargetSession.Open();
+                await this.TargetSession.Open(false);
             }
 
             CDPMessageBus.Current.SendMessage(new LogEvent
