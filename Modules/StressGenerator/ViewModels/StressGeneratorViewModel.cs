@@ -28,13 +28,16 @@ namespace StressGenerator.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reactive;
     using System.Threading.Tasks;
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
+    using Common.Events;
+    using Common.Utils;
     using Common.ViewModels;
+    using DevExpress.Xpf.Charts;
     using ReactiveUI;
     using Utils;
+    using Unit = System.Reactive.Unit;
 
     /// <summary>
     /// Supported operation modes
@@ -145,6 +148,34 @@ namespace StressGenerator.ViewModels
         {
             get => this.sourceEngineeringModelSetupList;
             private set => this.RaiseAndSetIfChanged(ref this.sourceEngineeringModelSetupList, value);
+        }
+
+        /// <summary>
+        /// Backing field for the <see cref="ChartData"/> property
+        /// </summary>
+        private ReactiveList<DataPoint> chartData;
+
+        /// <summary>
+        /// Gets or sets the chart datapoints
+        /// </summary>
+        public ReactiveList<DataPoint> ChartData
+        {
+            get => this.chartData;
+            private set => this.RaiseAndSetIfChanged(ref this.chartData, value);
+        }
+
+        /// <summary>
+        /// Backing field for the <see cref="ConstantLines"/> property
+        /// </summary>
+        private ReactiveList<ConstantLine> constantLines;
+
+        /// <summary>
+        /// Gets or sets the chart constant lines
+        /// </summary>
+        public ReactiveList<ConstantLine> ConstantLines
+        {
+            get => this.constantLines;
+            private set => this.RaiseAndSetIfChanged(ref this.constantLines, value);
         }
 
         /// <summary>
@@ -368,6 +399,20 @@ namespace StressGenerator.ViewModels
                                                   objectsNumber > StressGeneratorConfiguration.MaxNumberOfTestObjects;
             });
 
+            CDPMessageBus.Current.Listen<AddDataPointEvent>().Subscribe((dataPointEvent) =>
+            {
+                this.ChartData.Add(dataPointEvent.DataPoint);
+            });
+
+            CDPMessageBus.Current.Listen<AddConstantLineEvent>().Subscribe((constantLineEvent) =>
+            {
+                this.ConstantLines.Add(new ConstantLine
+                {
+                    Title = new ConstantLineTitle(){ Content = constantLineEvent.Text },
+                    Value = constantLineEvent.Timestamp
+                });
+            });
+
             var canExecuteStress = this.WhenAnyValue(
                 vm => vm.SourceViewModel.LoginSuccessfully,
                 vm => vm.TimeInterval,
@@ -427,6 +472,16 @@ namespace StressGenerator.ViewModels
         {
             base.SetProperties();
 
+            this.ChartData = new ReactiveList<DataPoint>()
+            {
+                ChangeTrackingEnabled = true
+            };
+
+            this.ConstantLines = new ReactiveList<ConstantLine>()
+            {
+                ChangeTrackingEnabled = true
+            };
+
             this.EngineeringModelSetupList = new ReactiveList<EngineeringModelSetup>
             {
                 ChangeTrackingEnabled = true
@@ -455,9 +510,13 @@ namespace StressGenerator.ViewModels
         /// </returns>
         private async Task ExecuteStressCommand()
         {
+            this.ChartData.Clear();
+            this.ConstantLines.Clear();
+
             this.stressGenerator.Init(new StressGeneratorConfiguration(this.SourceViewModel.ServerSession)
             {
                 TimeInterval = this.TimeInterval * 1000,
+                TestObjectsNumber = this.TestObjectsNumber,
                 OperationMode = this.SelectedOperationMode,
                 TestModelSetupName = this.NewModelName,
                 TestModelSetup = this.SelectedEngineeringModelSetup,

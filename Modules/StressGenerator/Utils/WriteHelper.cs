@@ -26,11 +26,13 @@
 namespace StressGenerator.Utils
 {
     using System;
+    using System.Diagnostics;
     using System.Text;
     using System.Threading.Tasks;
     using CDP4Dal;
     using CDP4Dal.Operations;
     using Common.Events;
+    using Common.Utils;
     using Polly;
     using ViewModels;
 
@@ -69,7 +71,23 @@ namespace StressGenerator.Utils
                     {
                         LogOperationResult(false, actionDescription, ex, retryCount);
                     })
-                    .ExecuteAsync(async () => await session.Dal.Write(operationContainer));
+                    .ExecuteAsync(async () =>
+                    {
+                        var startTime = DateTime.Now;
+                        var stopWatch = new Stopwatch();
+                        stopWatch.Start();
+                        await session.Dal.Write(operationContainer);
+                        stopWatch.Stop();
+                        CDPMessageBus.Current.SendMessage(new AddDataPointEvent()
+                        {
+                            DataPoint = new DataPoint
+                            {
+                                Argument = startTime,
+                                Description = "Executing Write",
+                                Value = stopWatch.ElapsedMilliseconds
+                            }
+                        });
+                    });
 
                 LogOperationResult(true, actionDescription);
             }

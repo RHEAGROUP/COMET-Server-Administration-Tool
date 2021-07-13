@@ -126,15 +126,15 @@ namespace StressGenerator.Utils
             }
 
             var testModelSetup = session.RetrieveSiteDirectory().Model
-                .SingleOrDefault(ems => ems.Iid == this.configuration.TestModelSetup.Iid);
+                .SingleOrDefault(ems => ems.Iid == this.configuration.TestModelSetup?.Iid);
 
             if (testModelSetup == null)
             {
                 CDPMessageBus.Current.SendMessage(new LogEvent
                 {
-                    Message = $"Could not find test EngineeringModelSetup {this.configuration.TestModelSetup.ShortName} " +
-                              $"({this.configuration.TestModelSetup.ShortName}) " +
-                              $"with iid {this.configuration.TestModelSetup.Iid}.",
+                    Message = $"Could not find test EngineeringModelSetup {this.configuration.TestModelSetup?.ShortName} " +
+                              $"({this.configuration.TestModelSetup?.ShortName}) " +
+                              $"with iid {this.configuration.TestModelSetup?.Iid}.",
                     Verbosity = LogVerbosity.Error,
                     Type = typeof(StressGeneratorViewModel)
                 });
@@ -167,7 +167,7 @@ namespace StressGenerator.Utils
             {
                 await EngineeringModelSetupGenerator.Delete(
                     this.configuration.Session,
-                    this.configuration.TestModelSetup.Iid);
+                    this.configuration.TestModelSetup?.Iid);
             }
 
             CDPMessageBus.Current.SendMessage(new LogEvent
@@ -283,6 +283,12 @@ namespace StressGenerator.Utils
             var generatedElementsList = new List<ElementDefinition>();
             var stopwatch = new Stopwatch();
 
+            CDPMessageBus.Current.SendMessage(new AddConstantLineEvent()
+            {
+                Text = "ElementDefinitions",
+                Timestamp = DateTime.Now
+            });
+
             for (var number = start; number < start + this.configuration.TestObjectsNumber; number++)
             {
                 iteration = this.configuration.Session.OpenIterations.Keys
@@ -356,6 +362,13 @@ namespace StressGenerator.Utils
             }
 
             var index = 0;
+
+            CDPMessageBus.Current.SendMessage(new AddConstantLineEvent()
+            {
+                Text = "ParameterValueSets",
+                Timestamp = DateTime.Now
+            });
+
             foreach (var elementDefinition in generatedIteration.Element.ToList())
             {
                 // Write value sets only for the generated elements
