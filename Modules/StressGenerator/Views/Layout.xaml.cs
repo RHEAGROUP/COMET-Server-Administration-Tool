@@ -132,8 +132,7 @@ namespace StressGenerator.Views
             var visual = new DrawingVisual();
             var context = visual.RenderOpen();
 
-            context.DrawRectangle(
-                brush, null, new Rect(0, 0, actualWidth, actualHeight));
+            context.DrawRectangle(brush, null, new Rect(0, 0, actualWidth, actualHeight));
             context.Close();
 
             // set up render target
