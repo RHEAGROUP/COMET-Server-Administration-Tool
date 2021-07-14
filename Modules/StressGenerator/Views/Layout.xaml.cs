@@ -49,8 +49,12 @@ namespace StressGenerator.Views
         /// <summary>
         /// Scroll up output window
         /// </summary>
-        /// <param name="sender">The sender control <see cref="TextEdit"/></param>
-        /// <param name="e">The <see cref="EditValueChangedEventArgs"/></param>
+        /// <param name="sender">
+        /// The sender control <see cref="TextEdit"/>
+        /// </param>
+        /// <param name="e">
+        /// The <see cref="EditValueChangedEventArgs"/>
+        /// </param>
         private void BaseEdit_OnEditValueChanged(object sender, EditValueChangedEventArgs e)
         {
             if (!(sender is TextEdit textEdit))
@@ -65,8 +69,12 @@ namespace StressGenerator.Views
         /// <summary>
         /// Saves the graph to an image file
         /// </summary>
-        /// <param name="sender">The sender</param>
-        /// <param name="e">The arguments</param>
+        /// <param name="sender">
+        /// The sender
+        /// </param>
+        /// <param name="e">
+        /// The arguments
+        /// </param>
         private void SaveToImage_OnItemClick(object sender, ItemClickEventArgs e)
         {
             var dialog = new DXSaveFileDialog
@@ -78,24 +86,27 @@ namespace StressGenerator.Views
 
             var result = dialog.ShowDialog();
 
-            if (result.HasValue && result.Value)
-            {
-                var encoder = this.GetImageEncoder();
+            if (!result.HasValue || !result.Value) return;
 
-                // start stream
-                var file = new FileStream(dialog.FileName, FileMode.Create);
-                encoder.Save(file);
+            var encoder = this.GetImageEncoder();
 
-                // close stream
-                file.Close();
-            }
+            // start stream
+            var file = new FileStream(dialog.FileName, FileMode.Create);
+            encoder.Save(file);
+
+            // close stream
+            file.Close();
         }
 
         /// <summary>
         /// Saves image to clipboard
         /// </summary>
-        /// <param name="sender">The sender</param>
-        /// <param name="e">The arguments</param>
+        /// <param name="sender">
+        /// The sender
+        /// </param>
+        /// <param name="e">
+        /// The arguments
+        /// </param>
         private void SaveToClipboard_OnItemClick(object sender, ItemClickEventArgs e)
         {
             var encoder = this.GetImageEncoder();
@@ -108,7 +119,9 @@ namespace StressGenerator.Views
         /// <summary>
         /// Computes and returns the Bitmap Image encoder with the chart of the correct size
         /// </summary>
-        /// <returns>The <see cref="JpegBitmapEncoder"/> containing the bitmap of the exported chart</returns>
+        /// <returns>
+        /// The <see cref="JpegBitmapEncoder"/> containing the bitmap of the exported chart
+        /// </returns>
         private JpegBitmapEncoder GetImageEncoder()
         {
             var actualWidth = this.ResponseChartControl.ActualWidth;
@@ -123,7 +136,7 @@ namespace StressGenerator.Views
                 brush, null, new Rect(0, 0, actualWidth, actualHeight));
             context.Close();
 
-            // set up redenr target
+            // set up render target
             var bmp = new RenderTargetBitmap(
                 (int)actualWidth,
                 (int)actualHeight,

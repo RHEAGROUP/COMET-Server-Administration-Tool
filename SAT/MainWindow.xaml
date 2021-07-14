@@ -8,7 +8,6 @@
     Height="950"
     Width="1000"
     ResizeMode="CanResizeWithGrip"
-    
     WindowStartupLocation="CenterScreen"
     Icon="pack://application:,,,/SAT;component/Resources/cdplogo3d_48x48.png">
     <Grid>
