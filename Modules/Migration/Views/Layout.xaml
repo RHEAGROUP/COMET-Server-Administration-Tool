@@ -123,7 +123,7 @@
             </Grid>
         </StackPanel>
     </dxlc:LayoutGroup>
-    <dxlc:LayoutGroup View="GroupBox"  Header="Target">
+    <dxlc:LayoutGroup View="GroupBox"  Header="Target" Height="340">
         <StackPanel Margin="0">
             <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
@@ -171,7 +171,7 @@
             </StackPanel>
         </Button>
     </StackPanel>
-    <dxlc:LayoutGroup View="GroupBox" Header="Output" HorizontalAlignment="Stretch">
+    <dxlc:LayoutGroup View="GroupBox" Header="Output" HorizontalAlignment="Stretch" MinHeight="100">
         <dxe:TextEdit
             Height="Auto"
             FontSize="12"

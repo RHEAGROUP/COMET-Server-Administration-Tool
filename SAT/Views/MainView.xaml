@@ -19,7 +19,7 @@
         <dxlc:LayoutControl
             Margin="5"
             Orientation="Vertical"
-            ScrollBars="None"
+            ScrollBars="Auto"
             VerticalAlignment="Stretch"
             HorizontalAlignment="Stretch">
             <dxlc:LayoutGroup

@@ -24,7 +24,7 @@
     <dx:DXTabControl>
         <dx:DXTabItem Header="Configuration">
             <dxlc:LayoutGroup Orientation="Vertical">
-                <dxlc:LayoutGroup Header="Connection" View="GroupBox" Margin="0">
+                <dxlc:LayoutGroup Header="Connection" View="GroupBox" Margin="0" Height="390">
                     <Grid HorizontalAlignment="Left">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />

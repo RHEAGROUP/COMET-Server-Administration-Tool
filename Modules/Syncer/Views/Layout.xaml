@@ -23,7 +23,7 @@
         <viewModels:SyncerViewModel />
     </dxlc:LayoutGroup.DataContext>
 
-    <dxlc:LayoutGroup View="GroupBox"  Header="Source" Height="320">
+    <dxlc:LayoutGroup View="GroupBox"  Header="Source" Height="390">
         <StackPanel Margin="0" HorizontalAlignment="Stretch">
             <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
@@ -111,7 +111,7 @@
         </Button>
     </StackPanel>
 
-    <dxlc:LayoutGroup View="GroupBox" Header="Output" HorizontalAlignment="Stretch">
+    <dxlc:LayoutGroup View="GroupBox" Header="Output" HorizontalAlignment="Stretch" MinHeight="100">
         <dxe:TextEdit
             Height="Auto"
             FontSize="12"
