@@ -30,7 +30,6 @@ namespace StressGenerator.Views
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
     using DevExpress.Xpf.Bars;
-    using DevExpress.Xpf.Charts;
     using DevExpress.Xpf.Dialogs;
     using DevExpress.Xpf.Editors;
 
@@ -50,8 +49,12 @@ namespace StressGenerator.Views
         /// <summary>
         /// Scroll up output window
         /// </summary>
-        /// <param name="sender">The sender control <see cref="TextEdit"/></param>
-        /// <param name="e">The <see cref="EditValueChangedEventArgs"/></param>
+        /// <param name="sender">
+        /// The sender control <see cref="TextEdit"/>
+        /// </param>
+        /// <param name="e">
+        /// The <see cref="EditValueChangedEventArgs"/>
+        /// </param>
         private void BaseEdit_OnEditValueChanged(object sender, EditValueChangedEventArgs e)
         {
             if (!(sender is TextEdit textEdit))
@@ -66,8 +69,12 @@ namespace StressGenerator.Views
         /// <summary>
         /// Saves the graph to an image file
         /// </summary>
-        /// <param name="sender">The sender</param>
-        /// <param name="e">The arguments</param>
+        /// <param name="sender">
+        /// The sender
+        /// </param>
+        /// <param name="e">
+        /// The arguments
+        /// </param>
         private void SaveToImage_OnItemClick(object sender, ItemClickEventArgs e)
         {
             var dialog = new DXSaveFileDialog
@@ -79,47 +86,49 @@ namespace StressGenerator.Views
 
             var result = dialog.ShowDialog();
 
-            if (result.HasValue && result.Value)
-            {
-                var actualWidth = this.ResponseChartControl.ActualWidth;
-                var actualHeight = this.ResponseChartControl.ActualHeight;
+            if (!result.HasValue || !result.Value) return;
 
-                // init contexts
-                var brush = new VisualBrush(this.ResponseChartControl);
-                var visual = new DrawingVisual();
-                var context = visual.RenderOpen();
+            var actualWidth = this.ResponseChartControl.ActualWidth;
+            var actualHeight = this.ResponseChartControl.ActualHeight;
 
-                context.DrawRectangle(
-                    brush, null, new Rect(0, 0, actualWidth, actualHeight));
-                context.Close();
+            // init contexts
+            var brush = new VisualBrush(this.ResponseChartControl);
+            var visual = new DrawingVisual();
+            var context = visual.RenderOpen();
 
-                // set up redenr target
-                var bmp = new RenderTargetBitmap(
-                    (int)actualWidth,
-                    (int)actualHeight,
-                    96,
-                    96,
-                    PixelFormats.Pbgra32);
+            context.DrawRectangle(brush, null, new Rect(0, 0, actualWidth, actualHeight));
+            context.Close();
 
-                bmp.Render(visual);
+            // set up render target
+            var bmp = new RenderTargetBitmap(
+                (int)actualWidth,
+                (int)actualHeight,
+                96,
+                96,
+                PixelFormats.Pbgra32);
 
-                var encoder = new JpegBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(bmp));
+            bmp.Render(visual);
 
-                // start stream
-                var file = new FileStream(dialog.FileName, FileMode.Create);
-                encoder.Save(file);
+            var encoder = new JpegBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(bmp));
 
-                // close stream
-                file.Close();
-            }
+            // start stream
+            var file = new FileStream(dialog.FileName, FileMode.Create);
+            encoder.Save(file);
+
+            // close stream
+            file.Close();
         }
 
         /// <summary>
         /// Saves image to clipboard
         /// </summary>
-        /// <param name="sender">The sender</param>
-        /// <param name="e">The arguments</param>
+        /// <param name="sender">
+        /// The sender
+        /// </param>
+        /// <param name="e">
+        /// The arguments
+        /// </param>
         private void SaveToClipboard_OnItemClick(object sender, ItemClickEventArgs e)
         {
             var actualWidth = this.ResponseChartControl.ActualWidth;

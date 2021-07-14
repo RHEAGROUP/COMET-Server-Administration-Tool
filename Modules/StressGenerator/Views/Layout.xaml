@@ -46,6 +46,7 @@
                             ServerTypes="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
                                                                      AncestorType={x:Type dxlc:LayoutGroup}},
                                                                      Path=DataContext.StressGeneratorTargetServerTypes}" />
+                        
                         <!-- Mode -->
                         <dxlc:LayoutItemLabel
                             Grid.Row="1"
@@ -66,6 +67,7 @@
                             IsSynchronizedWithCurrentItem="True"
                             SelectedValuePath="Key"
                             DisplayMemberPath="Value" />
+                        
                         <!-- Stress model -->
                         <dxlc:LayoutItemLabel
                             Grid.Row="2"
@@ -101,6 +103,7 @@
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
                         </StackPanel>
+                        
                         <!-- Source stress model -->
                         <dxlc:LayoutItemLabel
                             Grid.Row="3"
@@ -123,6 +126,7 @@
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
+                        
                         <!-- Info -->
                         <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" HorizontalAlignment="Stretch">
                             <Grid.RowDefinitions>
@@ -215,6 +219,7 @@
                                 VerticalAlignment="Center"
                                 Margin="5" />
                         </StackPanel>
+                        
                         <!-- Element name -->
                         <dxlc:LayoutItemLabel
                             Grid.Row="2"
@@ -320,7 +325,6 @@
                     <dxc:Title Content="Response Times"
                                HorizontalAlignment="Center" />
                 </dxc:ChartControl.Titles>
-
                 <dxc:XYDiagram2D EnableAxisXNavigation="True"
                                  DependentAxesYRange="True"
                                  EnableAxisYNavigation="True">
@@ -328,7 +332,6 @@
                                       ArgumentScaleType="DateTime"
                                       AggregateFunction="Average"
                                       ValueScaleType="Numerical"
-
                                       ArgumentDataMember="Argument"
                                       ValueDataMember="Value" LabelsVisibility="False">
                         <dxc:LineSeries2D.Indicators>
@@ -344,7 +347,6 @@
                                                 ShowInLegend="True" />
                         </dxc:LineSeries2D.Indicators>
                     </dxc:LineSeries2D>
-
                     <dxc:XYDiagram2D.AxisY>
                         <dxc:AxisY2D GridLinesVisible="True" GridLinesMinorVisible="True" Logarithmic="False">
                             <dxc:AxisY2D.NumericScaleOptions>
@@ -373,7 +375,6 @@
         </dx:DXTabItem>
     </dx:DXTabControl>
     <dxlc:LayoutGroup Header="Output" View="GroupBox" HorizontalAlignment="Stretch">
-
         <dxe:TextEdit
             EditValueChanged="BaseEdit_OnEditValueChanged"
             VerticalAlignment="Stretch"
@@ -385,9 +386,7 @@
             VerticalScrollBarVisibility="Visible"
             IsReadOnly="True"
             Text="{Binding Path=Output, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
     </dxlc:LayoutGroup>
-
     <dxmvvm:Interaction.Behaviors>
         <behaviors:StressGeneratorBehavior />
     </dxmvvm:Interaction.Behaviors>

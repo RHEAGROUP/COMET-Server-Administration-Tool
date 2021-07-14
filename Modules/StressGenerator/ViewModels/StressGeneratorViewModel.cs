@@ -37,7 +37,6 @@ namespace StressGenerator.ViewModels
     using DevExpress.Xpf.Charts;
     using ReactiveUI;
     using Utils;
-    using Unit = System.Reactive.Unit;
 
     /// <summary>
     /// Supported operation modes
@@ -79,8 +78,8 @@ namespace StressGenerator.ViewModels
         public static Dictionary<DataSource, string> StressGeneratorTargetServerTypes { get; } =
             new Dictionary<DataSource, string>
             {
-                {DataSource.CDP4, "CDP4 WebServices"},
-                {DataSource.WSP, "OCDT WSP Server"}
+                { DataSource.CDP4, "CDP4 WebServices" },
+                { DataSource.WSP, "OCDT WSP Server" }
             };
 
         /// <summary>
@@ -89,9 +88,9 @@ namespace StressGenerator.ViewModels
         public static Dictionary<SupportedOperationMode, string> StressGeneratorModes { get; } =
             new Dictionary<SupportedOperationMode, string>
             {
-                {SupportedOperationMode.Open, SupportedOperationMode.Open.ToString()},
-                {SupportedOperationMode.Create, SupportedOperationMode.Create.ToString()},
-                {SupportedOperationMode.CreateOverwrite, SupportedOperationMode.CreateOverwrite.ToString()}
+                { SupportedOperationMode.Open, SupportedOperationMode.Open.ToString() },
+                { SupportedOperationMode.Create, SupportedOperationMode.Create.ToString() },
+                { SupportedOperationMode.CreateOverwrite, SupportedOperationMode.CreateOverwrite.ToString() }
             };
 
         /// <summary>
@@ -156,7 +155,7 @@ namespace StressGenerator.ViewModels
         private ReactiveList<DataPoint> chartData;
 
         /// <summary>
-        /// Gets or sets the chart datapoints
+        /// Gets or sets the chart data-points
         /// </summary>
         public ReactiveList<DataPoint> ChartData
         {
@@ -289,7 +288,7 @@ namespace StressGenerator.ViewModels
         /// <summary>
         /// Gets the server sync command
         /// </summary>
-        public ReactiveCommand<Unit> StressCommand { get; set; }
+        public ReactiveCommand<System.Reactive.Unit> StressCommand { get; set; }
 
         /// <summary>
         /// Backing field for the <see cref="SupportedOperationMode"/> property
@@ -408,7 +407,7 @@ namespace StressGenerator.ViewModels
             {
                 this.ConstantLines.Add(new ConstantLine
                 {
-                    Title = new ConstantLineTitle(){ Content = constantLineEvent.Text },
+                    Title = new ConstantLineTitle { Content = constantLineEvent.Text },
                     Value = constantLineEvent.Timestamp
                 });
             });
