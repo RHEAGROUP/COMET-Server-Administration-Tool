@@ -33,11 +33,11 @@ for:
     build_script:
       - cmd: msbuild CDP4-SAT.sln -p:Configuration=Release /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
     after_build:
-      - cmd: 7z a CDP4-SAT-%APPVEYOR_REPO_TAG_NAME%.zip %APPVEYOR_BUILD_FOLDER%\CDP4-SAT\bin\Release\net452\*
+      - cmd: 7z a COMET-SAT-%APPVEYOR_REPO_TAG_NAME%.zip %APPVEYOR_BUILD_FOLDER%\SAT\bin\Release\net452\*
 
     artifacts:
-      - path: CDP4-SAT-%APPVEYOR_REPO_TAG_NAME%.zip
-        name: CDP4-SAT %APPVEYOR_REPO_TAG_NAME%
+      - path: COMET-SAT-%APPVEYOR_REPO_TAG_NAME%.zip
+        name: COMET-SAT %APPVEYOR_REPO_TAG_NAME%
 
   -
     matrix:
@@ -50,7 +50,7 @@ for:
       - Debug
 
     install:
-      - choco install opencover.portable
+      - choco install opencover.portable --version=4.7.922
       - choco install "sonarscanner-msbuild-net46" -y
 
     before_build:

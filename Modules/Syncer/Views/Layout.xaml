@@ -23,7 +23,7 @@
         <viewModels:SyncerViewModel />
     </dxlc:LayoutGroup.DataContext>
 
-    <GroupBox Header="Source" Height="320">
+    <dxlc:LayoutGroup View="GroupBox"  Header="Source" Height="390">
         <StackPanel Margin="0" HorizontalAlignment="Stretch">
             <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
@@ -73,9 +73,9 @@
                 </dxlc:LayoutGroup>
             </Grid>
         </StackPanel>
-    </GroupBox>
+    </dxlc:LayoutGroup>
 
-    <GroupBox Header="Target" Height="230">
+    <dxlc:LayoutGroup View="GroupBox" Header="Target" Height="230">
         <StackPanel Margin="0">
             <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
@@ -92,7 +92,7 @@
                                                         Path=DataContext.SyncerTargetServerTypes}" />
             </Grid>
         </StackPanel>
-    </GroupBox>
+    </dxlc:LayoutGroup>
 
     <StackPanel Margin="0" HorizontalAlignment="Left" MaxHeight="30">
         <Button
@@ -111,7 +111,7 @@
         </Button>
     </StackPanel>
 
-    <GroupBox Header="Output" HorizontalAlignment="Stretch">
+    <dxlc:LayoutGroup View="GroupBox" Header="Output" HorizontalAlignment="Stretch" MinHeight="100">
         <dxe:TextEdit
             Height="Auto"
             FontSize="12"
@@ -122,7 +122,7 @@
             IsReadOnly="True"
             Text="{Binding Path=Output, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             />
-    </GroupBox>
+    </dxlc:LayoutGroup>
 
     <dxmvvm:Interaction.Behaviors>
         <behaviors:SyncerBehavior />

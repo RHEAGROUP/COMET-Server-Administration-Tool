@@ -45,7 +45,9 @@
     <PackageReference Include="DevExpress.Printing.Core" Version="20.1.8" />
     <PackageReference Include="DevExpress.RichEdit.Core" Version="20.1.8" />
     <PackageReference Include="DevExpress.RichEdit.Export" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.Charts" Version="20.1.8" />
     <PackageReference Include="DevExpress.Wpf.Core" Version="20.1.8" />
+    <PackageReference Include="DevExpress.Wpf.Dialogs" Version="20.1.8" />
     <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="20.1.8" />
     <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="20.1.8" />
     <PackageReference Include="DevExpress.Wpf.Grid" Version="20.1.8" />

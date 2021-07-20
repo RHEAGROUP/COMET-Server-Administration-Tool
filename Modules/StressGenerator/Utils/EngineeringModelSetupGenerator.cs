@@ -32,6 +32,8 @@ namespace StressGenerator.Utils
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
+    using Common.Events;
+    using Common.Utils;
 
     /// <summary>
     /// Helper class for creating <see cref="EngineeringModelSetup"/>s
@@ -90,6 +92,12 @@ namespace StressGenerator.Utils
             }
 
             siteDirectoryCloned.Model.Add(engineeringModelSetup);
+
+            CDPMessageBus.Current.SendMessage(new AddConstantLineEvent()
+            {
+                Text = "EngineeringModel",
+                Timestamp = DateTime.Now
+            });
 
             await Write(session, engineeringModelSetup, siteDirectory, siteDirectoryCloned);
 
@@ -153,8 +161,13 @@ namespace StressGenerator.Utils
         /// <param name="engineeringModelSetupIid">
         /// The <see cref="EngineeringModelSetup"/> iid.
         /// </param>
-        public static async Task Delete(ISession session, Guid engineeringModelSetupIid)
+        public static async Task Delete(ISession session, Guid? engineeringModelSetupIid)
         {
+            if (engineeringModelSetupIid == null)
+            {
+                return;
+            }
+
             var siteDirectory = session.RetrieveSiteDirectory();
             var engineeringModelSetup = siteDirectory.Model
                 .SingleOrDefault(ems => ems.Iid == engineeringModelSetupIid);

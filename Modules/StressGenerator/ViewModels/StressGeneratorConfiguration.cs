@@ -67,7 +67,7 @@ namespace StressGenerator.ViewModels
         /// <summary>
         /// Maximum number of test objects
         /// </summary>
-        public const int MaxNumberOfTestObjects = 500;
+        public const int MaxNumberOfTestObjects = 5000;
 
         /// <summary>
         /// Parameters values configuration

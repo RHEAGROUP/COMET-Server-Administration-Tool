@@ -24,7 +24,7 @@
     <TextBlock TextWrapping="Wrap" Height="40" Background="LightYellow" Padding="5">
         Warning: Migrating a server is potentially a very dangerous operation. The data on the Target server will be entirely erased in the process; thus it is recommended to only migrate to fresh new installations.
     </TextBlock>
-    <GroupBox Header="Source" Height="380">
+    <dxlc:LayoutGroup View="GroupBox" Header="Source" Height="390">
         <StackPanel Margin="0" HorizontalAlignment="Stretch">
             <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
@@ -122,8 +122,8 @@
                 </StackPanel>
             </Grid>
         </StackPanel>
-    </GroupBox>
-    <GroupBox Header="Target" Height="230">
+    </dxlc:LayoutGroup>
+    <dxlc:LayoutGroup View="GroupBox"  Header="Target" Height="340">
         <StackPanel Margin="0">
             <Grid HorizontalAlignment="Stretch">
                 <Grid.RowDefinitions>
@@ -155,7 +155,7 @@
                 </StackPanel>
             </Grid>
         </StackPanel>
-    </GroupBox>
+    </dxlc:LayoutGroup>
     <StackPanel Margin="0" HorizontalAlignment="Left" MaxHeight="30">
         <Button
             MinWidth="100"
@@ -171,7 +171,7 @@
             </StackPanel>
         </Button>
     </StackPanel>
-    <GroupBox Header="Output" HorizontalAlignment="Stretch">
+    <dxlc:LayoutGroup View="GroupBox" Header="Output" HorizontalAlignment="Stretch" MinHeight="100">
         <dxe:TextEdit
             Height="Auto"
             FontSize="12"
@@ -183,7 +183,7 @@
             Text="{Binding Path=Output, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
             EditValueChanged="BaseEdit_OnEditValueChanged"
         />
-    </GroupBox>
+    </dxlc:LayoutGroup>
     <dxmvvm:Interaction.Behaviors>
         <behaviors:MigrationBehavior />
     </dxmvvm:Interaction.Behaviors>

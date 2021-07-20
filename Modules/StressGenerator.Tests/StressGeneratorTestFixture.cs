@@ -383,6 +383,7 @@ namespace StressGenerator.Tests
         }
 
         [Test]
+        [Apartment(ApartmentState.STA)]
         public void VerifyThatStressGeneratorWorksInOpenMode()
         {
             // open session
@@ -424,6 +425,7 @@ namespace StressGenerator.Tests
         }
 
         [Test]
+        [Apartment(ApartmentState.STA)]
         public void VerifyThatStressGeneratorWorksInCreateMode()
         {
             // open session
@@ -468,6 +470,7 @@ namespace StressGenerator.Tests
         }
 
         [Test]
+        [Apartment(ApartmentState.STA)]
         public void VerifyThatStressGeneratorWorksInCreateOverwriteMode()
         {
             // open session
