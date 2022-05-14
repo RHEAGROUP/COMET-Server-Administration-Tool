@@ -379,11 +379,14 @@ namespace Migration.Utils
         /// <param name="migrationFile">
         /// Migration file
         /// </param>
+        /// <param name="importVersion">
+        /// The meta model version of the import to try
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>
         /// </returns>
         [ExcludeFromCodeCoverage]
-        public async Task<bool> PackData(string migrationFile)
+        public async Task<bool> PackData(string migrationFile, Version importVersion)
         {
             var success = true;
             List<string> extensionFiles = null;
@@ -462,7 +465,7 @@ namespace Migration.Utils
             {
                 // write using underlying Dal because Session does not currently expose Write(List<OperationContainer>)
                 await new Session(
-                        new JsonFileDal(new Version("1.0.0")),
+                        new JsonFileDal(importVersion),
                         new Credentials(
                             this.SourceSession.Credentials.UserName,
                             this.TargetSession.Credentials.Password,
@@ -518,6 +521,7 @@ namespace Migration.Utils
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
                 Convert.ToBase64String(Encoding.ASCII.GetBytes($"{credentials.UserName}:{credentials.Password}")));
             client.DefaultRequestHeaders.Add("User-Agent", "SAT");
+            client.DefaultRequestHeaders.Add("Accept-CDP", "1.2.0");
 
             return client;
         }

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
@@ -15,13 +15,13 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="7.5.0" />
-    <PackageReference Include="CDP4Dal-CE" Version="7.5.0" />
-    <PackageReference Include="CDP4JsonFileDal-CE" Version="7.5.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="7.5.0" />
-    <PackageReference Include="CDP4Rules-CE" Version="7.5.0" />
-    <PackageReference Include="CDP4ServicesDal-CE" Version="7.5.0" />
-    <PackageReference Include="CDP4WspDal-CE" Version="7.5.0" />
+    <PackageReference Include="CDP4Common-CE" Version="8.2.0" />
+    <PackageReference Include="CDP4Dal-CE" Version="8.1.0" />
+    <PackageReference Include="CDP4JsonFileDal-CE" Version="8.1.0" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="8.1.0" />
+    <PackageReference Include="CDP4Rules-CE" Version="8.1.0" />
+    <PackageReference Include="CDP4ServicesDal-CE" Version="8.1.0" />
+    <PackageReference Include="CDP4WspDal-CE" Version="8.1.0" />
     <PackageReference Include="DevExpress.CodeParser" Version="20.1.8" />
     <PackageReference Include="DevExpress.Data" Version="20.1.8" />
     <PackageReference Include="DevExpress.Data.Desktop" Version="20.1.8" />
@@ -46,10 +46,7 @@
     <PackageReference Include="DevExpress.Wpf.RichEdit" Version="20.1.8" />
     <PackageReference Include="DevExpress.Wpf.Themes.Office2019Colorful" Version="20.1.8" />
     <PackageReference Include="DevExpress.Xpo" Version="20.1.8" />
-    <PackageReference Include="DotNetZip" Version="1.13.8" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="NLog" Version="4.6.8" />
     <PackageReference Include="reactiveui-core.Net40" Version="6.5.0" />
     <PackageReference Include="Rx-Core" Version="2.2.5" />
     <PackageReference Include="Rx-Interfaces" Version="2.2.5" />

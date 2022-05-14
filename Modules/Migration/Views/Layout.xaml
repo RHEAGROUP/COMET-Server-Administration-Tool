@@ -156,21 +156,29 @@
             </Grid>
         </StackPanel>
     </dxlc:LayoutGroup>
-    <StackPanel Margin="0" HorizontalAlignment="Left" MaxHeight="30">
+    <dxlc:LayoutGroup Orientation="Horizontal" Margin="0" HorizontalAlignment="Left" MaxHeight="30">
         <Button
             MinWidth="100"
             IsEnabled="{Binding Path=CanMigrate}"
             Command="{Binding Path=MigrateCommand}"
             Height="Auto"
             MaxWidth="100"
-            Margin="0 5 0 5"
+            Margin="0 5 10 5"
             FontSize="12">
             <StackPanel Orientation="Horizontal">
                 <Image Source="{dx:DXImage Image=Export_16x16.png}" Stretch="Uniform" />
                 <TextBlock Text="Migrate" VerticalAlignment="Center" Margin="5 0 0 0" />
             </StackPanel>
         </Button>
-    </StackPanel>
+        <dxlc:LayoutItem AddColonToLabel="True" Label="Import Model Version">
+            <dxe:ComboBoxEdit DisplayMember="Key"
+                                      ItemsSource="{Binding Path=Versions,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                                      SelectedItem="{Binding Path=SelectedVersion,
+                                                 Mode=TwoWay,
+                                                 UpdateSourceTrigger=PropertyChanged}" />
+        </dxlc:LayoutItem>
+    </dxlc:LayoutGroup>
     <dxlc:LayoutGroup View="GroupBox" Header="Output" HorizontalAlignment="Stretch" MinHeight="100">
         <dxe:TextEdit
             Height="Auto"

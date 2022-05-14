@@ -27,6 +27,7 @@ namespace Migration.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
@@ -45,12 +46,27 @@ namespace Migration.ViewModels
     public class MigrationViewModel : BaseModuleViewModel
     {
         /// <summary>
+        /// The available <see cref="Version"/>s
+        /// </summary>
+        private readonly Dictionary<string, Version> availableVersions;
+
+        /// <summary>
+        /// Backing field for the <see cref="Versions"/> property.
+        /// </summary>
+        private Dictionary<string, Version> versions;
+
+        /// <summary>
+        /// Backing field for the <see cref="SelectedVersion"/> property.
+        /// </summary>
+        private KeyValuePair<string, Version> selectedVersion;
+
+        /// <summary>
         /// Gets data source server type
         /// </summary>
         public static Dictionary<DataSource, string> MigrationTargetServerTypes { get; } =
             new Dictionary<DataSource, string>
             {
-                {DataSource.CDP4, "CDP4 WebServices"}
+                {DataSource.CDP4, "COMET WebServices"}
             };
 
         /// <summary>
@@ -242,10 +258,37 @@ namespace Migration.ViewModels
         public ReactiveCommand<Unit> MigrateCommand { get; private set; }
 
         /// <summary>
+        /// Gets or sets the currently Selected version used to create the Annex.C3 data from
+        /// </summary>
+        public KeyValuePair<string, Version> SelectedVersion
+        {
+            get => this.selectedVersion;
+            set => this.RaiseAndSetIfChanged(ref this.selectedVersion, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the currently implemented and supported CDP/COMET versions used to create the Annex.C3 data from
+        /// </summary>
+        public Dictionary<string, Version> Versions
+        {
+            get => this.versions;
+            set => this.RaiseAndSetIfChanged(ref this.versions, value);
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="MigrationViewModel"/> class
         /// </summary>
         public MigrationViewModel()
         {
+            this.Versions = new Dictionary<string, Version>
+            {
+                { "ECSS-E-TM-10-25 (Version 2.4.1)", new Version("1.0.0") },
+                { "COMET 1.1.0", new Version("1.1.0") },
+                { "COMET 1.2.0", new Version("1.2.0") }
+            };
+
+            this.SelectedVersion = this.Versions.FirstOrDefault(kvp => kvp.Key == "COMET 1.2.0");
+
             var canExecuteMigrate = this.WhenAnyValue(
                 vm => vm.SourceViewModel.LoginSuccessfully,
                 vm => vm.SourceViewModel.ServerSession,
@@ -309,7 +352,7 @@ namespace Migration.ViewModels
         /// </summary>
         private async Task ExecuteMigration()
         {
-            if (!this.CanSkipReadAndValidation)
+            if (!this.SkipReadAndValidation)
             {
                 if (!await this.MigrationFactory.ImportData(this.SourceViewModel?.EngineeringModels))
                 {
@@ -333,7 +376,7 @@ namespace Migration.ViewModels
                     }
                 }
 
-                if (!await this.MigrationFactory.PackData(this.MigrationFile))
+                if (!await this.MigrationFactory.PackData(this.MigrationFile, this.SelectedVersion.Value))
                 {
                     this.OperationMessageHandler("Migration pack of data failed");
                     return;
