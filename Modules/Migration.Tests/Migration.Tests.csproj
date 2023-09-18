@@ -33,8 +33,6 @@
     <PackageReference Include="Rx-PlatformServices" Version="2.2.5" />
     <PackageReference Include="Rx-XAML" Version="2.2.5" />
     <PackageReference Include="Splat.Net40" Version="1.6.2" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.0" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.1" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />

@@ -15,7 +15,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NLog" Version="4.7.10" />
     <PackageReference Include="reactiveui-core.Net40" Version="6.5.0" />
     <PackageReference Include="Rx-Core" Version="2.2.5" />
     <PackageReference Include="Rx-Interfaces" Version="2.2.5" />
