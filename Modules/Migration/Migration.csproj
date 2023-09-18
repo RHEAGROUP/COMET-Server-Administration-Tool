@@ -19,13 +19,6 @@
     <None Remove="Views\FixCardinalityErrorsDialog.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="8.2.0" />
-    <PackageReference Include="CDP4Dal-CE" Version="8.1.0" />
-    <PackageReference Include="CDP4JsonFileDal-CE" Version="8.1.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="8.1.0" />
-    <PackageReference Include="CDP4Rules-CE" Version="8.1.0" />
-    <PackageReference Include="CDP4ServicesDal-CE" Version="8.1.0" />
-    <PackageReference Include="CDP4WspDal-CE" Version="8.1.0" />
     <PackageReference Include="DevExpress.CodeParser" Version="20.1.8" />
     <PackageReference Include="DevExpress.Data" Version="20.1.8" />
     <PackageReference Include="DevExpress.Data.Desktop" Version="20.1.8" />
