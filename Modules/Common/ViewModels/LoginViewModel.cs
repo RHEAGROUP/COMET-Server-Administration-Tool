@@ -28,18 +28,33 @@ namespace Common.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Reactive;
     using System.Threading.Tasks;
+
     using CDP4Dal;
     using CDP4Dal.DAL;
+    
     using CDP4JsonFileDal;
+    
     using CDP4ServicesDal;
+    
     using CDP4WspDal;
+    
+    using Common.Utils;
+    
+    using DynamicData;
+    
     using Events;
+    
     using Microsoft.Win32;
+    
     using PlainObjects;
+    
     using ReactiveUI;
+    
     using Settings;
+
 
     /// <summary>
     /// Enum describing the possible server types
@@ -213,11 +228,6 @@ namespace Common.ViewModels
         private bool canSaveUri;
 
         /// <summary>
-        /// Backing field for the <see cref="SavedUris"/> property
-        /// </summary>
-        private ReactiveList<string> savedUris;
-
-        /// <summary>
         /// Gets or sets output panel log messages
         /// </summary>
         public string Output
@@ -229,17 +239,17 @@ namespace Common.ViewModels
         /// <summary>
         /// Gets the server login command
         /// </summary>
-        public ReactiveCommand<Unit> LoginCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> LoginCommand { get; private set; }
 
         /// <summary>
         /// Gets the AnnexC-3 zip file command which loads json file as data source <see cref="IReactiveCommand"/>
         /// </summary>
-        public ReactiveCommand<object> LoadSourceFile { get; private set; }
+        public ReactiveCommand<Unit, Unit> LoadSourceFile { get; private set; }
 
         /// <summary>
         /// Gets the command to save the current URI
         /// </summary>
-        public ReactiveCommand<object> SaveCurrentUri { get; private set; }
+        public ReactiveCommand<Unit, Unit> SaveCurrentUri { get; private set; }
 
         /// <summary>
         /// Gets or sets engineering models list
@@ -249,11 +259,7 @@ namespace Common.ViewModels
         /// <summary>
         /// Gets or sets the list of saved uris
         /// </summary>
-        public ReactiveList<string> SavedUris
-        {
-            get => this.savedUris;
-            set => this.RaiseAndSetIfChanged(ref this.savedUris, value);
-        }
+        public SourceList<string> SavedUris { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginViewModel"/> class.
@@ -269,7 +275,7 @@ namespace Common.ViewModels
                     !string.IsNullOrWhiteSpace(password) &&
                     !string.IsNullOrWhiteSpace(uri));
 
-            this.SavedUris = new ReactiveList<string> {ChangeTrackingEnabled = true};
+            this.SavedUris = new SourceList<string>();
 
             this.WhenAnyValue(vm => vm.LoginFailed).Subscribe((loginFailed) =>
             {
@@ -291,7 +297,9 @@ namespace Common.ViewModels
             });
 
             this.WhenAnyValue(vm => vm.Uri).Subscribe(_ => { this.ComputeCanSaveUri(); });
-            this.WhenAnyValue(vm => vm.SavedUris).Subscribe(_ => { this.ComputeCanSaveUri(); });
+
+            this.SavedUris.Connect().Subscribe(_ => this.ComputeCanSaveUri());
+
             this.WhenAnyValue(vm => vm.SelectedDataSource).Subscribe(_ =>
             {
                 switch (this.SelectedDataSource)
@@ -326,12 +334,11 @@ namespace Common.ViewModels
                 await ExecuteLogin();
             });
 
-            this.LoginCommand =
-                ReactiveCommand.CreateAsyncTask(canLogin, x => this.ExecuteLogin(), RxApp.MainThreadScheduler);
-            this.LoadSourceFile = ReactiveCommand.Create();
+            this.LoginCommand = ReactiveCommand.CreateFromTask(x => this.ExecuteLogin(), canLogin, RxApp.MainThreadScheduler);
+            this.LoadSourceFile = ReactiveCommandCreator.Create();
             this.LoadSourceFile.Subscribe(_ => this.ExecuteLoadSourceFile());
 
-            this.SaveCurrentUri = ReactiveCommand.Create();
+            this.SaveCurrentUri = ReactiveCommandCreator.Create();
             this.SaveCurrentUri.Subscribe(_ => this.ExecuteSaveCurrentUri());
 
             this.LoginSuccessfully = false;
@@ -343,7 +350,11 @@ namespace Common.ViewModels
         /// </summary>
         private void GetSavedUris()
         {
-            this.SavedUris = new ReactiveList<string>(AppSettingsHandler.Settings.SavedUris);
+            this.SavedUris.Edit(inner =>
+            {
+                inner.Clear();
+                inner.AddRange(AppSettingsHandler.Settings.SavedUris);
+            });
         }
 
         /// <summary>
@@ -361,7 +372,7 @@ namespace Common.ViewModels
         /// </summary>
         private void ComputeCanSaveUri()
         {
-            this.CanSaveUri = !string.IsNullOrWhiteSpace(this.Uri) && !this.SavedUris.Contains(this.Uri);
+            this.CanSaveUri = !string.IsNullOrWhiteSpace(this.Uri) && !this.SavedUris.Items.Contains(this.Uri);
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
@@ -46,13 +46,7 @@
     <PackageReference Include="DevExpress.Wpf.RichEdit" Version="20.2.4" />
     <PackageReference Include="DevExpress.Wpf.Themes.Office2019Colorful" Version="20.2.4" />
     <PackageReference Include="DevExpress.Xpo" Version="20.2.4" />
-    <PackageReference Include="reactiveui-core.Net40" Version="6.5.0" />
-    <PackageReference Include="Rx-Core" Version="2.2.5" />
-    <PackageReference Include="Rx-Interfaces" Version="2.2.5" />
-    <PackageReference Include="Rx-Linq" Version="2.2.5" />
-    <PackageReference Include="Rx-Main" Version="2.2.5" />
-    <PackageReference Include="Rx-PlatformServices" Version="2.2.5" />
-    <PackageReference Include="Rx-XAML" Version="2.2.5" />
+    <PackageReference Include="ReactiveUI" Version="19.4.1" />
     <PackageReference Include="Splat.Net40" Version="1.6.2" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
