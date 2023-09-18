@@ -2,7 +2,7 @@
   <PropertyGroup>
     <RootNamespace>StressGenerator.Tests</RootNamespace>
     <AssemblyName>StressGenerator.Tests</AssemblyName>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
   </PropertyGroup>

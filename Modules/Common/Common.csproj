@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
+	<UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
@@ -89,7 +91,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\Login.xaml">
+    <!--<Page Include="Views\Login.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -116,6 +118,6 @@
     <Page Include="Views\Tabs\SiteRdlLayoutGroup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
+    </Page>-->
   </ItemGroup>
 </Project>

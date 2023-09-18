@@ -1,7 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
+	<OutputPath>bin\$(Configuration)\</OutputPath>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
   </PropertyGroup>
@@ -38,7 +40,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\FixCardinalityErrorsDialog.xaml">
+    <!--<Page Include="Views\FixCardinalityErrorsDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ServerInfo.xaml">
@@ -48,7 +50,7 @@
     <Page Include="Views\Layout.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
+    </Page>-->
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Views\ServerInfo.xaml.cs">

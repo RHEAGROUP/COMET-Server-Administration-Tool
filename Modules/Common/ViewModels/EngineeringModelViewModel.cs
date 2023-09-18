@@ -23,6 +23,9 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Reactive;
+using Common.Utils;
+
 namespace Common.ViewModels
 {
     using System;
@@ -69,12 +72,12 @@ namespace Common.ViewModels
         /// <summary>
         /// Gets or sets the command to select/unselect model for import
         /// </summary>
-        public ReactiveCommand<object> CheckUncheckModel { get; set; }
+        public ReactiveCommand<Unit, Unit> CheckUncheckModel { get; set; }
 
         /// <summary>
         /// Gets or sets the command to select/unselect all models for import
         /// </summary>
-        public ReactiveCommand<object> CheckUncheckAllModels { get; set; }
+        public ReactiveCommand<Unit, Unit> CheckUncheckAllModels { get; set; }
 
         /// <summary>
         /// Out property for the <see cref="SelectAllModels"/> property
@@ -115,15 +118,12 @@ namespace Common.ViewModels
         public EngineeringModelViewModel(ISession serverSession)
         {
             this.serverSession = serverSession;
-            this.EngineeringModels = new ReactiveList<EngineeringModelRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.EngineeringModels = new ReactiveList<EngineeringModelRowViewModel>();
 
-            this.CheckUncheckModel = ReactiveCommand.Create();
+            this.CheckUncheckModel = ReactiveCommandCreator.Create();
             this.CheckUncheckModel.Subscribe(_ => this.ExecuteCheckUncheckModel());
 
-            this.CheckUncheckAllModels = ReactiveCommand.Create();
+            this.CheckUncheckAllModels = ReactiveCommandCreator.Create();
             this.CheckUncheckAllModels.Subscribe(_ => this.ExecuteCheckUncheckAllModels());
 
             this.WhenAnyValue(vm => vm.ServerSession).Subscribe(session =>

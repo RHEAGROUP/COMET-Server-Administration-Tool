@@ -23,6 +23,9 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Reactive;
+using Common.Utils;
+
 namespace Common.ViewModels
 {
     using System;
@@ -92,12 +95,12 @@ namespace Common.ViewModels
         /// <summary>
         /// Gets or sets the poco grid row double click command
         /// </summary>
-        public ReactiveCommand<object> PocoSelectRowCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> PocoSelectRowCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets  the grid row double click command
         /// </summary>
-        public ReactiveCommand<object> ModelSelectRowCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ModelSelectRowCommand { get; private set; }
 
         /// <summary>
         /// Out property for the <see cref="IsDetailsVisible"/> property
@@ -134,15 +137,9 @@ namespace Common.ViewModels
         {
             this.serverSession = serverSession;
 
-            this.PocoErrors = new ReactiveList<PocoErrorRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.PocoErrors = new ReactiveList<PocoErrorRowViewModel>();
 
-            this.RuleCheckerErrors = new ReactiveList<RuleCheckerErrorRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.RuleCheckerErrors = new ReactiveList<RuleCheckerErrorRowViewModel>();
 
             this.IsDetailsVisible = false;
             this.ErrorDetails = string.Empty;
@@ -155,10 +152,10 @@ namespace Common.ViewModels
                 this.BindRuleCheckerErrors(session);
             });
 
-            this.PocoSelectRowCommand = ReactiveCommand.Create();
+            this.PocoSelectRowCommand = ReactiveCommandCreator.Create();
             this.PocoSelectRowCommand.Subscribe(_ => this.ExecuteSelectErrorPocoRow());
 
-            this.ModelSelectRowCommand = ReactiveCommand.Create();
+            this.ModelSelectRowCommand = ReactiveCommandCreator.Create();
             this.ModelSelectRowCommand.Subscribe(_ => this.ExecuteSelectErrorModelRow());
         }
 
