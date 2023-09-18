@@ -46,7 +46,6 @@
     <PackageReference Include="DevExpress.Wpf.RichEdit" Version="20.1.8" />
     <PackageReference Include="DevExpress.Wpf.Themes.Office2019Colorful" Version="20.1.8" />
     <PackageReference Include="DevExpress.Xpo" Version="20.1.8" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="reactiveui-core.Net40" Version="6.5.0" />
     <PackageReference Include="Rx-Core" Version="2.2.5" />
     <PackageReference Include="Rx-Interfaces" Version="2.2.5" />
