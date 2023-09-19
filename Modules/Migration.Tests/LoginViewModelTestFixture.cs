@@ -23,6 +23,9 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Reactive.Linq;
+using DynamicData;
+
 namespace Migration.Tests
 {
     using System;
@@ -36,6 +39,7 @@ namespace Migration.Tests
     using CDP4Dal.DAL;
     using Common.Events;
     using Common.Settings;
+    using Common.Utils;
     using Common.ViewModels;
     using Common.ViewModels.PlainObjects;
     using Moq;
@@ -92,7 +96,7 @@ namespace Migration.Tests
                     UserName = this.person.ShortName,
                     Password = this.person.Password,
                     Uri = ServerUrl,
-                    SavedUris = new ReactiveList<string>()
+                    SavedUris = new SourceList<string>()
                 }
             };
 
@@ -134,7 +138,7 @@ namespace Migration.Tests
         [Test]
         public void VerifyIfLoginSucceeded()
         {
-            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
+            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.Execute());
 
             Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
 
@@ -144,11 +148,11 @@ namespace Migration.Tests
         [Test]
         public void VerifyIfLoginAfterLoginSucceeded()
         {
-            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
+            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.Execute());
 
             Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
 
-            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
+            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.Execute());
 
             Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
 
@@ -158,7 +162,7 @@ namespace Migration.Tests
         [Test]
         public void VerifyIfLogoutAndLoginSucceeded()
         {
-            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
+            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.Execute());
 
             Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
 
@@ -174,7 +178,7 @@ namespace Migration.Tests
         [Test]
         public void VerifyIfLogoutAndLoginWithInvalidSession()
         {
-            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
+            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.Execute());
 
             Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
 
@@ -198,11 +202,11 @@ namespace Migration.Tests
                     UserName = this.person.ShortName,
                     Password = this.person.Password,
                     Uri = ServerUrl,
-                    SavedUris = new ReactiveList<string>()
+                    SavedUris = new SourceList<string>()
                 }
             };
 
-            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.ExecuteAsyncTask());
+            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.Execute());
             Assert.AreEqual(false, this.loginViewModel.Object.LoginSuccessfully);
         }
     }

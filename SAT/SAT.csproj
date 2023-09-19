@@ -60,12 +60,12 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="MainWindow.xaml">
+    <!--<Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\MainView.xaml">
       <Generator>MsBuild:Compile</Generator>
-    </Page>
+    </Page>-->
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\cdplogo3d_48x48.png" />

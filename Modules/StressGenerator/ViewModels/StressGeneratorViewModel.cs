@@ -288,7 +288,7 @@ namespace StressGenerator.ViewModels
         /// <summary>
         /// Gets the server sync command
         /// </summary>
-        public ReactiveCommand<System.Reactive.Unit> StressCommand { get; set; }
+        public ReactiveCommand<System.Reactive.Unit, System.Reactive.Unit> StressCommand { get; set; }
 
         /// <summary>
         /// Backing field for the <see cref="SupportedOperationMode"/> property
@@ -434,7 +434,7 @@ namespace StressGenerator.ViewModels
             this.WhenAnyValue(
                     vm => vm.SourceViewModel.LoginSuccessfully,
                     vm => vm.SourceViewModel.ServerSession)
-                .Subscribe(delegate(Tuple<bool, ISession> tuple)
+                .Subscribe((tuple) =>
                 {
                     var (success, session) = tuple;
 
@@ -458,10 +458,7 @@ namespace StressGenerator.ViewModels
                     }
                 });
 
-            this.StressCommand = ReactiveCommand.CreateAsyncTask(
-                canExecuteStress,
-                _ => this.ExecuteStressCommand(),
-                RxApp.MainThreadScheduler);
+            this.StressCommand = ReactiveCommand.CreateFromTask(_ => this.ExecuteStressCommand(), canExecuteStress, RxApp.MainThreadScheduler);
         }
 
         /// <summary>
@@ -471,24 +468,13 @@ namespace StressGenerator.ViewModels
         {
             base.SetProperties();
 
-            this.ChartData = new ReactiveList<DataPoint>()
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.ChartData = new ReactiveList<DataPoint>();
 
-            this.ConstantLines = new ReactiveList<ConstantLine>()
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.ConstantLines = new ReactiveList<ConstantLine>();
 
-            this.EngineeringModelSetupList = new ReactiveList<EngineeringModelSetup>
-            {
-                ChangeTrackingEnabled = true
-            };
-            this.SourceEngineeringModelSetupList = new ReactiveList<EngineeringModelSetup>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.EngineeringModelSetupList = new ReactiveList<EngineeringModelSetup>();
+
+            this.SourceEngineeringModelSetupList = new ReactiveList<EngineeringModelSetup>();
 
             this.TimeInterval = StressGeneratorConfiguration.MinTimeInterval;
             this.TestObjectsNumber = StressGeneratorConfiguration.MinNumberOfTestObjects;

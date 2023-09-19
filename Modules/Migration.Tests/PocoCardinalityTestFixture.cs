@@ -157,7 +157,7 @@ namespace Migration.Tests
         [Test]
         public void VerifyIfExecuteCommandsWorks()
         {
-            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute());
         }
 
         [Test]
@@ -189,7 +189,7 @@ namespace Migration.Tests
 
             Assert.That(this.viewModel.Errors.Any(e => e.Error.Contains("The property Extension is null or empty")));
 
-            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute());
 
             Assert.AreEqual(0, this.viewModel.Errors.Count(e => e.Error.Contains("The property Extension is null or empty")));
 
@@ -218,7 +218,7 @@ namespace Migration.Tests
 
             Assert.That(this.viewModel.Errors.Any(e => e.Error.Contains("The property Value is null or empty")));
 
-            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute());
 
             Assert.AreEqual(0, this.viewModel.Errors.Count(e => e.Error.Contains("The property Value is null or empty")));
 
@@ -247,7 +247,7 @@ namespace Migration.Tests
 
             Assert.That(this.viewModel.Errors.Any(e => e.Error.Contains("The property Value is null or empty")));
 
-            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute());
 
             Assert.AreEqual(0, this.viewModel.Errors.Count(e => e.Error.Contains("The property Value is null or empty")));
 
@@ -285,7 +285,7 @@ namespace Migration.Tests
 
             Assert.That(this.viewModel.Errors.Any(e => e.Error.Contains("The property Source is null")));
 
-            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute());
 
             Assert.DoesNotThrowAsync(async () => await this.session.Object.Close());
         }
@@ -316,7 +316,7 @@ namespace Migration.Tests
 
             Assert.That(this.viewModel.Errors.Any(e => e.Error.Contains("The property Content is null or empty")));
 
-            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute());
 
             Assert.AreEqual(0, this.viewModel.Errors.Count(e => e.Error.Contains("The property Content is null or empty")));
 
@@ -334,7 +334,7 @@ namespace Migration.Tests
 
             Assert.That(this.viewModel.Errors.Any(e => e.Error.Contains("The property Description is null or empty")));
 
-            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute());
 
             Assert.AreEqual(0, this.viewModel.Errors.Count(e => e.Error.Contains("The property Description is null or empty")));
 
@@ -369,7 +369,7 @@ namespace Migration.Tests
             Assert.That(this.viewModel.Errors.Any(e => e.Error.Contains("The property Name is null or empty")));
             Assert.That(this.viewModel.Errors.Any(e => e.Error.Contains("The property ShortName is null or empty")));
 
-            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute());
 
             Assert.AreEqual(0, this.viewModel.Errors.Count(e => e.Error.Contains("The property Name is null or empty")));
             Assert.AreEqual(0, this.viewModel.Errors.Count(e => e.Error.Contains("The property ShortName is null or empty")));
@@ -388,7 +388,7 @@ namespace Migration.Tests
 
             Assert.IsTrue(this.viewModel.Errors.Count > 0);
 
-            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute());
 
             Assert.IsTrue(this.viewModel.Errors.Count == 0);
 
@@ -439,7 +439,7 @@ namespace Migration.Tests
 
             Assert.That(this.viewModel.Errors.Any(e => e.Error.Contains("The property Symbol is null")));
 
-            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute());
 
             Assert.DoesNotThrowAsync(async () => await this.session.Object.Close());
         }
@@ -516,7 +516,7 @@ namespace Migration.Tests
                 e.ContainerThingClassKind == ClassKind.ParameterValueSet &&
                 e.Error.Contains("The number of elements in the property Reference is wrong. It should be at least 1.")));
 
-            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute());
 
             Assert.DoesNotThrowAsync(async () => await this.session.Object.Close());
         }
@@ -598,7 +598,7 @@ namespace Migration.Tests
                 e.ContainerThingClassKind == ClassKind.ParameterSubscription &&
                 e.Error.Contains("Duplicated value-sets were found for the")));
 
-            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.viewModel.FixCommand.Execute());
 
             Assert.DoesNotThrowAsync(async () => await this.session.Object.Close());
         }

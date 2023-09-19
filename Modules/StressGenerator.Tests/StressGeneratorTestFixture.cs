@@ -365,7 +365,7 @@ namespace StressGenerator.Tests
             // verify
             var initialObjectsCount = this.sessionThings.Values.Count;
 
-            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute());
             Assert.AreEqual(initialObjectsCount, this.sessionThings.Values.Count);
         }
 
@@ -393,7 +393,7 @@ namespace StressGenerator.Tests
             this.stressGeneratorViewModel.SelectedOperationMode = SupportedOperationMode.Open;
 
             // verify
-            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute());
 
             Assert.AreEqual(
                 StressGeneratorConfiguration.MinNumberOfTestObjects,
@@ -420,7 +420,7 @@ namespace StressGenerator.Tests
             // verify
             var initialObjectsCount = this.sessionThings.Values.Count;
 
-            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute());
             Assert.AreEqual(initialObjectsCount, this.sessionThings.Values.Count);
         }
 
@@ -435,7 +435,7 @@ namespace StressGenerator.Tests
             this.stressGeneratorViewModel.SelectedOperationMode = SupportedOperationMode.Create;
 
             // verify
-            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute());
 
             Assert.AreEqual(2, this.sessionThings.Values.OfType<EngineeringModelSetup>().Count());
 
@@ -463,7 +463,7 @@ namespace StressGenerator.Tests
             this.stressGeneratorViewModel.DeleteModel = true;
 
             // verify
-            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute());
 
             Assert.AreEqual(1, this.sessionThings.Values.OfType<EngineeringModelSetup>().Count());
             Assert.IsTrue(this.sessionThings.ContainsKey(this.engineeringModelSetup.Iid));
@@ -487,7 +487,7 @@ namespace StressGenerator.Tests
                     null);
 
             // verify
-            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute(null));
+            Assert.DoesNotThrow(() => this.stressGeneratorViewModel.StressCommand.Execute());
 
             var engineeringModelSetups = this.sessionThings.Values.OfType<EngineeringModelSetup>().ToList();
             Assert.AreEqual(1, engineeringModelSetups.Count);

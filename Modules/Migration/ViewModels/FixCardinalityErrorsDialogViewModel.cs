@@ -23,6 +23,9 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Reactive;
+using Common.Utils;
+
 namespace Migration.ViewModels
 {
     using System;
@@ -113,7 +116,7 @@ namespace Migration.ViewModels
         /// <summary>
         /// Gets the fix <see cref="IReactiveCommand" />
         /// </summary>
-        public ReactiveCommand<object> FixCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> FixCommand { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FixCardinalityErrorsDialogViewModel" /> class.
@@ -123,11 +126,11 @@ namespace Migration.ViewModels
         {
             this.migrationSourceSession = migrationSourceSession;
 
-            this.Errors = new ReactiveList<PocoErrorRowViewModel> { ChangeTrackingEnabled = true };
+            this.Errors = new ReactiveList<PocoErrorRowViewModel>();
 
             this.IsBusy = false;
 
-            this.FixCommand = ReactiveCommand.Create();
+            this.FixCommand = ReactiveCommandCreator.Create();
             this.FixCommand.Subscribe(_ => this.ExecuteFixCommand());
 
             this.WhenAnyValue(vm => vm.SelectedError)

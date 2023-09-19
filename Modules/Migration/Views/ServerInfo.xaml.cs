@@ -23,6 +23,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Reactive;
+
 namespace Migration.Views
 {
     using System.Collections.Generic;
@@ -160,7 +162,7 @@ namespace Migration.Views
             this.engineeringModelViewModel = new EngineeringModelViewModel(this.serverSession);
             this.engineeringModelViewModel.ModelListChangedEvent += EngineeringModelViewModelModelListChangedEvent;
             this.EngineeringModelLayoutGroup.DataContext = this.engineeringModelViewModel;
-            this.engineeringModelViewModel.CheckUncheckAllModels.Execute(null);
+            this.engineeringModelViewModel.CheckUncheckAllModels.Execute(Unit.Default);
 
             this.errorViewModel = new ErrorViewModel(this.serverSession);
             this.PocoErrorsLayoutGroup.DataContext = this.errorViewModel;

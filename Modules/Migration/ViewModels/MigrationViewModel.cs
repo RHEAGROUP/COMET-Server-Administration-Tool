@@ -23,6 +23,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using Common.Utils;
+
 namespace Migration.ViewModels
 {
     using System;
@@ -230,7 +232,7 @@ namespace Migration.ViewModels
             this.WhenAnyValue(
                     vm => vm.SourceViewModel.SelectedDataSource,
                     vm => vm.SourceViewModel.LoginSuccessfully)
-                .Subscribe(delegate(Tuple<DataSource, bool> tuple)
+                .Subscribe((tuple) =>
                 {
                     var (selectedDataSource, loginSuccessfully) = tuple;
                     this.CanSkipReadAndValidation = selectedDataSource == DataSource.JSON && loginSuccessfully;
@@ -250,12 +252,12 @@ namespace Migration.ViewModels
         /// <summary>
         /// Gets the migration file <see cref="IReactiveCommand"/>
         /// </summary>
-        public ReactiveCommand<object> LoadMigrationFileCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> LoadMigrationFileCommand { get; private set; }
 
         /// <summary>
         /// Gets the server migrate command
         /// </summary>
-        public ReactiveCommand<Unit> MigrateCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> MigrateCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the currently Selected version used to create the Annex.C3 data from
@@ -312,11 +314,10 @@ namespace Migration.ViewModels
 
             this.MigrationFactory = new Migration();
 
-            this.LoadMigrationFileCommand = ReactiveCommand.Create();
+            this.LoadMigrationFileCommand = ReactiveCommandCreator.Create();
             this.LoadMigrationFileCommand.Subscribe(_ => this.ExecuteLoadMigrationFile());
 
-            this.MigrateCommand = ReactiveCommand.CreateAsyncTask(canExecuteMigrate,
-                x => this.ExecuteMigration(), RxApp.MainThreadScheduler);
+            this.MigrateCommand = ReactiveCommand.CreateFromTask(x => this.ExecuteMigration(), canExecuteMigrate, RxApp.MainThreadScheduler);
         }
 
         /// <summary>

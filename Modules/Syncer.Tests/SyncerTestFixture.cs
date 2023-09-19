@@ -124,7 +124,7 @@ namespace Syncer.Tests
 
             this.sourceViewModel.Setup(x => x.EngineeringModels).Returns(selectedEngineeringModels);
 
-            await Task.Run(() => this.syncerViewModel.SyncCommand.Execute(null));
+            await Task.Run(() => this.syncerViewModel.SyncCommand.Execute());
         }
 
         private void InitSessionThings()

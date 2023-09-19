@@ -24,30 +24,32 @@
     <PackageReference Include="CDP4Rules-CE" Version="24.1.0" />
     <PackageReference Include="CDP4ServicesDal-CE" Version="24.1.0" />
     <PackageReference Include="CDP4WspDal-CE" Version="24.1.0" />
-    <PackageReference Include="DevExpress.CodeParser" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Data" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Data.Desktop" Version="20.2.4" />
-    <PackageReference Include="DevExpress.DataAccess" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Images" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Mvvm" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Office.Core" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Pdf.Core" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Pdf.Drawing" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Printing.Core" Version="20.2.4" />
-    <PackageReference Include="DevExpress.RichEdit.Core" Version="20.2.4" />
-    <PackageReference Include="DevExpress.RichEdit.Export" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Wpf.Core" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Wpf.Grid" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Wpf.Layout" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Wpf.Navigation" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Wpf.Office" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Wpf.Printing" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Wpf.Themes.Office2019Colorful" Version="20.2.4" />
-    <PackageReference Include="DevExpress.Xpo" Version="20.2.4" />
+    <PackageReference Include="DevExpress.CodeParser" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Data" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Data.Desktop" Version="22.2.6" />
+    <PackageReference Include="DevExpress.DataAccess" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Images" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Mvvm" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Office.Core" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Pdf.Core" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Printing.Core" Version="22.2.6" />
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="22.2.6" />
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Wpf.Charts" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Wpf.Core" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Wpf.Dialogs" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Wpf.LayoutControl" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Wpf.Controls" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Wpf.Office" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Wpf.Printing" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Wpf.Themes.Office2019Colorful" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Xpo" Version="22.2.6" />
     <PackageReference Include="ReactiveUI" Version="19.4.1" />
     <PackageReference Include="Splat.Net40" Version="1.6.2" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
