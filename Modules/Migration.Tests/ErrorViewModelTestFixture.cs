@@ -83,9 +83,9 @@ namespace Migration.Tests
         {
             var vm = new ErrorViewModel(this.session.Object);
 
-            Assert.DoesNotThrow(() => vm.ModelSelectRowCommand.Execute());
+            Assert.DoesNotThrow(() => vm.ModelSelectRowCommand.Execute().Subscribe());
 
-            Assert.DoesNotThrow(() => vm.PocoSelectRowCommand.Execute());
+            Assert.DoesNotThrow(() => vm.PocoSelectRowCommand.Execute().Subscribe());
         }
     }
 }

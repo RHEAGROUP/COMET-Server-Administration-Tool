@@ -23,18 +23,22 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.Reactive;
-using Common.Utils;
-
 namespace Common.ViewModels
 {
     using System;
     using System.Linq;
-    using CDP4Dal;
-    using DevExpress.Mvvm.Native;
-    using PlainObjects;
-    using ReactiveUI;
+    using System.Reactive;
 
+    using CDP4Dal;
+    
+    using Common.Utils;
+    
+    using DevExpress.Mvvm.Native;
+    
+    using PlainObjects;
+    
+    using ReactiveUI;
+    
     /// <summary>
     /// The view-model for the Source and target server that is responsible for getting referenced data libraries
     /// </summary>

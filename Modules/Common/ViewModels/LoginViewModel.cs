@@ -227,6 +227,11 @@ namespace Common.ViewModels
         /// </summary>
         private bool canSaveUri;
 
+        /// <summary>	
+        /// Backing field for the <see cref="SavedUris"/> property	
+        /// </summary>	
+        private ReactiveList<string> savedUris;
+
         /// <summary>
         /// Gets or sets output panel log messages
         /// </summary>
@@ -259,7 +264,11 @@ namespace Common.ViewModels
         /// <summary>
         /// Gets or sets the list of saved uris
         /// </summary>
-        public SourceList<string> SavedUris { get; set; }
+        public ReactiveList<string> SavedUris
+        {
+            get => this.savedUris;
+            set => this.RaiseAndSetIfChanged(ref this.savedUris, value);
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginViewModel"/> class.
@@ -275,7 +284,7 @@ namespace Common.ViewModels
                     !string.IsNullOrWhiteSpace(password) &&
                     !string.IsNullOrWhiteSpace(uri));
 
-            this.SavedUris = new SourceList<string>();
+            this.SavedUris = new ReactiveList<string>();
 
             this.WhenAnyValue(vm => vm.LoginFailed).Subscribe((loginFailed) =>
             {
@@ -297,9 +306,7 @@ namespace Common.ViewModels
             });
 
             this.WhenAnyValue(vm => vm.Uri).Subscribe(_ => { this.ComputeCanSaveUri(); });
-
-            this.SavedUris.Connect().Subscribe(_ => this.ComputeCanSaveUri());
-
+            this.WhenAnyValue(vm => vm.SavedUris).Subscribe(_ => { this.ComputeCanSaveUri(); });
             this.WhenAnyValue(vm => vm.SelectedDataSource).Subscribe(_ =>
             {
                 switch (this.SelectedDataSource)
@@ -350,11 +357,7 @@ namespace Common.ViewModels
         /// </summary>
         private void GetSavedUris()
         {
-            this.SavedUris.Edit(inner =>
-            {
-                inner.Clear();
-                inner.AddRange(AppSettingsHandler.Settings.SavedUris);
-            });
+            this.SavedUris = new ReactiveList<string>(AppSettingsHandler.Settings.SavedUris);
         }
 
         /// <summary>
@@ -372,7 +375,7 @@ namespace Common.ViewModels
         /// </summary>
         private void ComputeCanSaveUri()
         {
-            this.CanSaveUri = !string.IsNullOrWhiteSpace(this.Uri) && !this.SavedUris.Items.Contains(this.Uri);
+            this.CanSaveUri = !string.IsNullOrWhiteSpace(this.Uri) && !this.SavedUris.Contains(this.Uri);
         }
 
         /// <summary>

@@ -23,25 +23,28 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.Reactive;
-using Common.Utils;
-
 namespace Migration.ViewModels
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+    
     using CDP4Dal;
+    
     using Common.Events;
+    using Common.Utils;
     using Common.ViewModels.PlainObjects;
+    
     using ReactiveUI;
-
+    
     /// <summary>
     /// The viewmodel of the migration cardinality fix wizard.
     /// </summary>

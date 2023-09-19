@@ -96,7 +96,7 @@ namespace Migration.Tests
                     UserName = this.person.ShortName,
                     Password = this.person.Password,
                     Uri = ServerUrl,
-                    SavedUris = new SourceList<string>()
+                    SavedUris = new ReactiveList<string>()
                 }
             };
 
@@ -138,7 +138,7 @@ namespace Migration.Tests
         [Test]
         public void VerifyIfLoginSucceeded()
         {
-            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.Execute());
+            Assert.DoesNotThrow(() =>  this.loginViewModel.Object.LoginCommand.Execute().Subscribe());
 
             Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
 
@@ -148,11 +148,11 @@ namespace Migration.Tests
         [Test]
         public void VerifyIfLoginAfterLoginSucceeded()
         {
-            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.Execute());
+            Assert.DoesNotThrow(() => this.loginViewModel.Object.LoginCommand.Execute().Subscribe());
 
             Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
 
-            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.Execute());
+            Assert.DoesNotThrow(() => this.loginViewModel.Object.LoginCommand.Execute().Subscribe());
 
             Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
 
@@ -162,7 +162,7 @@ namespace Migration.Tests
         [Test]
         public void VerifyIfLogoutAndLoginSucceeded()
         {
-            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.Execute());
+            Assert.DoesNotThrow(() => this.loginViewModel.Object.LoginCommand.Execute().Subscribe());
 
             Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
 
@@ -178,7 +178,7 @@ namespace Migration.Tests
         [Test]
         public void VerifyIfLogoutAndLoginWithInvalidSession()
         {
-            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.Execute());
+            Assert.DoesNotThrow(() => this.loginViewModel.Object.LoginCommand.Execute().Subscribe());
 
             Assert.AreEqual(true, this.loginViewModel.Object.LoginSuccessfully);
 
@@ -202,11 +202,11 @@ namespace Migration.Tests
                     UserName = this.person.ShortName,
                     Password = this.person.Password,
                     Uri = ServerUrl,
-                    SavedUris = new SourceList<string>()
+                    SavedUris = new ReactiveList<string>()
                 }
             };
 
-            Assert.DoesNotThrowAsync(async () => await this.loginViewModel.Object.LoginCommand.Execute());
+            Assert.DoesNotThrow(() =>  this.loginViewModel.Object.LoginCommand.Execute().Subscribe());
             Assert.AreEqual(false, this.loginViewModel.Object.LoginSuccessfully);
         }
     }

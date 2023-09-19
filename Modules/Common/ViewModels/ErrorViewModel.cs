@@ -23,18 +23,22 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.Reactive;
-using Common.Utils;
-
 namespace Common.ViewModels
 {
     using System;
     using System.Linq;
-    using CDP4Dal;
-    using CDP4Rules;
-    using PlainObjects;
-    using ReactiveUI;
+    using System.Reactive;
 
+    using CDP4Dal;
+   
+    using CDP4Rules;
+    
+    using Common.Utils;
+    
+    using PlainObjects;
+    
+    using ReactiveUI;
+    
     /// <summary>
     /// The view-model for the Source server errors that will be displayed before migration
     /// </summary>

@@ -23,8 +23,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using Common.Utils;
-
 namespace Migration.ViewModels
 {
     using System;
@@ -34,12 +32,19 @@ namespace Migration.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Dal;
+    
     using Common.Events;
+    using Common.Utils;
     using Common.ViewModels;
+    
     using Microsoft.Win32;
+    
     using ReactiveUI;
+    
     using Utils;
+    
     using Views;
 
     /// <summary>
