@@ -17,12 +17,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <!--<Page Include="Views\Layout.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>-->
-  </ItemGroup>
-  <ItemGroup>
     <Compile Update="Views\Layout.xaml.cs">
       <DependentUpon>Layout.xaml</DependentUpon>
     </Compile>

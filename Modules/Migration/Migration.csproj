@@ -39,19 +39,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <!--<Page Include="Views\FixCardinalityErrorsDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ServerInfo.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Layout.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>-->
-  </ItemGroup>
-  <ItemGroup>
     <Compile Update="Views\ServerInfo.xaml.cs">
       <DependentUpon>ServerInfo.xaml</DependentUpon>
     </Compile>

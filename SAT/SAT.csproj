@@ -54,20 +54,6 @@
     <EmbeddedResource Include="Properties\Licenses.licx" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MsBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-  </ItemGroup>
-  <ItemGroup>
-    <!--<Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\MainView.xaml">
-      <Generator>MsBuild:Compile</Generator>
-    </Page>-->
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\cdplogo3d_48x48.png" />
   </ItemGroup>
   <ItemGroup>

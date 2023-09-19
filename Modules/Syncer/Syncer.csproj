@@ -24,8 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    
+  <ItemGroup>    
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -36,12 +35,6 @@
     <Reference Include="System.Transactions" />
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
-  </ItemGroup>
-  <ItemGroup>
-    <!--<Page Include="Views\Layout.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>-->
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Views\Layout.xaml.cs">
