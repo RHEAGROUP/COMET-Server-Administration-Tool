@@ -28,18 +28,33 @@ namespace Common.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Reactive;
     using System.Threading.Tasks;
+
     using CDP4Dal;
     using CDP4Dal.DAL;
+    
     using CDP4JsonFileDal;
+    
     using CDP4ServicesDal;
+    
     using CDP4WspDal;
+    
+    using Common.Utils;
+    
+    using DynamicData;
+    
     using Events;
+    
     using Microsoft.Win32;
+    
     using PlainObjects;
+    
     using ReactiveUI;
+    
     using Settings;
+
 
     /// <summary>
     /// Enum describing the possible server types
@@ -212,9 +227,9 @@ namespace Common.ViewModels
         /// </summary>
         private bool canSaveUri;
 
-        /// <summary>
-        /// Backing field for the <see cref="SavedUris"/> property
-        /// </summary>
+        /// <summary>	
+        /// Backing field for the <see cref="SavedUris"/> property	
+        /// </summary>	
         private ReactiveList<string> savedUris;
 
         /// <summary>
@@ -229,17 +244,17 @@ namespace Common.ViewModels
         /// <summary>
         /// Gets the server login command
         /// </summary>
-        public ReactiveCommand<Unit> LoginCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> LoginCommand { get; private set; }
 
         /// <summary>
         /// Gets the AnnexC-3 zip file command which loads json file as data source <see cref="IReactiveCommand"/>
         /// </summary>
-        public ReactiveCommand<object> LoadSourceFile { get; private set; }
+        public ReactiveCommand<Unit, Unit> LoadSourceFile { get; private set; }
 
         /// <summary>
         /// Gets the command to save the current URI
         /// </summary>
-        public ReactiveCommand<object> SaveCurrentUri { get; private set; }
+        public ReactiveCommand<Unit, Unit> SaveCurrentUri { get; private set; }
 
         /// <summary>
         /// Gets or sets engineering models list
@@ -269,7 +284,7 @@ namespace Common.ViewModels
                     !string.IsNullOrWhiteSpace(password) &&
                     !string.IsNullOrWhiteSpace(uri));
 
-            this.SavedUris = new ReactiveList<string> {ChangeTrackingEnabled = true};
+            this.SavedUris = new ReactiveList<string>();
 
             this.WhenAnyValue(vm => vm.LoginFailed).Subscribe((loginFailed) =>
             {
@@ -326,12 +341,11 @@ namespace Common.ViewModels
                 await ExecuteLogin();
             });
 
-            this.LoginCommand =
-                ReactiveCommand.CreateAsyncTask(canLogin, x => this.ExecuteLogin(), RxApp.MainThreadScheduler);
-            this.LoadSourceFile = ReactiveCommand.Create();
+            this.LoginCommand = ReactiveCommand.CreateFromTask(x => this.ExecuteLogin(), canLogin, RxApp.MainThreadScheduler);
+            this.LoadSourceFile = ReactiveCommandCreator.Create();
             this.LoadSourceFile.Subscribe(_ => this.ExecuteLoadSourceFile());
 
-            this.SaveCurrentUri = ReactiveCommand.Create();
+            this.SaveCurrentUri = ReactiveCommandCreator.Create();
             this.SaveCurrentUri.Subscribe(_ => this.ExecuteSaveCurrentUri());
 
             this.LoginSuccessfully = false;

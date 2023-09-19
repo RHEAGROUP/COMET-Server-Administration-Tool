@@ -23,6 +23,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using Common.Utils;
+
 namespace Syncer.ViewModels
 {
     using Common.ViewModels;
@@ -143,7 +145,7 @@ namespace Syncer.ViewModels
         /// <summary>
         /// Gets the server sync command
         /// </summary>
-        public ReactiveCommand<Unit> SyncCommand { get; }
+        public ReactiveCommand<Unit, Unit> SyncCommand { get; }
 
         /// <summary>
         /// The <see cref="SyncerFactory"/> used to build the helper sync classes
@@ -162,10 +164,7 @@ namespace Syncer.ViewModels
 
             canExecuteSync.ToProperty(this, vm => vm.CanSync, out this.canSync);
 
-            this.SyncCommand = ReactiveCommand.CreateAsyncTask(
-                canExecuteSync,
-                _ => this.ExecuteSync(),
-                RxApp.MainThreadScheduler);
+            this.SyncCommand = ReactiveCommand.CreateFromTask(_ => this.ExecuteSync(), canExecuteSync, RxApp.MainThreadScheduler);
         }
 
         /// <summary>

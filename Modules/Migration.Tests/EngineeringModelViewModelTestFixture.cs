@@ -80,9 +80,9 @@ namespace Migration.Tests
         {
             var vm = new EngineeringModelViewModel(this.session.Object);
 
-            Assert.DoesNotThrow(() => vm.CheckUncheckAllModels.Execute(null));
+            Assert.DoesNotThrow(() => vm.CheckUncheckAllModels.Execute().Subscribe());
 
-            Assert.DoesNotThrow(() => vm.CheckUncheckModel.Execute(null));
+            Assert.DoesNotThrow(() => vm.CheckUncheckModel.Execute().Subscribe());
         }
 
         [Test]

@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
+	<UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
@@ -15,45 +17,40 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="8.2.0" />
-    <PackageReference Include="CDP4Dal-CE" Version="8.1.0" />
-    <PackageReference Include="CDP4JsonFileDal-CE" Version="8.1.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="8.1.0" />
-    <PackageReference Include="CDP4Rules-CE" Version="8.1.0" />
-    <PackageReference Include="CDP4ServicesDal-CE" Version="8.1.0" />
-    <PackageReference Include="CDP4WspDal-CE" Version="8.1.0" />
-    <PackageReference Include="DevExpress.CodeParser" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Data" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Data.Desktop" Version="20.1.8" />
-    <PackageReference Include="DevExpress.DataAccess" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Images" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Mvvm" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Office.Core" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Pdf.Core" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Pdf.Drawing" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Printing.Core" Version="20.1.8" />
-    <PackageReference Include="DevExpress.RichEdit.Core" Version="20.1.8" />
-    <PackageReference Include="DevExpress.RichEdit.Export" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Wpf.Core" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Wpf.Grid" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Wpf.Layout" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Wpf.Navigation" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Wpf.Office" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Wpf.Printing" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Wpf.Themes.Office2019Colorful" Version="20.1.8" />
-    <PackageReference Include="DevExpress.Xpo" Version="20.1.8" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
-    <PackageReference Include="reactiveui-core.Net40" Version="6.5.0" />
-    <PackageReference Include="Rx-Core" Version="2.2.5" />
-    <PackageReference Include="Rx-Interfaces" Version="2.2.5" />
-    <PackageReference Include="Rx-Linq" Version="2.2.5" />
-    <PackageReference Include="Rx-Main" Version="2.2.5" />
-    <PackageReference Include="Rx-PlatformServices" Version="2.2.5" />
-    <PackageReference Include="Rx-XAML" Version="2.2.5" />
+    <PackageReference Include="CDP4Common-CE" Version="24.1.0" />
+    <PackageReference Include="CDP4Dal-CE" Version="24.1.0" />
+    <PackageReference Include="CDP4JsonFileDal-CE" Version="24.1.0" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="24.1.0" />
+    <PackageReference Include="CDP4Rules-CE" Version="24.1.0" />
+    <PackageReference Include="CDP4ServicesDal-CE" Version="24.1.0" />
+    <PackageReference Include="CDP4WspDal-CE" Version="24.1.0" />
+    <PackageReference Include="DevExpress.CodeParser" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Data" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Data.Desktop" Version="23.1.4" />
+    <PackageReference Include="DevExpress.DataAccess" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Images" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Mvvm" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Office.Core" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Pdf.Core" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Printing.Core" Version="23.1.4" />
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="23.1.4" />
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Wpf.Charts" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Wpf.Core" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Wpf.Dialogs" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Wpf.LayoutControl" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Wpf.Controls" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Wpf.Office" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Wpf.Printing" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Wpf.Themes.Office2019Colorful" Version="23.1.4" />
+    <PackageReference Include="DevExpress.Xpo" Version="23.1.4" />
+    <PackageReference Include="ReactiveUI" Version="19.4.1" />
     <PackageReference Include="Splat.Net40" Version="1.6.2" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
@@ -94,35 +91,5 @@
     <Compile Update="Views\Tabs\SiteRdlLayoutGroup.xaml.cs">
       <DependentUpon>SiteRdlLayoutGroup.xaml</DependentUpon>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Views\Login.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Tabs\DomainOfExpertiseLayoutGroup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Tabs\EngineeringModelLayoutGroup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Tabs\ErrorDetailLayoutGroup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Tabs\ModelErrorLayoutGroup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Tabs\POCOErrorLayoutGroup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Tabs\SiteRdlLayoutGroup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
 </Project>

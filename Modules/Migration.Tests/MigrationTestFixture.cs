@@ -116,7 +116,7 @@ namespace Migration.Tests
             this.InitSourceAndTargetViewModels();
 
             Assert.IsTrue(this.migrationViewModel.CanMigrate);
-            Assert.IsTrue(MigrationViewModel.MigrationTargetServerTypes[this.migrationViewModel.TargetViewModel.SelectedDataSource] == "CDP4 WebServices");
+            Assert.IsTrue(MigrationViewModel.MigrationTargetServerTypes[this.migrationViewModel.TargetViewModel.SelectedDataSource] == "COMET WebServices");
 
             var selectedEngineeringModels = new List<EngineeringModelRowViewModel>
             {
@@ -127,7 +127,7 @@ namespace Migration.Tests
 
             this.sourceViewModel.Setup(x => x.EngineeringModels).Returns(selectedEngineeringModels);
 
-            await Task.Run(() => this.migrationViewModel.MigrateCommand.Execute(null));
+            await Task.Run(() => this.migrationViewModel.MigrateCommand.Execute().Subscribe());
         }
 
         [Test]
@@ -138,7 +138,7 @@ namespace Migration.Tests
             this.migrationViewModel.FileIsChecked = true;
             Assert.IsTrue(this.migrationViewModel.FileIsChecked);
 
-            this.migrationViewModel.LoadMigrationFileCommand.Execute(null);
+            this.migrationViewModel.LoadMigrationFileCommand.Execute().Subscribe();
         }
 
         [Test]
@@ -148,7 +148,7 @@ namespace Migration.Tests
 
             Assert.IsTrue(this.migrationViewModel.CanMigrate);
 
-            await Task.Run(() => this.migrationViewModel.MigrateCommand.Execute(null));
+            await Task.Run(() => this.migrationViewModel.MigrateCommand.Execute().Subscribe());
 
             Assert.IsTrue(this.migrationViewModel.Output.Contains("Please select model(s) to migrate"));
         }
@@ -159,7 +159,7 @@ namespace Migration.Tests
             Assert.IsNull(this.migrationViewModel.SourceViewModel);
             Assert.IsNull(this.migrationViewModel.TargetViewModel);
 
-            await Task.Run(() => this.migrationViewModel.MigrateCommand.Execute(null));
+            await Task.Run(() => this.migrationViewModel.MigrateCommand.Execute().Subscribe());
 
             Assert.IsFalse(this.migrationViewModel.CanMigrate);
         }

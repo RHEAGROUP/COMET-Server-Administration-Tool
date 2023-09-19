@@ -27,11 +27,18 @@ namespace Common.ViewModels
 {
     using System;
     using System.Linq;
-    using CDP4Dal;
-    using DevExpress.Mvvm.Native;
-    using PlainObjects;
-    using ReactiveUI;
+    using System.Reactive;
 
+    using CDP4Dal;
+    
+    using Common.Utils;
+    
+    using DevExpress.Mvvm.Native;
+    
+    using PlainObjects;
+    
+    using ReactiveUI;
+    
     /// <summary>
     /// The viewmodel that is responsible for domains of expertise
     /// </summary>
@@ -68,12 +75,12 @@ namespace Common.ViewModels
         /// <summary>
         /// Gets or sets the command to select/unselect thing
         /// </summary>
-        public ReactiveCommand<object> CheckUncheckThing { get; set; }
+        public ReactiveCommand<Unit, Unit> CheckUncheckThing { get; set; }
 
         /// <summary>
         /// Gets or sets the command to select/unselect all things
         /// </summary>
-        public ReactiveCommand<object> CheckUncheckAllThings { get; set; }
+        public ReactiveCommand<Unit, Unit> CheckUncheckAllThings { get; set; }
 
         /// <summary>
         /// Out property for the <see cref="SelectAllThings"/> property
@@ -96,18 +103,15 @@ namespace Common.ViewModels
         {
             this.serverSession = serverSession;
 
-            this.CheckUncheckThing = ReactiveCommand.Create();
+            this.CheckUncheckThing = ReactiveCommandCreator.Create();
             this.CheckUncheckThing.Subscribe(_ =>
                 this.SelectAllThings = !(this.DomainsOfExpertise.Any(d => !d.IsSelected)));
 
-            this.CheckUncheckAllThings = ReactiveCommand.Create();
+            this.CheckUncheckAllThings = ReactiveCommandCreator.Create();
             this.CheckUncheckAllThings.Subscribe(_ =>
                 this.DomainsOfExpertise.ForEach(d => d.IsSelected = this.SelectAllThings));
 
-            this.DomainsOfExpertise = new ReactiveList<DomainOfExpertiseRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.DomainsOfExpertise = new ReactiveList<DomainOfExpertiseRowViewModel>();
 
             foreach (var domain in this.serverSession.RetrieveSiteDirectory().Domain)
             {
